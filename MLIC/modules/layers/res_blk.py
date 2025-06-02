@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 from compressai.layers import GDN, subpel_conv3x3
-from modules.layers.conv import conv1x1, conv3x3
+from MLIC.MLIC.modules.layers.conv import conv1x1, conv3x3
 
 
 class AttentionBlock(nn.Module):

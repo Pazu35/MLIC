@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from compressai.layers import subpel_conv3x3, AttentionBlock
-from modules.layers.conv import conv1x1, conv3x3, conv, deconv
-from modules.layers.res_blk import *
+from MLIC.MLIC.modules.layers.conv import conv1x1, conv3x3, conv, deconv
+from MLIC.MLIC.modules.layers.res_blk import *
 
 
 class HyperSynthesis(nn.Module):
@@ -20,7 +20,7 @@ class HyperSynthesis(nn.Module):
             nn.GELU(),
             subpel_conv3x3(M, M, 2),
             nn.GELU(),
-            conv3x3(M, M * 3 // 2),
+            conv3x3(M, M * 3 // 2),  ###? pourquoi 3
             nn.GELU(),
             subpel_conv3x3(M * 3 // 2, M * 3 // 2, 2),
             nn.GELU(),
@@ -44,7 +44,7 @@ class SynthesisTransformOld(nn.Module):
             ResidualBlock(N, N),
             ResidualBlockUpsample(N, N, 2),
             ResidualBlock(N, N),
-            subpel_conv3x3(N, 3, 2),
+            subpel_conv3x3(N, 157, 2),
         )
 
     def forward(self, x):
@@ -64,7 +64,7 @@ class SynthesisTransform(nn.Module):
             ResidualBlock(N, N),
             ResidualBlockUpsample(N, N, 2),
             ResidualBlock(N, N),
-            subpel_conv3x3(N, 3, 2),
+            subpel_conv3x3(N, 157, 2),
         )
 
     def forward(self, x):

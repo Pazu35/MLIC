@@ -2,15 +2,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from compressai.layers import subpel_conv3x3
-from modules.layers.conv import conv1x1, conv3x3, conv, deconv
-from modules.layers.res_blk import *
+from MLIC.MLIC.modules.layers.conv import conv1x1, conv3x3, conv, deconv
+from MLIC.MLIC.modules.layers.res_blk import *
 
 
 class AnalysisTransform(nn.Module):
     def __init__(self, N, M):
         super().__init__()
         self.analysis_transform = nn.Sequential(
-            ResidualBlockWithStride(3, N, stride=2),
+            ResidualBlockWithStride(157, N, stride=2),
             ResidualBlock(N, N),
             ResidualBlockWithStride(N, N, stride=2),
             ResidualBlock(N, N),

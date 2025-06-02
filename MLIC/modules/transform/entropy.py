@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from modules.layers.attention import MLP
+from MLIC.MLIC.modules.layers.attention import MLP
 
 
 class EntropyParameters(nn.Module):

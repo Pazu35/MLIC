@@ -3,9 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.init import trunc_normal_
 from einops import rearrange
-from modules.layers import MLP, build_position_index
-from modules.layers import conv, deconv
-from utils.ckbd import *
+from MLIC.MLIC.modules.layers import MLP, build_position_index
+from MLIC.MLIC.modules.layers import conv, deconv
+from MLIC.MLIC.utils.ckbd import *
 
 
 class LocalContext(nn.Module):

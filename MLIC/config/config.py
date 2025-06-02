@@ -1,5 +1,5 @@
 import torch.nn as nn
-from utils.utils import Config
+from MLIC.MLIC.utils.utils import Config
 
 def model_config():
     config = Config({

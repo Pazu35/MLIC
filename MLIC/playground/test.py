@@ -12,8 +12,8 @@ from torchvision import transforms
 from torch.utils.data import DataLoader
 from PIL import ImageFile, Image
 from models import *
-from utils.testing import test_model
-from utils.logger import setup_logger
+from MLIC.utils.testing import test_model
+from MLIC.utils.logger import setup_logger
 
 
 def main():

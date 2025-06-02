@@ -12,11 +12,11 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 from transformers import get_linear_schedule_with_warmup
 from compressai.datasets import ImageFolder
-from utils.logger import setup_logger
-from utils.utils import CustomDataParallel, save_checkpoint
-from utils.optimizers import configure_optimizers
-from utils.training import warmup_one_epoch
-from utils.testing import test_one_epoch
+from MLIC.utils.logger import setup_logger
+from MLIC.utils.utils import CustomDataParallel, save_checkpoint
+from MLIC.utils.optimizers import configure_optimizers
+from MLIC.utils.training import warmup_one_epoch
+from MLIC.utils.testing import test_one_epoch
 from loss.rd_loss import RateDistortionLoss
 from config.args import train_options
 from config.config import model_config

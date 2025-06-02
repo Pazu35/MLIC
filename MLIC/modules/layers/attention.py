@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 from torch.nn.init import trunc_normal_
 from torch.nn import functional as F
-from timm.models.layers import to_2tuple
-from modules.layers.res_blk import ResidualBottleneck
+#from timm.models.layers import to_2tuple
+from MLIC.MLIC.modules.layers.res_blk import ResidualBottleneck
 
 class MLP(nn.Module):
 

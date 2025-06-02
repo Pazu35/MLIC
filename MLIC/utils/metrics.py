@@ -11,17 +11,17 @@ def compute_metrics(
     max_val: float = 255.0,
 ) -> Tuple[float, float]:
     """Returns PSNR and MS-SSIM between images `a` and `b`. """
-    if isinstance(a, Image.Image):
-        a = np.asarray(a)
-    if isinstance(b, Image.Image):
-        b = np.asarray(b)
+    # if isinstance(a, Image.Image):
+    #     a = np.asarray(a)
+    # if isinstance(b, Image.Image):
+    #     b = np.asarray(b)
 
-    a = torch.from_numpy(a.copy()).float().unsqueeze(0)
-    if a.size(3) == 3:
-        a = a.permute(0, 3, 1, 2)
-    b = torch.from_numpy(b.copy()).float().unsqueeze(0)
-    if b.size(3) == 3:
-        b = b.permute(0, 3, 1, 2)
+    # a = torch.from_numpy(a.copy()).float().unsqueeze(0)
+    # if a.size(3) == 3:
+    #     a = a.permute(0, 3, 1, 2)
+    # b = torch.from_numpy(b.copy()).float().unsqueeze(0)
+    # if b.size(3) == 3:
+    #     b = b.permute(0, 3, 1, 2)
 
     mse = torch.mean((a - b) ** 2).item()
     p = 20 * np.log10(max_val) - 10 * np.log10(mse)

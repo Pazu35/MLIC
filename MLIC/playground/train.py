@@ -1,3 +1,10 @@
+import os 
+import sys
+
+running_path = "/Odyssey/private/o23gauvr/code/"
+os.chdir(running_path)
+sys.path.insert(0,running_path)
+
 import os
 import random
 import logging
@@ -11,19 +18,23 @@ from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from compressai.datasets import ImageFolder
-from utils.logger import setup_logger
-from utils.utils import CustomDataParallel, save_checkpoint
-from utils.optimizers import configure_optimizers
-from utils.training import train_one_epoch
-from utils.testing import test_one_epoch
-from loss.rd_loss import RateDistortionLoss
-from config.args import train_options
-from config.config import model_config
-from models import *
+from MLIC.MLIC.utils.logger import setup_logger
+from MLIC.MLIC.utils.utils import CustomDataParallel, save_checkpoint
+from MLIC.MLIC.utils.optimizers import configure_optimizers
+from MLIC.MLIC.utils.training import train_one_epoch
+from MLIC.MLIC.utils.testing import test_one_epoch
+from MLIC.MLIC.loss.rd_loss import RateDistortionLoss
+from MLIC.MLIC.config.args import train_options
+from MLIC.MLIC.config.config import model_config
+from MLIC.MLIC.models import *
 import random
+import pickle
+import xarray as xr
+from FASCINATION.src.autoencoder_datamodule import AutoEncoderDatamodule_3D
 
 
-def main():
+
+def main(dm):
     torch.backends.cudnn.benchmark = True
     ImageFile.LOAD_TRUNCATED_IMAGES = True
     Image.MAX_IMAGE_PIXELS = None
@@ -51,10 +62,10 @@ def main():
 
     logger_train = logging.getLogger('train')
     logger_val = logging.getLogger('val')
-    tb_logger = SummaryWriter(log_dir='./tb_logger/' + args.experiment)
+    tb_logger = SummaryWriter(log_dir='/Odyssey/private/o23gauvr/code/MLIC/tb_logger/' + args.experiment)
 
-    if not os.path.exists(os.path.join('./experiments', args.experiment, 'checkpoints')):
-        os.makedirs(os.path.join('./experiments', args.experiment, 'checkpoints'))
+    if not os.path.exists(os.path.join('/Odyssey/private/o23gauvr/code/MLIC/experiments', args.experiment, 'checkpoints')):
+        os.makedirs(os.path.join('/Odyssey/private/o23gauvr/code/MLIC/experiments', args.experiment, 'checkpoints'))
 
     train_transforms = transforms.Compose(
         [transforms.RandomCrop(args.patch_size), transforms.ToTensor()]
@@ -63,24 +74,30 @@ def main():
         [transforms.ToTensor()]
     )
 
-    train_dataset = ImageFolder(args.dataset, split="train", transform=train_transforms)
-    test_dataset = ImageFolder(args.dataset, split="test", transform=test_transforms)
+    if dm==None:
+            
+        train_dataset = ImageFolder(args.dataset, split="train", transform=train_transforms)
+        test_dataset = ImageFolder(args.dataset, split="test", transform=test_transforms)
 
-    train_dataloader = DataLoader(
-        train_dataset,
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
-        shuffle=True,
-        pin_memory=(device == "cuda"),
-    )
+        train_dataloader = DataLoader(
+            train_dataset,
+            batch_size=args.batch_size,
+            num_workers=args.num_workers,
+            shuffle=True,
+            pin_memory=(device == "cuda"),
+        )
 
-    test_dataloader = DataLoader(
-        test_dataset,
-        batch_size=args.test_batch_size,
-        num_workers=args.num_workers,
-        shuffle=False,
-        pin_memory=(device == "cuda"),
-    )
+        test_dataloader = DataLoader(
+            test_dataset,
+            batch_size=args.test_batch_size,
+            num_workers=args.num_workers,
+            shuffle=False,
+            pin_memory=(device == "cuda"),
+        )
+    
+    else:
+        train_dataloader = dm["train"]
+        test_dataloader = dm["test"]
 
     net = MLICPlusPlus(config=config)
     if args.cuda and torch.cuda.device_count() > 1:
@@ -134,7 +151,7 @@ def main():
             current_step
         )
 
-        save_dir = os.path.join('./experiments', args.experiment, 'val_images', '%03d' % (epoch + 1))
+        save_dir = os.path.join('/Odyssey/private/o23gauvr/code/MLIC/experiments', args.experiment, 'val_images', '%03d' % (epoch + 1))
         loss = test_one_epoch(epoch, test_dataloader, net, criterion, save_dir, logger_val, tb_logger)
 
         lr_scheduler.step()
@@ -142,7 +159,7 @@ def main():
         best_loss = min(loss, best_loss)
 
         net.update(force=True)
-        if args.save:
+        if args.save and is_best:
             save_checkpoint(
                 {
                     "epoch": epoch + 1,
@@ -153,10 +170,66 @@ def main():
                     "lr_scheduler": lr_scheduler.state_dict(),
                 },
                 is_best,
-                os.path.join('./experiments', args.experiment, 'checkpoints', "checkpoint_%03d.pth.tar" % (epoch + 1))
+                os.path.join('/Odyssey/private/o23gauvr/code/MLIC/experiments', args.experiment, 'checkpoints', "checkpoint_%03d.pth.tar" % (epoch + 1))
             )
             if is_best:
                 logger_val.info('best checkpoint saved.')
 
-if __name__ == '__main__':
-    main()
+if __name__ == '__main__':  
+
+    load_datamodule = False
+    dm_path = "/Odyssey/private/o23gauvr/code/FASCINATION/pickle/natl_dm_4_157_196_256.pkl"
+
+
+    sys.argv = [
+        "train.py",
+        "--metrics", "mse",
+        "--exp", "mlicpp_on_ssp",
+        "--gpu_id", "0",
+        "--epochs", "34000",
+        "--lambda", "0.0018",
+        "-lr", "1e-4",
+        "--clip_max_norm", "1.0",
+        "--seed", "42",
+        "--batch-size", "32",
+        "--patch-size", "196", "256"
+    ]
+
+    if load_datamodule:
+        with open(dm_path, 'rb') as f:
+            datamodule = pickle.load(f)
+            dm={"train": datamodule.train_dataloader(), "test": datamodule.test_dataloader()}
+
+    else:
+
+        data_path ={"enatl": "/Odyssey/public/enatl60/celerity/eNATL60_BLB002_sound_speed_regrid_0_botm.nc",
+                "natl": "/Odyssey/public/natl60/celerity/NATL60GULF-CJM165_sound_speed_regrid_0_botm.nc"}
+
+
+        datamodule = AutoEncoderDatamodule_3D(
+        input_da=xr.open_dataarray(data_path["natl"]),         # your xarray DataArray
+        dl_kw={"batch_size": 4, "num_workers": 2},
+        norm_stats={"method": "min_max", "params": {"mean": None, "std": None}},
+        pooled_dim="dense",
+        depth_pre_treatment={"method": None},
+        manage_nan="supress_with_max_depth",
+        n_profiles=None,
+        reshape=["factor_64"], #"RGB"
+        dtype_str="float32"
+        )
+
+
+        datamodule.setup(stage="fit")
+        train_dataloader = datamodule.train_dataloader()
+
+        datamodule.setup(stage="test")
+        test_dataloader = datamodule.test_dataloader()
+
+        dm={"train": train_dataloader, "test": test_dataloader}
+
+        with open(dm_path, 'wb') as f:
+            pickle.dump(datamodule, f)
+
+
+
+    main(dm)
