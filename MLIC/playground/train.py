@@ -34,13 +34,13 @@ from FASCINATION.src.autoencoder_datamodule import AutoEncoderDatamodule_3D
 
 
 
-def main(dm):
+def main(dm,config):
     torch.backends.cudnn.benchmark = True
     ImageFile.LOAD_TRUNCATED_IMAGES = True
     Image.MAX_IMAGE_PIXELS = None
 
     args = train_options()
-    config = model_config()
+    #config = model_config()
 
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id)
     device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
@@ -52,8 +52,8 @@ def main(dm):
     torch.manual_seed(seed)
     random.seed(seed)
 
-    if not os.path.exists(os.path.join('./experiments', args.experiment)):
-        os.makedirs(os.path.join('./experiments', args.experiment))
+    if not os.path.exists(os.path.join('/Odyssey/private/o23gauvr/code/MLIC/experiments', args.experiment)):
+        os.makedirs(os.path.join('/Odyssey/private/o23gauvr/code/MLIC/experiments', args.experiment))
 
     setup_logger('train', os.path.join('./experiments', args.experiment), 'train_' + args.experiment, level=logging.INFO,
                         screen=True, tofile=True)
@@ -177,9 +177,6 @@ def main(dm):
 
 if __name__ == '__main__':  
 
-    load_datamodule = False
-    dm_path = "/Odyssey/private/o23gauvr/code/FASCINATION/pickle/natl_dm_4_157_196_256.pkl"
-
 
     sys.argv = [
         "train.py",
@@ -189,11 +186,23 @@ if __name__ == '__main__':
         "--epochs", "34000",
         "--lambda", "0.0018",
         "-lr", "1e-4",
+        "--num-workers", "16",
         "--clip_max_norm", "1.0",
         "--seed", "42",
         "--batch-size", "32",
         "--patch-size", "196", "256"
     ]
+
+    cfg = model_config()
+    cfg["N"] = 249
+    cfg["M"] = 320
+    # cfg["slice_num"] = 10
+    # cfg["context_window"] = 5
+
+
+    load_datamodule = True
+    dm_path = "/Odyssey/private/o23gauvr/code/FASCINATION/pickle/natl_dm_4_157_196_256.pkl"
+
 
     if load_datamodule:
         with open(dm_path, 'rb') as f:
@@ -232,4 +241,4 @@ if __name__ == '__main__':
 
 
 
-    main(dm)
+    main(dm,cfg)
