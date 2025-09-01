@@ -7,10 +7,10 @@ from MLIC.MLIC.modules.layers.res_blk import *
 
 
 class AnalysisTransform(nn.Module):
-    def __init__(self, N, M):
+    def __init__(self, in_channels, N, M):
         super().__init__()
         self.analysis_transform = nn.Sequential(
-            ResidualBlockWithStride(157, N, stride=2),
+            ResidualBlockWithStride(in_channels, N, stride=2),
             ResidualBlock(N, N),
             ResidualBlockWithStride(N, N, stride=2),
             ResidualBlock(N, N),

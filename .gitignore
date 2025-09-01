@@ -1,6 +1,40 @@
-# Ignore some files
-*.pyc
+# Ignore Jupyter notebook images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.svg
+
+# Ignore archive files
 *.tar
-*.0
-*.out
-*.DS_store
+
+
+# Ignore Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore virtual environment directories
+venv/
+env/
+
+# Ignore Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.bak
+*.old
+
+# ignore tb_logger directory
+tb_logger/
+# ignore experiments directory
+experiments/

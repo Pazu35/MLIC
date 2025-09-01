@@ -111,10 +111,11 @@ class CustomDataParallel(nn.DataParallel):
 
 def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
     Path(filename).parent.mkdir(parents=True, exist_ok=True)
-    torch.save(state, filename)
+    
     if is_best:
-        best_filename = filename.replace(filename.split('/')[-1], "checkpoint_best_loss.pth.tar")
-        shutil.copyfile(filename, best_filename)
+        filename = filename.replace(filename.split('/')[-1], "checkpoint_best_loss.pth.tar")
+        torch.save(state, filename)
+        #shutil.copyfile(filename, best_filename)
 
 
 def split_data(source_path, destination_path, train_file):

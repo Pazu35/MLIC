@@ -16,10 +16,12 @@ class MLICPlusPlus(CompressionModel):
         super().__init__(config.N, **kwargs)
         N = config.N
         M = config.M
+        in_channels = getattr(config, "in_channels", 157)
         context_window = config.context_window
         slice_num = config.slice_num
         slice_ch = M // slice_num
         assert slice_ch * slice_num == M
+        assert slice_ch%32==0
 
         self.N = N
         self.M = M
@@ -27,8 +29,8 @@ class MLICPlusPlus(CompressionModel):
         self.slice_num = slice_num
         self.slice_ch = slice_ch
 
-        self.g_a = AnalysisTransform(N=N, M=M)
-        self.g_s = SynthesisTransform(N=N, M=M)
+        self.g_a = AnalysisTransform(N=N, M=M, in_channels=in_channels)
+        self.g_s = SynthesisTransform(N=N, M=M, out_channels=in_channels)
 
         self.h_a = HyperAnalysis(M=M, N=N)
         self.h_s = HyperSynthesis(M=M, N=N)
@@ -373,14 +375,14 @@ class MLICPlusPlus(CompressionModel):
             "cost_time": cost_time
         }
 
-    def load_state_dict(self, state_dict):
+    def load_state_dict(self, state_dict, strict=True):
         update_registered_buffers(
             self.gaussian_conditional,
             "gaussian_conditional",
             ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
             state_dict,
         )
-        super().load_state_dict(state_dict)
+        super().load_state_dict(state_dict, strict=strict)
 
     def update(self, scale_table=None, force=False):
         if scale_table is None:

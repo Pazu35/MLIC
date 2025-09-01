@@ -34,7 +34,7 @@ class HyperSynthesis(nn.Module):
 
 
 class SynthesisTransformOld(nn.Module):
-    def __init__(self, N, M):
+    def __init__(self, N, M, out_channels):
         super().__init__()
         self.synthesis_transform = nn.Sequential(
             ResidualBlock(M, N),
@@ -44,7 +44,7 @@ class SynthesisTransformOld(nn.Module):
             ResidualBlock(N, N),
             ResidualBlockUpsample(N, N, 2),
             ResidualBlock(N, N),
-            subpel_conv3x3(N, 157, 2),
+            subpel_conv3x3(N, out_channels, 2),
         )
 
     def forward(self, x):
@@ -54,7 +54,7 @@ class SynthesisTransformOld(nn.Module):
 
 
 class SynthesisTransform(nn.Module):
-    def __init__(self, N, M):
+    def __init__(self, N, M, out_channels):
         super().__init__()
         self.synthesis_transform = nn.Sequential(
             ResidualBlock(M, M),
@@ -64,7 +64,7 @@ class SynthesisTransform(nn.Module):
             ResidualBlock(N, N),
             ResidualBlockUpsample(N, N, 2),
             ResidualBlock(N, N),
-            subpel_conv3x3(N, 157, 2),
+            subpel_conv3x3(N, out_channels, 2),
         )
 
     def forward(self, x):

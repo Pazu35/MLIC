@@ -123,6 +123,12 @@ def train_options():
         default='env://',
         help='url used to set up distributed training'
     )
+    parser.add_argument(
+        "--gradient_accumulation_steps",
+        default=1,
+        type=int,
+        help="Number of gradient accumulation steps (default: %(default)s)"
+    )
     args = parser.parse_args()
     return args
 
