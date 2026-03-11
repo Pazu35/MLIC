@@ -62,13 +62,18 @@ def train_options():
     parser.add_argument(
         "--test-batch-size",
         type=int,
-        default=1,
+        default=4,
         help="Test batch size (default: %(default)s)",
     )
     parser.add_argument(
         "--aux-learning-rate",
         default=1e-3,
         help="Auxiliary loss learning rate (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--loss-learning-rate",
+        default=1e-2,
+        help="Loss loss learning rate (default: %(default)s)",
     )
     parser.add_argument(
         "--patch-size",
@@ -90,7 +95,8 @@ def train_options():
     )
     parser.add_argument(
         "--save",
-        default=True,
+        action = "store_true",
+        default=False,
         help="Save model to disk"
     )
     parser.add_argument(
@@ -129,6 +135,13 @@ def train_options():
         type=int,
         help="Number of gradient accumulation steps (default: %(default)s)"
     )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        default=False,
+        help="Enable verbose for training"
+    )
+
     args = parser.parse_args()
     return args
 
@@ -179,11 +192,13 @@ def test_options():
     parser.add_argument(
         "--cuda",
         default=True,
+        type=bool,
         help="Use cuda"
     )
     parser.add_argument(
         "--save",
-        default=True,
+        action="store_true",
+        default=False,
         help="Save model to disk"
     )
     parser.add_argument(
@@ -193,5 +208,13 @@ def test_options():
         type=str,
         help="pretrained model path"
     )
+
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        default=False,
+        help="Enable verbose for training"
+    )
+
     args = parser.parse_args()
     return args

@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 
-def configure_optimizers(net, args):
+def configure_optimizers(net, criterion, args):
     """Separate parameters for the main optimizer and the auxiliary optimizer.
     Return two optimizers"""
 
@@ -13,6 +13,9 @@ def configure_optimizers(net, args):
     aux_parameters = [
         p for n, p in net.named_parameters() if n.endswith(".quantiles")
     ]
+
+    #loss_parameters = [criterion.log_vars]
+    #loss_parameters = [
 
     # Make sure we don't have an intersection of parameters
     params_dict = dict(net.named_parameters())
@@ -30,4 +33,14 @@ def configure_optimizers(net, args):
         (p for p in aux_parameters if p.requires_grad),
         lr=args.aux_learning_rate,
     )
-    return optimizer, aux_optimizer
+
+    if len (list(criterion.parameters())) > 0:
+        print("Configuring loss optimizer")
+        loss_optimizer = optim.Adam(
+            (p for p in criterion.parameters() if p.requires_grad),
+            lr=args.loss_learning_rate,
+        )
+    else:
+        loss_optimizer = None
+
+    return optimizer, aux_optimizer, loss_optimizer

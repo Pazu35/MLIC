@@ -1,3 +1,4 @@
+import os
 import PIL.Image as Image
 import shutil
 import torch
@@ -109,12 +110,15 @@ class CustomDataParallel(nn.DataParallel):
             return getattr(self.module, key)
 
 
-def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
-    Path(filename).parent.mkdir(parents=True, exist_ok=True)
+def save_checkpoint(state, dir_path = "/Odyssey/private/o23gauvr/code/MLIC/experiments",filename="checkpoint.pth.tar"):
+    Path(dir_path).mkdir(parents=True, exist_ok=True)
+    filename = os.path.join(dir_path, filename)
     
-    if is_best:
-        filename = filename.replace(filename.split('/')[-1], "checkpoint_best_loss.pth.tar")
-        torch.save(state, filename)
+    torch.save(state, filename)
+
+    #if is_best:
+        #filename = filename.replace(filename.split('/')[-1], "checkpoint_best_loss.pth.tar")
+        
         #shutil.copyfile(filename, best_filename)
 
 

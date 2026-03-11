@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 
 def train_one_epoch(
-    model, criterion, train_dataloader, optimizer, aux_optimizer, epoch, clip_max_norm, logger_train, tb_logger, current_step, gradient_accumulation_steps=1
+    model, criterion, train_dataloader, optimizer, aux_optimizer, loss_optimizer, epoch, clip_max_norm, logger_train, tb_logger, current_step, gradient_accumulation_steps=1
 ):
     model.train()
     device = next(model.parameters()).device
@@ -16,6 +16,7 @@ def train_one_epoch(
         if i % gradient_accumulation_steps == 0:
             optimizer.zero_grad()
             aux_optimizer.zero_grad()
+            loss_optimizer.zero_grad()
 
         out_net = model(d)
         out_criterion = criterion(out_net, d)
@@ -34,35 +35,38 @@ def train_one_epoch(
             aux_loss = model.aux_loss() / gradient_accumulation_steps
             aux_loss.backward()
             aux_optimizer.step()
+            loss_optimizer.step()
 
         current_step += 1
         if current_step % 100 == 0:
+            for key, value in out_criterion.items():
+                tb_logger.add_scalar('{}'.format(f'[train]: {key}'), value.item(), current_step)
+
             # Log original (unscaled) loss values for TensorBoard
-            tb_logger.add_scalar('{}'.format('[train]: loss'), out_criterion["loss"].item(), current_step)
-            tb_logger.add_scalar('{}'.format('[train]: bpp_loss'), out_criterion["bpp_loss"].item(), current_step)
+            # tb_logger.add_scalar('{}'.format('[train]: loss'), out_criterion["loss"].item(), current_step)
+            # tb_logger.add_scalar('{}'.format('[train]: bpp_loss'), out_criterion["bpp_loss"].item(), current_step)
             tb_logger.add_scalar('{}'.format('[train]: lr'), optimizer.param_groups[0]['lr'], current_step)
             tb_logger.add_scalar('{}'.format('[train]: aux_loss'), model.aux_loss().item(), current_step)
-            if out_criterion["mse_loss"] is not None:
-                tb_logger.add_scalar('{}'.format('[train]: mse_loss'), out_criterion["mse_loss"].item(), current_step)
-            if out_criterion["ms_ssim_loss"] is not None:
-                tb_logger.add_scalar('{}'.format('[train]: ms_ssim_loss'), out_criterion["ms_ssim_loss"].item(), current_step)
+            
 
         if i % 100 == 0:
+            criterion_log = " | ".join(
+                f"{k}: {v.item():.4f}" if torch.is_tensor(v) else f"{k}: {v}"
+                for k, v in out_criterion.items()
+            )
+
             logger_train.info(
-                f"Train epoch {epoch}: ["
-                f"{i*len(d)}/{len(train_dataloader.dataset)}"
-                f" ({100. * i / len(train_dataloader):.0f}%)]"
-                f'\tLoss: {out_criterion["loss"].item():.3f} |'
-                f'\tMSE loss: {out_criterion["mse_loss"].item():.3f} |' if out_criterion["mse_loss"] is not None else ""
-                f'\tBpp loss: {out_criterion["bpp_loss"].item():.2f} |'
-                f'\tAux loss: {model.aux_loss().item():.2f}'
+                f"Train epoch {epoch}: "
+                f"[{i*len(d)}/{len(train_dataloader.dataset)} "
+                f"({100. * i / len(train_dataloader):.0f}%)]\t"
+                f"{criterion_log} | Aux loss: {model.aux_loss().item():.4f}"
             )
 
     return current_step
 
 
 def warmup_one_epoch(
-    model, criterion, train_dataloader, optimizer, aux_optimizer, epoch, clip_max_norm, logger_train, tb_logger, current_step, lr_scheduler
+    model, criterion, train_dataloader, optimizer, aux_optimizer, loss_optimizer, epoch, clip_max_norm, logger_train, tb_logger, current_step, lr_scheduler
 ):
     model.train()
     device = next(model.parameters()).device
@@ -72,6 +76,7 @@ def warmup_one_epoch(
 
         optimizer.zero_grad()
         aux_optimizer.zero_grad()
+        loss_optimizer.zero_grad()
 
         out_net = model(d)
 
@@ -85,40 +90,29 @@ def warmup_one_epoch(
         aux_loss = model.aux_loss()
         aux_loss.backward()
         aux_optimizer.step()
+        loss_optimizer.step()
 
         current_step += 1
         if current_step % 100 == 0:
-            tb_logger.add_scalar('{}'.format('[train]: loss'), out_criterion["loss"].item(), current_step)
-            tb_logger.add_scalar('{}'.format('[train]: bpp_loss'), out_criterion["bpp_loss"].item(), current_step)
+            for key, value in out_criterion.items():
+                tb_logger.add_scalar('{}'.format(f'[train]: {key}'), value.item(), current_step)
+
             tb_logger.add_scalar('{}'.format('[train]: lr'), optimizer.param_groups[0]['lr'], current_step)
             tb_logger.add_scalar('{}'.format('[train]: aux_loss'), aux_loss.item(), current_step)
-            if out_criterion["mse_loss"] is not None:
-                tb_logger.add_scalar('{}'.format('[train]: mse_loss'), out_criterion["mse_loss"].item(), current_step)
-            if out_criterion["ms_ssim_loss"] is not None:
-                tb_logger.add_scalar('{}'.format('[train]: ms_ssim_loss'), out_criterion["ms_ssim_loss"].item(), current_step)
+
 
         if i % 100 == 0:
-            if out_criterion["ms_ssim_loss"] is None:
-                logger_train.info(
-                    f"Train epoch {epoch}: ["
-                    f"{i*len(d):5d}/{len(train_dataloader.dataset)}"
-                    f" ({100. * i / len(train_dataloader):.0f}%)] "
-                    f'Lr: {optimizer.param_groups[0]["lr"]:.6f} | '
-                    f'Loss: {out_criterion["loss"].item():.4f} | '
-                    f'MSE loss: {out_criterion["mse_loss"].item():.4f} | '
-                    f'Bpp loss: {out_criterion["bpp_loss"].item():.2f} | '
-                    f"Aux loss: {aux_loss.item():.2f}"
-                )
-            else:
-                logger_train.info(
-                    f"Train epoch {epoch}: ["
-                    f"{i*len(d):5d}/{len(train_dataloader.dataset)}"
-                    f" ({100. * i / len(train_dataloader):.0f}%)] "
-                    f'Lr: {optimizer.param_groups[0]["lr"]:.6f} | '
-                    f'Loss: {out_criterion["loss"].item():.4f} | '
-                    f'MS-SSIM loss: {out_criterion["ms_ssim_loss"].item():.4f} | '
-                    f'Bpp loss: {out_criterion["bpp_loss"].item():.2f} | '
-                    f"Aux loss: {aux_loss.item():.2f}"
-                )
+            criterion_log = " | ".join(
+                f"{k}: {v.item():.4f}" if torch.is_tensor(v) else f"{k}: {v}"
+                for k, v in out_criterion.items()
+            )
+
+            logger_train.info(
+                f"Train epoch {epoch}: "
+                f"[{i*len(d)}/{len(train_dataloader.dataset)} "
+                f"({100. * i / len(train_dataloader):.0f}%)]\t"
+                f"{criterion_log} | Aux loss: {model.aux_loss().item():.4f}"
+            )
+
 
     return current_step
