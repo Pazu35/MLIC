@@ -2,6 +2,7 @@ import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 from MLIC.MLIC.utils.metrics import compute_psnr, get_f1_score
 from MLIC.MLIC.utils.utils import *
 
@@ -26,9 +27,11 @@ def test_one_epoch(epoch, test_dataloader, model, criterion, save_dir, logger_va
 
     criterion_losses = {}
 
-    norm_stats = test_dataloader.dataset.input.attrs["norm_stats"]
+    
     rgb_model = test_dataloader.dataset.input.attrs.get("rgb_model", None)
-    #depth_array = test_dataloader.dataset.input.attrs["depth"]
+    depth_array = test_dataloader.dataset.input.z.values.astype(test_dataloader.dataset.input.dtype)
+    
+    norm_stats = test_dataloader.dataset.input.attrs["norm_stats"]
     season_idx_list = test_dataloader.dataset.input.attrs.get("season_idx", None)
     sst_full = test_dataloader.dataset.input.attrs.get("sst", None)
 
@@ -118,8 +121,8 @@ def test_one_epoch(epoch, test_dataloader, model, criterion, save_dir, logger_va
 
             rmse_loss.update(torch.sqrt(F.mse_loss(out_net['x_hat'], d)))
 
-            ecs = torch.abs(torch.argmax(out_net['x_hat'],dim=1) - torch.argmax(d,dim=1))
-            ecs_loss.update(ecs.float().mean())
+            ecs = np.abs(depth_array[torch.argmax(out_net['x_hat'],dim=1).detach().cpu()] - depth_array[torch.argmax(d,dim=1).detach().cpu()])
+            ecs_loss.update(ecs.mean())
 
             for key, value in out_criterion.items():
                 if value is not None and torch.is_tensor(value):

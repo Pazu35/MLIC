@@ -45,7 +45,7 @@ def compute_psnr(
 
 
 
-def get_min_max_idx(arr,axs=1, pad=True):
+def get_min_max_idx(arr,axs=1, pad=False):
     grad = np.diff(arr,axis=axs)
     grad_sign = np.sign(grad)
     min_max = np.diff(grad_sign,axis=axs) 

@@ -205,6 +205,9 @@ def main(dm,config, loss_params,checkpoint_dir_name):
         net = CustomDataParallel(net)
     net = net.to(device)
 
+    if dm.dtype_str == "float64":
+        net = net.double()
+
     if loss_params["method"] == "original":
         criterion = RateDistortionLoss(lmbda=args.lmbda, metrics=args.metrics)
     elif loss_params["method"] == "homoscedastic":
@@ -541,7 +544,7 @@ if __name__ == '__main__':
     sys.argv = [
         "train.py",
         #"--metrics", "mse",
-        "--exp", "test_loss", #"mlicpp_multi_loss_test_lr_step500",
+        "--exp", "article",  #"mlicpp_multi_loss_test_lr_step500",
         "--gpu_id", "0",
         "--epochs", "1500",
         "--lambda", "1.0",
@@ -553,7 +556,7 @@ if __name__ == '__main__':
         "--test-batch-size", "4",
         "--patch-size", "196", "256",
         "--gradient_accumulation_steps", "1",
-        #"--checkpoint", "/Odyssey/private/o23gauvr/code/MLIC/checkpoints/mlicpp_mse_q5_2960000.pth.tar",
+        #"--checkpoint", "/Odyssey/private/o23gauvr/code/FASCINATION/outputs/Tensorboard/test_enatl_natl/fixed_weight_loss_64_96_1.0_CR_10000.0_enatl_natl__mean_std_along_depth/20260323_190527/checkpoints/best_checkpoint_bpp_loss.pth.tar",
         "--save",
         #"--verbose", 
     ]
@@ -571,26 +574,27 @@ if __name__ == '__main__':
         # after, weights are normalized so that loss_dict values act as relative factors
         # e.g., weighted_recon=5.0 means 5x the weight of recon after normalization
         "loss_dict":{"recon": 1.0,
-                    "weighted_recon": 1.0, 
-                    "deriv": 1.0,
-                    "weighted_deriv": 1.0,  # weighted derivative loss (emphasis on first depth indices)
+                    "weighted_recon": 0.0, 
+                    "deriv": 0.0,
+                    "weighted_deriv": 0.0,  # weighted derivative loss (emphasis on first depth indices)
                     "curvature_recon": 0.0,
                     "soft_peak": 0.0,  # soft peak localization
                     "wasserstein_peak": 0.0,  # Wasserstein peak alignment
-                    "max_pos": 100.0,
-                    "max_value": 1.0,
+                    "max_pos": 0.0,
+                    "max_value": 0.0,
                     "extrema_pos": 0.0,
                     "extrema_value": 0.0},  
         "extrema_method": "minmax",
         "dlw_method": "uncertainty", #"uncertainty", "dwa", "gradnorm" #"ruw"
         "cr_treshold": 10000.0,
+        "recon_treshold": None,   #In RMSE will be convert to MSE 
         "lmbda": float(sys.argv[8]),
-        "use_smoothl1": True,
+        "use_smoothl1": False,
         "auto_normalize": False,
         "use_factor_weights": True,
         "factor_warmup_epochs": 150,  # Only used when method="factor"
     }
- 
+
 #        "lambda_deriv": 0.1,
 #        "lambda_extrema": 0.5
 
@@ -611,7 +615,7 @@ if __name__ == '__main__':
 
     rgb = {"use":False, "method":"depth_layers"} #PCA
     chn = "3" if rgb["use"] else "157"
-
+    dtype_str = "float32"
     # if rgb["use"] and rgb["method"] == "CAE":
     #     cae_ckpt_path = "/Odyssey/private/o23gauvr/code/FASCINATION/outputs/remote/outputs/CAE/CAE/channels_[5000, 3000, 1000, 3]/upsample_mode_trilinear/linear_layer_False/cr_100000/1_conv_per_layer/padding_cubic/interp_size_5/final_upsample_upsample/act_fn_LeakyRelu/use_final_act_fn_True/lr_0.001/normalization_mean_std_along_depth/manage_nan_supress_with_max_depth/n_profiles_None/2025-03-04_06-01/checkpoints/val_loss=0.01-epoch=970.ckpt"
     #     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -623,11 +627,14 @@ if __name__ == '__main__':
 
     load_datamodule = False
     save_dm = False
-    norm_method = "mean_std_along_depth"
-    dm_type = "good_split" #"enatl_natl" #"good_split"
-    data_name = "enatl" #enatl, natl, natl_sst
+    norm_method = "mean_std" #"mean_std_along_depth" #"mean_std_along_depth" #mean_std"
+    dm_type = "enatl_natl" #"enatl_natl" #"good_split"
+    data_name = "enatl_natl" #enatl_natl", natl, natl_sst
     data_name_dir = data_name if dm_type=="good_split" else ""
-    dm_path = f"/Odyssey/private/o23gauvr/code/FASCINATION/pickle/{data_name}_dm_157_196_256_good_split.pkl"
+   
+
+
+    dm_path = f"/Odyssey/private/o23gauvr/code/FASCINATION/pickle/{data_name}_dm_157_196_256_norm_per_split.pkl"
     if load_datamodule and os.path.exists(dm_path):
         with open(dm_path, 'rb') as f:
             datamodule = pickle.load(f)
@@ -659,7 +666,8 @@ if __name__ == '__main__':
                 manage_nan="supress_with_max_depth",
                 reshape=["factor_64"],
                 rgb=rgb,
-                dtype_str="float32"
+                dtype_str=dtype_str,
+                normalize_per_split=True
             )
         else:
             datamodule = AEDatamodule(
@@ -667,9 +675,10 @@ if __name__ == '__main__':
                 dl_kw={"batch_size": int(sys.argv[18]), "num_workers": int(sys.argv[12])},
                 norm_stats={"method": norm_method},
                 manage_nan="supress_with_max_depth",
-                reshape=["factor_64"],
+                reshape={"factor_64": True, "spatial_crop":0},
+                normalize_per_split=True,
                 rgb=rgb,
-                dtype_str="float32",
+                dtype_str=dtype_str,
                 shuffle=True,
             )
         datamodule.setup()
@@ -686,6 +695,25 @@ if __name__ == '__main__':
 
     datamodule.dl_kw['batch_size'] = int(sys.argv[18])
     datamodule.dl_kw['num_workers'] = int(sys.argv[12])
+
+    if loss_params['recon_treshold'] is not None:
+        tresh = loss_params['recon_treshold']
+        train_norm = datamodule.train_ds.input.attrs.get("norm_stats", None)
+        train_norm_method = train_norm["method"]
+        
+        if train_norm_method == "min_max":
+            x_min = train_norm["params"]["x_min"]
+            x_max = train_norm["params"]["x_max"]  
+            tresh = tresh / (x_max - x_min)
+        elif train_norm_method == "mean_std" or train_norm_method == "mean_std_along_depth":
+            mean = train_norm['params']["mean"]
+            std = train_norm['params']["std"]
+            tresh = tresh / std
+
+
+        loss_params['recon_treshold'] = tresh
+
+
 
     cfg["in_channels"] = datamodule.test_shape[1] # e.g., 3 for RGB, 157 for your current data
 
@@ -706,10 +734,20 @@ if __name__ == '__main__':
     with open(config_log_path, 'w') as f:
         f.write("="*50 + "\n")
         f.write(f"EXPERIMENT LOG - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write(f"Experiment name: {sys.argv[2]}\n")
         f.write("="*50 + "\n\n")
         f.write(f"Datamodule type: {dm_type}\n")
         f.write(f"Data name: {data_name}\n")
+        f.write(f"Load datamodule: {load_datamodule}\n")
+        f.write(f"Datamodule path: {dm_path}\n")
         f.write(f"Norm method: {norm_method}\n")
+        f.write("DATAMODULE PARAMETERS:\n")
+        f.write("-" * 23 + "\n")
+        for key, value in datamodule.__dict__.items():
+            f.write(f"{key}: {value}\n")
+        f.write("\n")
+        
+        
         f.write("\n")
         
         f.write("COMMAND LINE ARGUMENTS:\n")
@@ -739,8 +777,7 @@ if __name__ == '__main__':
         
         f.write("ADDITIONAL INFO:\n")
         f.write("-" * 15 + "\n")
-        f.write(f"Load datamodule: {load_datamodule}\n")
-        f.write(f"Datamodule path: {dm_path}\n")
+
         f.write(f"PyTorch version: {torch.__version__}\n")
         f.write(f"CUDA available: {torch.cuda.is_available()}\n")
         if torch.cuda.is_available():

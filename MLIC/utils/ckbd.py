@@ -24,7 +24,7 @@ def ckbd_split(y):
     return anchor, nonanchor
 
 def ckbd_merge(anchor, nonanchor):
-    # out = torch.zeros_like(anchor).to(anchor.device)
+    # out = torch.zeros_like(anchor).to(anchor.device anchor.dtype)
     # out[:, :, 0::2, 0::2] = non_anchor[:, :, 0::2, 0::2]
     # out[:, :, 1::2, 1::2] = non_anchor[:, :, 1::2, 1::2]
     # out[:, :, 0::2, 1::2] = anchor[:, :, 0::2, 1::2]
@@ -33,41 +33,41 @@ def ckbd_merge(anchor, nonanchor):
     return anchor + nonanchor
 
 def ckbd_anchor(y):
-    anchor = torch.zeros_like(y).to(y.device)
+    anchor = torch.zeros_like(y).to(y.device, y.dtype)
     anchor[:, :, 0::2, 1::2] = y[:, :, 0::2, 1::2]
     anchor[:, :, 1::2, 0::2] = y[:, :, 1::2, 0::2]
     return anchor
 
 def ckbd_nonanchor(y):
-    nonanchor = torch.zeros_like(y).to(y.device)
+    nonanchor = torch.zeros_like(y).to(y.device, y.dtype)
     nonanchor[:, :, 0::2, 0::2] = y[:, :, 0::2, 0::2]
     nonanchor[:, :, 1::2, 1::2] = y[:, :, 1::2, 1::2]
     return nonanchor
 
 def ckbd_anchor_sequeeze(y):
     B, C, H, W = y.shape
-    anchor = torch.zeros([B, C, H, W // 2]).to(y.device)
+    anchor = torch.zeros([B, C, H, W // 2]).to(y.device, y.dtype)
     anchor[:, :, 0::2, :] = y[:, :, 0::2, 1::2]
     anchor[:, :, 1::2, :] = y[:, :, 1::2, 0::2]
     return anchor
 
 def ckbd_nonanchor_sequeeze(y):
     B, C, H, W = y.shape
-    nonanchor = torch.zeros([B, C, H, W // 2]).to(y.device)
+    nonanchor = torch.zeros([B, C, H, W // 2]).to(y.device, y.dtype)
     nonanchor[:, :, 0::2, :] = y[:, :, 0::2, 0::2]
     nonanchor[:, :, 1::2, :] = y[:, :, 1::2, 1::2]
     return nonanchor
 
 def ckbd_anchor_unsequeeze(anchor):
     B, C, H, W = anchor.shape
-    y_anchor = torch.zeros([B, C, H, W * 2]).to(anchor.device)
+    y_anchor = torch.zeros([B, C, H, W * 2]).to(anchor.device, anchor.dtype)
     y_anchor[:, :, 0::2, 1::2] = anchor[:, :, 0::2, :]
     y_anchor[:, :, 1::2, 0::2] = anchor[:, :, 1::2, :]
     return y_anchor
 
 def ckbd_nonanchor_unsequeeze(nonanchor):
     B, C, H, W = nonanchor.shape
-    y_nonanchor = torch.zeros([B, C, H, W * 2]).to(nonanchor.device)
+    y_nonanchor = torch.zeros([B, C, H, W * 2]).to(nonanchor.device, nonanchor.dtype)
     y_nonanchor[:, :, 0::2, 0::2] = nonanchor[:, :, 0::2, :]
     y_nonanchor[:, :, 1::2, 1::2] = nonanchor[:, :, 1::2, :]
     return y_nonanchor

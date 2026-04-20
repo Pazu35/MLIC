@@ -583,6 +583,7 @@ class FixedWeightSSPLoss(nn.Module):
         lmbda=1e-2, 
         use_smoothl1=True,
         cr_treshold=10000.0,
+        recon_treshold=None,
         curvature_beta=10.0,
         peak_beta=20.0,  # sharpness for soft peak and Wasserstein
         # Poids fixes pour chaque loss
@@ -595,11 +596,16 @@ class FixedWeightSSPLoss(nn.Module):
     ):
         super().__init__()
         self.lmbda = lmbda
-        self.loss_dict = loss_dict
-        self.loss_weights = loss_dict.copy()
+
         self.extrema_method = extrema_method
         self.use_smoothl1 = use_smoothl1
-        self.cr_treshold = cr_treshold
+        self.recon_treshold = recon_treshold
+        self.cr_treshold = cr_treshold if recon_treshold is None else None  # If recon_treshold is set, ignore cr_treshold
+        if self.recon_treshold is not None:
+            loss_dict = {k:0.0 for k in loss_dict.keys()}
+            loss_dict["recon"] = 1.0  # Only use recon loss for factor weighting if recon_treshold is set
+        self.loss_dict = loss_dict
+        self.loss_weights = loss_dict.copy()
         self.curvature_beta = curvature_beta
         self.peak_beta = peak_beta
         self.auto_normalize = auto_normalize
@@ -671,6 +677,8 @@ class FixedWeightSSPLoss(nn.Module):
                         recon_loss = F.smooth_l1_loss(pred, target, reduction="mean")
                     else:
                         recon_loss = torch.mean((pred - target) ** 2)
+
+                    
                     losses_accum["recon"].append(recon_loss.item())
                 
                 if "weighted_recon" in self.loss_dict:
@@ -820,6 +828,11 @@ class FixedWeightSSPLoss(nn.Module):
                 recon_loss = F.smooth_l1_loss(pred, target, reduction="mean")
             else:
                 recon_loss = torch.mean((pred - target) ** 2)
+
+            
+            if self.recon_treshold is not None:
+                recon_loss = nn.ReLU()(recon_loss - self.recon_treshold)
+
             losses_dict["recon"] = recon_loss
         
         if "weighted_recon" in self.loss_dict:
