@@ -113,8 +113,13 @@ class CustomDataParallel(nn.DataParallel):
 def save_checkpoint(state, dir_path = "/Odyssey/private/o23gauvr/code/MLIC/experiments",filename="checkpoint.pth.tar"):
     Path(dir_path).mkdir(parents=True, exist_ok=True)
     filename = os.path.join(dir_path, filename)
-    
-    torch.save(state, filename)
+
+    # Write to a temporary file and rename: a job killed mid-write used to leave a
+    # truncated file in place of the previous good one (every last_checkpoint of the
+    # PF2/20260923_* runs, 24 Sep). os.replace is atomic on the same filesystem.
+    tmp = filename + ".tmp"
+    torch.save(state, tmp)
+    os.replace(tmp, filename)
 
     #if is_best:
         #filename = filename.replace(filename.split('/')[-1], "checkpoint_best_loss.pth.tar")

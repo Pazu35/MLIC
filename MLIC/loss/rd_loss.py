@@ -1,20 +1,242 @@
 import math
+import warnings
+from contextlib import contextmanager
+
 import torch
 import torch.nn as nn
 from pytorch_msssim import ms_ssim
 import torch.nn.functional as F
 import numpy as np
 from FASCINATION.src import differentiable_fonc as DF
+from MLIC.MLIC.loss import structure_losses as SL
+
+SIGNIFICANT_DEPTH_M = 762.0
+
+# Terms that are computed and logged but cannot train anything. `max_pos` is
+# `|argmax(pred) - argmax(target)|`: torch.argmax returns integer indices, the
+# result has no grad_fn, and adding it to the distortion sum adds a constant.
+# Four runs (A1, A3, A4, CX1) carried it at a non-zero weight and none of them
+# improved on it -- each finished *worse* on max_pos than the matched run that
+# never optimised it. Requesting one now raises, naming the replacement.
+INERT_LOSS_TERMS = {"max_pos": "soft_max_pos"}
+
+# Terms that have a gradient but a degenerate one, kept for backward
+# compatibility with existing configs and warned about once.
+DEGENERATE_LOSS_TERMS = {
+    "extrema_pos": ("it penalises the *centroid* of the extremum mask, so any "
+                    "rearrangement preserving the mean index is invisible to it; "
+                    "use local_extrema_pos"),
+    "matched_extrema_pos": ("its softmax is stabilised on the profile-wide extremum, "
+                            "so only the global max/min get a gradient, and its "
+                            "window is +/-1 level on the native axis, so it only "
+                            "reaches extrema already within tolerance (report "
+                            "section 14.4b); use local_extrema_pos"),
+}
+
+STRUCTURE_LOSS_TERMS = ("soft_max_pos", "matched_extrema_pos", "local_extrema_pos",
+                        "prominence_recall")
+
+
+def check_loss_dict(loss_dict, allow_inert=False):
+    """Refuse a configuration that asks for a term which cannot train.
+
+    Raising here rather than warning is deliberate: the alternative is another
+    2000-epoch run whose headline term contributed nothing, which is what the
+    first four attempts were.
+    """
+    offenders = {k: r for k, r in INERT_LOSS_TERMS.items()
+                 if float(loss_dict.get(k, 0.0) or 0.0) > 0}
+    if offenders and not allow_inert:
+        lines = [f"  '{k}' has no gradient -- use '{r}' instead"
+                 for k, r in offenders.items()]
+        raise ValueError(
+            "loss_dict requests inert term(s):\n" + "\n".join(lines)
+            + "\nThese are still computed and logged for continuity, but they "
+              "cannot train the network. Pass allow_inert_terms=True to "
+              "reproduce an old run deliberately."
+        )
+    for k, why in DEGENERATE_LOSS_TERMS.items():
+        if float(loss_dict.get(k, 0.0) or 0.0) > 0:
+            warnings.warn(f"loss term '{k}' is degenerate: {why}", RuntimeWarning,
+                          stacklevel=2)
+
+
+def rate_reference_bits_per_profile(target, native_depth_levels=None,
+                                    bits_per_level=None):
+    """Bits per water column in the field the compression ratio is quoted against.
+
+    `cr_treshold` is a floor on the compression ratio, imposed as
+    `ReLU(bpe - bits_per_profile_reference / cr_treshold)`. The reference used to
+    be `target.nelement() * element_size * 8 / (N*H*W)`, which is
+    `model_levels * element_size * 8` -- the size of the field **on the model's
+    own depth grid**. That makes the bit budget proportional to how many levels
+    the model chose to use: at `cr_treshold=10000` and float32 the budget is
+    0.5024 bits/profile for a 157-level model, 0.3072 for 96 and 0.2048 for 64.
+    Three models asked for "compression ratio 10000" therefore train at three
+    different rates, and the measured group-C runs landed at 0.504, 0.239 and
+    0.142 bits/profile -- so their reconstruction errors are not comparable, and
+    the grid ablation they were meant to be became a rate-distortion sweep.
+
+    With `native_depth_levels` set, the reference is the **native** field
+    instead, so `cr_treshold` targets `cr_native` and every model gets the same
+    bit budget per water column whatever grid it runs on. For a model already on
+    the native grid the two are identical, so no run done so far changes except
+    the reduced-grid ones, which is the point.
+    """
+    levels = native_depth_levels or int(target.shape[1])
+    # `bits_per_level` defaults to the training tensor's own precision, which is what
+    # this always did. It is exposed because `test_metrics.py` builds `cr_native`
+    # against a float32 reference (it casts the truth to float32 before scoring), so
+    # on a float64 run the loss would target a budget twice the one the metric
+    # reports. Every run to date is float32 and the two agree; pass 32 explicitly if
+    # that ever stops being true.
+    width = float(bits_per_level) if bits_per_level else target.element_size() * 8
+    return float(levels) * width
+
+
+class StructureLossMixin:
+    """Depth-aware structure terms, shared by every weighting scheme.
+
+    Holds the depth axis and, optionally, the normalisation statistics. The
+    structure terms are defined on **physical** profiles in m/s: with
+    `mean_std_along_depth` normalisation the argmax over depth of the normalised
+    profile is the largest anomaly relative to that level's climatology, which is
+    neither the sound-speed maximum nor what any evaluation metric looks at.
+    """
+
+    def _init_structure(self, depth_array=None, norm_stats=None,
+                        structure_params=None, allow_inert_terms=False,
+                        native_depth_levels=None,
+                        rate_reference_bits_per_level=None):
+        self.allow_inert_terms = bool(allow_inert_terms)
+        # Number of levels in the field the compression ratio is *quoted against* --
+        # the native axis, not whatever reduced grid this model happens to use. See
+        # _rate_reference_bits_per_profile.
+        self.native_depth_levels = (int(native_depth_levels)
+                                    if native_depth_levels else None)
+        self.rate_reference_bits_per_level = rate_reference_bits_per_level
+        sp = dict(search_m=30.0, beta=10.0, pos_scale_m=50.0,
+                  min_prominence_frac=0.05,
+                  prominence_scales_m=(10.0, 25.0, 50.0, 100.0),
+                  capture_m=40.0, local_beta=4.0)
+        sp.update(structure_params or {})
+        self.structure_params = sp
+
+        if depth_array is not None:
+            z = torch.as_tensor(np.asarray(depth_array, dtype=np.float64).ravel(),
+                                dtype=torch.float32)
+        else:
+            z = torch.zeros(0)
+        self.register_buffer("_depth_m", z)
+
+        offset, scale = _affine_from_norm_stats(norm_stats)
+        self.register_buffer("_norm_offset", offset if offset is not None else torch.zeros(0))
+        self.register_buffer("_norm_scale", scale if scale is not None else torch.zeros(0))
+
+    def _rate_reference_bits_per_profile(self, target):
+        """See :func:`rate_reference_bits_per_profile`."""
+        return rate_reference_bits_per_profile(
+            target, self.native_depth_levels,
+            getattr(self, "rate_reference_bits_per_level", None))
+
+    @contextmanager
+    def physical_inputs(self):
+        """Declare that ``pred``/``target`` are already in m/s for the enclosed calls.
+
+        Training feeds the criterion normalised tensors and :meth:`_physical`
+        converts them for the structure terms. ``test_one_epoch`` de-normalises
+        before calling the criterion, so without this the structure terms saw
+        ``(x * std + mean) * std + mean`` and logged numbers unrelated to the
+        training objective. Only the structure terms are affected; the value terms
+        never pass through :meth:`_physical`.
+        """
+        previous = getattr(self, "_inputs_are_physical", False)
+        self._inputs_are_physical = True
+        try:
+            yield self
+        finally:
+            self._inputs_are_physical = previous
+
+    def _physical(self, x):
+        """Undo the per-level normalisation, when the stats were supplied."""
+        if self._norm_scale.numel() == 0 or getattr(self, "_inputs_are_physical", False):
+            return x
+        scale = self._norm_scale.to(device=x.device, dtype=x.dtype)
+        offset = self._norm_offset.to(device=x.device, dtype=x.dtype)
+        return x * scale + offset
+
+    def _structure_terms(self, pred, target, wanted):
+        wanted = {n for n in wanted if n in STRUCTURE_LOSS_TERMS}
+        if not wanted:
+            return {}
+        if self._depth_m.numel() == 0:
+            raise ValueError(
+                f"structure losses {sorted(wanted)} need depth_array; pass it to "
+                "the loss constructor (train.py already has dm.depth_array)."
+            )
+        return SL.structure_losses(
+            self._physical(pred), self._physical(target),
+            self._depth_m.to(pred.device), wanted, **self.structure_params)
+
+
+def _affine_from_norm_stats(norm_stats):
+    """(offset, scale) as (1, C, 1, 1) tensors so that ``x * scale + offset`` is m/s."""
+    if not norm_stats:
+        return None, None
+    method = norm_stats.get("method")
+    params = norm_stats.get("params", {})
+
+    def t(key):
+        return torch.as_tensor(np.asarray(params[key], dtype=np.float64),
+                               dtype=torch.float32).reshape(1, -1, 1, 1)
+
+    try:
+        if method == "mean_std_along_depth":
+            return t("mean_along_depth"), t("std_along_depth")
+        if method == "min_max_along_depth":
+            lo, hi = t("x_min_along_depth"), t("x_max_along_depth")
+            return lo, hi - lo
+        if method == "mean_std":
+            return (torch.tensor(float(params["mean"])).reshape(1, 1, 1, 1),
+                    torch.tensor(float(params["std"])).reshape(1, 1, 1, 1))
+        if method == "min_max":
+            lo = float(params["x_min"])
+            return (torch.tensor(lo).reshape(1, 1, 1, 1),
+                    torch.tensor(float(params["x_max"]) - lo).reshape(1, 1, 1, 1))
+    except (KeyError, TypeError, ValueError):
+        return None, None
+    return None, None
+
+
+def resolve_significant_depth_idx(depth_array, significant_depth=SIGNIFICANT_DEPTH_M):
+    """Index of the deepest level still within `significant_depth` metres.
+
+    The weighted losses emphasise the upper ocean by depth index, so the cutoff has to be
+    resolved against the grid actually in use: a hardcoded index 60 means 762 m on the
+    uniform grid but only 354 m on the non-uniform one, silently changing which part of
+    the water column is emphasised. Falls back to 60 when no grid is supplied, which is
+    what that index meant on the uniform grid.
+    """
+    if depth_array is None:
+        return 60
+    z = np.asarray(depth_array, dtype=np.float64).ravel()
+    return int(np.clip(np.searchsorted(z, significant_depth, side="right") - 1, 0, len(z) - 1))
+
 
 class RateDistortionLoss(nn.Module):
     """Custom rate distortion loss with a Lagrangian parameter."""
 
-    def __init__(self, lmbda=1e-2, metrics='mse', cr_treshold=None):
+    def __init__(self, lmbda=1e-2, metrics='mse', cr_treshold=None,
+                 native_depth_levels=None, rate_reference_bits_per_level=None,
+                 **kwargs):
         super().__init__()
         self.mse = nn.MSELoss()
         self.lmbda = lmbda
         self.metrics = metrics
         self.cr_treshold = cr_treshold
+        self.native_depth_levels = (int(native_depth_levels)
+                                    if native_depth_levels else None)
+        self.rate_reference_bits_per_level = rate_reference_bits_per_level
     def set_lmbda(self, lmbda):
         self.lmbda = lmbda
 
@@ -31,7 +253,9 @@ class RateDistortionLoss(nn.Module):
         if self.cr_treshold is None:
             out["bpp_loss"] = bpe
         else:
-            bpe_original = target.nelement()*target.element_size()*8 / num_pixels
+            bpe_original = rate_reference_bits_per_profile(
+                target, getattr(self, "native_depth_levels", None),
+                getattr(self, "rate_reference_bits_per_level", None))
             bpe_treshold = bpe_original / self.cr_treshold
             out["bpp_loss"] = nn.ReLU()(bpe - bpe_treshold)
             
@@ -128,11 +352,12 @@ def diff_mask(x, eps=1e-6):
 
 
 
-class HomoscedasticSSPLoss(nn.Module):
+class HomoscedasticSSPLoss(StructureLossMixin, nn.Module):
     def __init__(self, 
                  loss_dict={"recon": 1.0,
                             "weighted_recon": 1.0,
                             "deriv": 1.0,
+                            "lsd": 1.0,
                             "max_pos": 1.0,
                             "max_value": 1.0,
                             "extrema_pos": 1.0,
@@ -142,12 +367,30 @@ class HomoscedasticSSPLoss(nn.Module):
                 use_smoothl1=True,
                 lambda_deriv=0.1,
                 lambda_extrema=0.5,
+                cr_treshold=None,
+                depth_array=None,
+                norm_stats=None,
+                structure_params=None,
+                allow_inert_terms=False,
+                native_depth_levels=None,
+                rate_reference_bits_per_level=None,
                 **kwargs):
         super().__init__()
         self.lmbda = lmbda
+        check_loss_dict(loss_dict, allow_inert=allow_inert_terms)
         self.loss_dict = loss_dict
         self.extrema_method = extrema_method
         self.use_smoothl1 = use_smoothl1
+        # Previously absent: `cr_treshold` landed in **kwargs and was silently
+        # dropped, so this method ignored the rate constraint entirely while
+        # accepting the key in loss_params. Same failure mode as `max_pos`.
+        self.cr_treshold = cr_treshold
+        self.max_significant_depth_idx = resolve_significant_depth_idx(depth_array)
+        self._init_structure(depth_array=depth_array, norm_stats=norm_stats,
+                             structure_params=structure_params,
+                             allow_inert_terms=allow_inert_terms,
+                             native_depth_levels=native_depth_levels,
+                             rate_reference_bits_per_level=rate_reference_bits_per_level)
 
         # self.lambda_deriv = lambda_deriv
         # self.lambda_extrema = lambda_extrema
@@ -171,10 +414,16 @@ class HomoscedasticSSPLoss(nn.Module):
         recon_loss, weighted_recon_loss, deriv_loss, max_pos_loss, max_value_loss, extrema_pos_loss, extrema_value_loss = 0, 0, 0, 0, 0, 0, 0
 
         # === Bitrate term (bpp loss) ===
-        out["bpp_loss"] = sum(
+        bpe = sum(
             (torch.log(likelihoods).sum() / (-math.log(2) * num_pixels))
             for likelihoods in output["likelihoods"].values()
         )
+        if self.cr_treshold is None:
+            out["bpp_loss"] = bpe
+        else:
+            bpe_original = self._rate_reference_bits_per_profile(target)
+            bpe_treshold = bpe_original / self.cr_treshold
+            out["bpp_loss"] = nn.ReLU()(bpe - bpe_treshold)
 
         # === Distortion term ===
         pred = output["x_hat"]
@@ -192,7 +441,7 @@ class HomoscedasticSSPLoss(nn.Module):
         # weights = torch.ones_like(recon_loss)
         # weights[:, :30] *= 2.0
         if "weighted_recon" in self.loss_dict and self.loss_dict["weighted_recon"] > 0:
-            weighted_recon_loss = weighted_mse_loss(pred, target, max_significant_depth_idx=60, decay_factor=0.1, use_smoothl1=self.use_smoothl1)
+            weighted_recon_loss = weighted_mse_loss(pred, target, max_significant_depth_idx=self.max_significant_depth_idx, decay_factor=0.1, use_smoothl1=self.use_smoothl1)
             losses_dict["weighted_recon"] = weighted_recon_loss
 
         if "deriv" in self.loss_dict and self.loss_dict["deriv"] > 0:
@@ -202,9 +451,17 @@ class HomoscedasticSSPLoss(nn.Module):
             deriv_loss = F.mse_loss(dp, dt)
             losses_dict["deriv"] = deriv_loss
 
+        if "lsd" in self.loss_dict and self.loss_dict["lsd"] > 0:
+            lsd_loss = spectral_loss(pred, target, axis=1, normalize=True, use_smoothl1=self.use_smoothl1)
+            losses_dict["lsd"] = lsd_loss
+
         if "max_pos" in self.loss_dict and self.loss_dict["max_pos"] > 0:
-            max_pos_loss =torch.abs(torch.argmax(pred,dim=1) - torch.argmax(target,dim=1))
-            max_pos_loss = max_pos_loss.float().mean()
+            # Unreachable unless allow_inert_terms=True: argmax has no gradient,
+            # so this only ever added a constant to the distortion sum.
+            with torch.no_grad():
+                max_pos_loss = torch.abs(
+                    torch.argmax(pred, dim=1) - torch.argmax(target, dim=1)
+                ).float().mean()
             losses_dict["max_pos"] = max_pos_loss
 
         if "max_value" in self.loss_dict and self.loss_dict["max_value"] > 0:
@@ -261,7 +518,7 @@ class HomoscedasticSSPLoss(nn.Module):
 
 
 
-class DynamicLossWeightingSSPLoss(nn.Module):
+class DynamicLossWeightingSSPLoss(StructureLossMixin, nn.Module):
     """
     Dynamic Loss Weighting (DLW) for SSP compression.
     
@@ -279,6 +536,7 @@ class DynamicLossWeightingSSPLoss(nn.Module):
             "recon": 1.0,
             "weighted_recon": 1.0,
             "deriv": 1.0,
+            "lsd": 1.0,
             "weighted_deriv": 1.0,
             "curvature_recon": 1.0,
             "soft_peak": 1.0,  # NEW: soft peak localization
@@ -300,13 +558,26 @@ class DynamicLossWeightingSSPLoss(nn.Module):
         temperature=2.0,  # DWA: temperature for softmax
         ema_decay=0.9,  # EMA decay for loss history
         device="cuda",
+        depth_array=None,
+        norm_stats=None,
+        structure_params=None,
+        allow_inert_terms=False,
+        native_depth_levels=None,
+        rate_reference_bits_per_level=None,
         **kwargs
     ):
         super().__init__()
         self.lmbda = lmbda
+        check_loss_dict(loss_dict, allow_inert=allow_inert_terms)
         self.loss_dict = loss_dict
         self.extrema_method = extrema_method
         self.use_smoothl1 = use_smoothl1
+        self.max_significant_depth_idx = resolve_significant_depth_idx(depth_array)
+        self._init_structure(depth_array=depth_array, norm_stats=norm_stats,
+                             structure_params=structure_params,
+                             allow_inert_terms=allow_inert_terms,
+                             native_depth_levels=native_depth_levels,
+                             rate_reference_bits_per_level=rate_reference_bits_per_level)
         self.cr_treshold = cr_treshold
         self.dlw_method = dlw_method
         self.alpha = alpha
@@ -357,7 +628,7 @@ class DynamicLossWeightingSSPLoss(nn.Module):
         if "weighted_recon" in self.active_loss_names:
             losses["weighted_recon"] = weighted_mse_loss(
                 pred, target,
-                max_significant_depth_idx=60,
+                max_significant_depth_idx=self.max_significant_depth_idx,
                 decay_factor=0.1,
                 use_smoothl1=self.use_smoothl1
             )
@@ -366,11 +637,20 @@ class DynamicLossWeightingSSPLoss(nn.Module):
             dp = pred[:, 1:, :, :] - pred[:, :-1, :, :]
             dt = target[:, 1:, :, :] - target[:, :-1, :, :]
             losses["deriv"] = F.mse_loss(dp, dt)
+
+        if "lsd" in self.active_loss_names:
+            losses["lsd"] = spectral_loss(
+                pred,
+                target,
+                axis=1,
+                normalize=True,
+                use_smoothl1=self.use_smoothl1,
+            )
         
         if "weighted_deriv" in self.active_loss_names:
             losses["weighted_deriv"] = weighted_deriv_loss(
                 pred, target,
-                max_significant_depth_idx=60,
+                max_significant_depth_idx=self.max_significant_depth_idx,
                 decay_factor=0.1,
                 use_smoothl1=self.use_smoothl1
             )
@@ -398,9 +678,11 @@ class DynamicLossWeightingSSPLoss(nn.Module):
             )
 
         if "max_pos" in self.active_loss_names:
-            losses["max_pos"] = torch.abs(
-                torch.argmax(pred, dim=1) - torch.argmax(target, dim=1)
-            ).float().mean()
+            # Unreachable unless allow_inert_terms=True -- argmax has no gradient.
+            with torch.no_grad():
+                losses["max_pos"] = torch.abs(
+                    torch.argmax(pred, dim=1) - torch.argmax(target, dim=1)
+                ).float().mean()
         
         if "max_value" in self.active_loss_names:
             losses["max_value"] = F.mse_loss(
@@ -416,7 +698,9 @@ class DynamicLossWeightingSSPLoss(nn.Module):
                 losses["extrema_pos"] = extrema_pos
             if "extrema_value" in self.active_loss_names:
                 losses["extrema_value"] = extrema_val
-        
+
+        losses.update(self._structure_terms(pred, target, self.active_loss_names))
+
         return losses
 
     def _uncertainty_weighting(self, losses_tensor):
@@ -501,7 +785,7 @@ class DynamicLossWeightingSSPLoss(nn.Module):
         if self.cr_treshold is None:
             out["bpp_loss"] = bpe
         else:
-            bpe_original = target.nelement() * target.element_size() * 8 / num_pixels
+            bpe_original = self._rate_reference_bits_per_profile(target)
             bpe_treshold = bpe_original / self.cr_treshold
             out["bpp_loss"] = nn.ReLU()(bpe - bpe_treshold)
 
@@ -566,19 +850,24 @@ class DynamicLossWeightingSSPLoss(nn.Module):
         }
     
 
-class FixedWeightSSPLoss(nn.Module):
+class FixedWeightSSPLoss(StructureLossMixin, nn.Module):
     def __init__(
         self, 
         loss_dict={"recon": 1.0,
                     "weighted_recon": 1.0, 
                     "deriv": 10.0,
+                    "lsd": 1.0,
                     "curvature_recon": 1.0,
                     "soft_peak": 1.0,  # soft peak localization
                     "wasserstein_peak": 1.0,  # Wasserstein peak alignment
-                    "max_pos": 0.00001,
+                    "max_pos": 0.0,          # inert: no gradient, see INERT_LOSS_TERMS
                     "max_value": 1.0,
-                    "extrema_pos": 0.00001, 
-                    "extrema_value": 1.0}, 
+                    "extrema_pos": 0.0,      # degenerate: centroid, see DEGENERATE_LOSS_TERMS
+                    "extrema_value": 1.0,
+                    "soft_max_pos": 0.0,          # differentiable replacement for max_pos
+                    "matched_extrema_pos": 0.0,   # degenerate: see DEGENERATE_LOSS_TERMS
+                    "local_extrema_pos": 0.0,     # working replacement for extrema_pos
+                    "prominence_recall": 0.0},    # new: prominence-mass recall
         extrema_method="both", 
         lmbda=1e-2, 
         use_smoothl1=True,
@@ -592,6 +881,16 @@ class FixedWeightSSPLoss(nn.Module):
         factor_warmup_epochs=150,
         device="cuda",
         dtype="float32",  # Normalise automatiquement pour équilibrer les magnitudes
+        depth_array=None,
+        deriv_target_smooth_sigma_m=None,
+        deriv_target_smooth_max_depth_m=100.0,
+        deriv_target_smooth_taper_m=100.0,
+        deriv_smooth_applies_to=("deriv", "weighted_deriv"),
+        norm_stats=None,
+        structure_params=None,
+        allow_inert_terms=False,
+        native_depth_levels=None,
+        rate_reference_bits_per_level=None,
         **kwargs
     ):
         super().__init__()
@@ -599,13 +898,30 @@ class FixedWeightSSPLoss(nn.Module):
 
         self.extrema_method = extrema_method
         self.use_smoothl1 = use_smoothl1
+        self.max_significant_depth_idx = resolve_significant_depth_idx(depth_array)
         self.recon_treshold = recon_treshold
         self.cr_treshold = cr_treshold if recon_treshold is None else None  # If recon_treshold is set, ignore cr_treshold
         if self.recon_treshold is not None:
             loss_dict = {k:0.0 for k in loss_dict.keys()}
             loss_dict["recon"] = 1.0  # Only use recon loss for factor weighting if recon_treshold is set
+        check_loss_dict(loss_dict, allow_inert=allow_inert_terms)
+        # Terms with a zero weight are not computed at all: they cost a forward
+        # pass (the structure terms and lsd are the expensive ones) and, being
+        # summed with weight 0, a backward pass too, for a number that could only
+        # ever be logged. `recon` is kept under factor weighting, where it is both
+        # the warm-up objective and the reference magnitude.
+        self.loss_dict_config = dict(loss_dict)
+        loss_dict = {k: v for k, v in loss_dict.items()
+                     if float(v or 0.0) > 0 or (k == "recon" and use_factor_weights)}
         self.loss_dict = loss_dict
         self.loss_weights = loss_dict.copy()
+        self.last_weighted_terms = {}
+        self._diagnostic_terms = False
+        self._init_structure(depth_array=depth_array, norm_stats=norm_stats,
+                             structure_params=structure_params,
+                             allow_inert_terms=allow_inert_terms,
+                             native_depth_levels=native_depth_levels,
+                             rate_reference_bits_per_level=rate_reference_bits_per_level)
         self.curvature_beta = curvature_beta
         self.peak_beta = peak_beta
         self.auto_normalize = auto_normalize
@@ -622,9 +938,55 @@ class FixedWeightSSPLoss(nn.Module):
         else:
             self.active_weights = loss_dict.copy()
         
+        # Smoothing of the *target* of the derivative terms. The reconstruction target
+        # is deliberately left raw: section 9 of the diagnostics finds that smoothing
+        # the field target moves it away from what the model already produces above
+        # 100 m, while the derivative target is the one carrying wiggle the model
+        # never fits. Off by default (sigma=None) so existing runs are unchanged.
+        self.deriv_target_smooth_sigma_m = deriv_target_smooth_sigma_m
+        self.deriv_target_smooth_max_depth_m = deriv_target_smooth_max_depth_m
+        self.deriv_target_smooth_taper_m = deriv_target_smooth_taper_m
+        self.deriv_smooth_applies_to = tuple(deriv_smooth_applies_to)
+        smooth_op = None
+        if deriv_target_smooth_sigma_m is not None:
+            if depth_array is None:
+                raise ValueError("deriv_target_smooth_sigma_m needs depth_array to build "
+                                 "a metre-domain kernel on the real depth axis")
+            smooth_op = depth_smoothing_matrix(
+                depth_array, deriv_target_smooth_sigma_m,
+                max_depth_m=deriv_target_smooth_max_depth_m,
+                taper_m=deriv_target_smooth_taper_m,
+                dtype=torch.float64 if dtype == "float64" else torch.float32)
+        self.register_buffer('deriv_smooth_op', smooth_op if smooth_op is not None
+                             else torch.zeros(0))
+
         # Pour stocker les magnitudes moyennes (si auto_normalize)
         self.register_buffer('loss_magnitudes', torch.ones(len(loss_dict)))
         self.register_buffer('magnitude_count', torch.tensor(0))
+
+    @contextmanager
+    def diagnostic_terms(self):
+        """Also compute the zero-weight terms of the configured loss_dict.
+
+        Training skips them (a forward and, summed at weight 0, a backward pass for
+        a number that is only logged). Validation and test run under no_grad, so
+        there they are cheap and give the matched-baseline value of a term a run
+        does not train -- e.g. local_extrema_pos on a run without it. They are
+        reported as `<name>_loss` and never enter out["loss"].
+        """
+        previous = self._diagnostic_terms
+        self._diagnostic_terms = True
+        try:
+            yield self
+        finally:
+            self._diagnostic_terms = previous
+
+    def _smooth_depth(self, x):
+        """Apply the metre-domain smoother along the depth axis of (N, C, H, W)."""
+        if self.deriv_smooth_op.numel() == 0:
+            return x
+        op = self.deriv_smooth_op.to(device=x.device, dtype=x.dtype)
+        return torch.einsum("cd,ndhw->nchw", op, x)
 
     def update_magnitudes(self, losses_dict):
         """Met à jour les estimations de magnitude (EMA)"""
@@ -684,7 +1046,7 @@ class FixedWeightSSPLoss(nn.Module):
                 if "weighted_recon" in self.loss_dict:
                     weighted_recon_loss = weighted_mse_loss(
                         pred, target, 
-                        max_significant_depth_idx=60, 
+                        max_significant_depth_idx=self.max_significant_depth_idx, 
                         decay_factor=0.1, 
                         use_smoothl1=self.use_smoothl1
                     )
@@ -699,7 +1061,7 @@ class FixedWeightSSPLoss(nn.Module):
                 if "weighted_deriv" in self.loss_dict:
                     weighted_deriv = weighted_deriv_loss(
                         pred, target,
-                        max_significant_depth_idx=60,
+                        max_significant_depth_idx=self.max_significant_depth_idx,
                         decay_factor=0.1,
                         use_smoothl1=self.use_smoothl1
                     )
@@ -731,6 +1093,7 @@ class FixedWeightSSPLoss(nn.Module):
                     losses_accum["wasserstein_peak"].append(wasserstein_loss.item())
                 
                 if "max_pos" in self.loss_dict:
+                    # Diagnostic only -- see the note in forward().
                     max_pos_loss = torch.abs(
                         torch.argmax(pred, dim=1) - torch.argmax(target, dim=1)
                     ).float().mean()
@@ -751,6 +1114,12 @@ class FixedWeightSSPLoss(nn.Module):
                         losses_accum["extrema_pos"].append(extrema_pos_loss.item())
                     if "extrema_value" in self.loss_dict:
                         losses_accum["extrema_value"].append(extrema_value_loss.item())
+
+                # The structure terms have to be calibrated here too, or their
+                # magnitude is estimated as 1.0 and the factor weight is wrong.
+                for _name, _val in self._structure_terms(
+                        pred, target, self.loss_dict).items():
+                    losses_accum[_name].append(_val.item())
         
         # Compute mean magnitudes
         mean_magnitudes = {}
@@ -793,6 +1162,62 @@ class FixedWeightSSPLoss(nn.Module):
         
         model.train()
 
+    def apply_gradient_weights(self, model, dataloader, device, names=None,
+                               ratio=0.2, n_batches=4, logger=None):
+        """Weight the auxiliary terms by gradient norm instead of by loss value.
+
+        The factor normalisation equalises loss *values*, which set
+        `local_extrema_pos` to 0.62 in E1b and gave it a gradient 2-3x recon's
+        (report section 14.7). Here each term in ``names`` gets
+
+            active_weight = loss_dict[name] * ratio * |grad recon| / |grad name|
+
+        measured on ``n_batches`` training batches, so with ``loss_dict[name] = 1``
+        its gradient norm is ``ratio`` times recon's (recon at its active weight).
+        Terms not in ``names`` keep their factor weights. Call after
+        :meth:`apply_factor_weights`; can be called again later to re-calibrate.
+        """
+        names = [n for n in (names or STRUCTURE_LOSS_TERMS)
+                 if float(self.loss_dict.get(n, 0.0) or 0.0) > 0]
+        if not names or "recon" not in self.loss_dict:
+            return {}
+        params = [p for p in model.parameters() if p.requires_grad]
+
+        def gnorm(loss):
+            if not (torch.is_tensor(loss) and loss.requires_grad):
+                return 0.0
+            gs = torch.autograd.grad(loss, params, retain_graph=True, allow_unused=True)
+            return math.sqrt(sum(float((g * g).sum()) for g in gs if g is not None))
+
+        was_training = model.training
+        model.train()
+        ratios = {n: [] for n in names}
+        for i, d in enumerate(dataloader):
+            if i >= n_batches:
+                break
+            d = d.to(device)
+            out_net = model(d, torch.zeros(len(d), dtype=int, device=device),
+                            torch.zeros(len(d), device=device))
+            out = self(out_net, d)
+            g_recon = self.active_weights.get("recon", 1.0) * gnorm(out["recon_loss"])
+            for n in names:
+                g = gnorm(out[f"{n}_loss"])
+                if g > 0:
+                    ratios[n].append(g_recon / g)
+            del out, out_net
+        model.train(was_training)
+
+        applied = {}
+        for n, r in ratios.items():
+            if r:
+                self.active_weights[n] = (float(self.loss_dict[n]) * float(ratio)
+                                          * sum(r) / len(r))
+                applied[n] = self.active_weights[n]
+        msg = (f"Gradient-norm weights (target |grad| = {ratio} x recon's, "
+               f"{n_batches} batches): {applied}")
+        (logger.info if logger else print)(msg)
+        return applied
+
     def forward(self, output, target):
         """
         Args:
@@ -803,9 +1228,13 @@ class FixedWeightSSPLoss(nn.Module):
         out = {}
         losses_dict = {}
         num_pixels = N * H * W
+        # Terms to compute: the trained ones, plus -- inside diagnostic_terms(),
+        # i.e. validation/test -- the zero-weight ones, for logging only. Only
+        # self.loss_dict enters the weighted sum below.
+        wanted = (self.loss_dict_config if self._diagnostic_terms else self.loss_dict)
 
         # === Bitrate term (bpp loss) ===
-        bpe_original = target.nelement()*target.element_size()*8 / num_pixels
+        bpe_original = self._rate_reference_bits_per_profile(target)
 
 
         bpe = sum(
@@ -823,7 +1252,7 @@ class FixedWeightSSPLoss(nn.Module):
         pred = output["x_hat"]
 
         # Calcul de toutes les losses individuelles
-        if "recon" in self.loss_dict:
+        if "recon" in wanted:
             if self.use_smoothl1:
                 recon_loss = F.smooth_l1_loss(pred, target, reduction="mean")
             else:
@@ -835,31 +1264,45 @@ class FixedWeightSSPLoss(nn.Module):
 
             losses_dict["recon"] = recon_loss
         
-        if "weighted_recon" in self.loss_dict:
+        if "weighted_recon" in wanted:
             weighted_recon_loss = weighted_mse_loss(
                 pred, target, 
-                max_significant_depth_idx=60, 
+                max_significant_depth_idx=self.max_significant_depth_idx, 
                 decay_factor=0.1, 
                 use_smoothl1=self.use_smoothl1
             )
             losses_dict["weighted_recon"] = weighted_recon_loss
         
-        if "deriv" in self.loss_dict:
+        if "deriv" in wanted:
+            deriv_target = (self._smooth_depth(target)
+                            if "deriv" in self.deriv_smooth_applies_to else target)
             dp = pred[:, 1:, :, :] - pred[:, :-1, :, :]
-            dt = target[:, 1:, :, :] - target[:, :-1, :, :]
+            dt = deriv_target[:, 1:, :, :] - deriv_target[:, :-1, :, :]
             deriv_loss = F.mse_loss(dp, dt)
             losses_dict["deriv"] = deriv_loss
+
+        if "lsd" in wanted:
+            lsd_loss = spectral_loss(
+                pred,
+                target,
+                axis=1,
+                normalize=True,
+                use_smoothl1=self.use_smoothl1,
+            )
+            losses_dict["lsd"] = lsd_loss
         
-        if "weighted_deriv" in self.loss_dict:
+        if "weighted_deriv" in wanted:
+            wderiv_target = (self._smooth_depth(target)
+                             if "weighted_deriv" in self.deriv_smooth_applies_to else target)
             weighted_deriv = weighted_deriv_loss(
-                pred, target,
-                max_significant_depth_idx=60,
+                pred, wderiv_target,
+                max_significant_depth_idx=self.max_significant_depth_idx,
                 decay_factor=0.1,
                 use_smoothl1=self.use_smoothl1
             )
             losses_dict["weighted_deriv"] = weighted_deriv
         
-        if "curvature_recon" in self.loss_dict:
+        if "curvature_recon" in wanted:
             curvature_loss = curvature_weighted_loss(
                 pred, target,
                 depth_dim=1,
@@ -868,7 +1311,7 @@ class FixedWeightSSPLoss(nn.Module):
             )
             losses_dict["curvature_recon"] = curvature_loss
         
-        if "soft_peak" in self.loss_dict:
+        if "soft_peak" in wanted:
             soft_peak_loss = soft_peak_localization_loss(
                 pred, target,
                 depth_dim=1,
@@ -876,7 +1319,7 @@ class FixedWeightSSPLoss(nn.Module):
             )
             losses_dict["soft_peak"] = soft_peak_loss
         
-        if "wasserstein_peak" in self.loss_dict:
+        if "wasserstein_peak" in wanted:
             wasserstein_loss = wasserstein_peak_alignment_loss(
                 pred, target,
                 depth_dim=1,
@@ -884,53 +1327,67 @@ class FixedWeightSSPLoss(nn.Module):
             )
             losses_dict["wasserstein_peak"] = wasserstein_loss
         
-        if "max_pos" in self.loss_dict:
-            max_pos_loss = torch.abs(
-                torch.argmax(pred, dim=1) - torch.argmax(target, dim=1)
-            )
-            max_pos_loss = max_pos_loss.float().mean()
-            losses_dict["max_pos"] = max_pos_loss
+        if "max_pos" in wanted:
+            # Diagnostic only. argmax is not differentiable, so this cannot train
+            # anything; computed under no_grad and kept in the logs so the column
+            # stays comparable with the runs that reported it. check_loss_dict
+            # refuses a non-zero weight on it.
+            with torch.no_grad():
+                losses_dict["max_pos"] = torch.abs(
+                    torch.argmax(pred, dim=1) - torch.argmax(target, dim=1)
+                ).float().mean()
         
-        if "max_value" in self.loss_dict:
+        if "max_value" in wanted:
             max_value_loss = F.mse_loss(
                 torch.max(pred, dim=1)[0], 
                 torch.max(target, dim=1)[0]
             )
             losses_dict["max_value"] = max_value_loss
         
-        if "extrema_pos" in self.loss_dict or "extrema_value" in self.loss_dict:
+        if "extrema_pos" in wanted or "extrema_value" in wanted:
             extrema_pos_loss, extrema_value_loss = position_and_value_loss(
                 pred, target, dim=1, tau=10, mode=self.extrema_method
             )
-            if "extrema_pos" in self.loss_dict:
+            if "extrema_pos" in wanted:
                 losses_dict["extrema_pos"] = extrema_pos_loss
-            if "extrema_value" in self.loss_dict:
+            if "extrema_value" in wanted:
                 losses_dict["extrema_value"] = extrema_value_loss
+
+        losses_dict.update(self._structure_terms(pred, target, wanted))
 
         # Met à jour les magnitudes moyennes
         self.update_magnitudes(losses_dict)
 
         # === Weighted sum avec normalisation optionnelle ===
+        # A term at weight 0 (factor warm-up) stays out of the sum, so the backward
+        # pass does not traverse its graph. `last_weighted_terms` keeps each term's
+        # contribution to out["loss"] with its graph, for grad_monitor.
         distortion = 0
+        weighted_terms = {}
         for i, name in enumerate(self.loss_dict.keys()):
             loss = losses_dict[name]
             
             # Use active_weights when factor weights are enabled
             if self.use_factor_weights:
                 weight = self.active_weights[name]
-                distortion += weight * loss
+                term = weight * loss
             elif self.auto_normalize and self.magnitude_count > 100:
                 # Normalise par la magnitude moyenne pour équilibrer
                 weight = self.loss_dict[name]
-                normalized_loss = loss / (self.loss_magnitudes[i] + 1e-8)
-                distortion += weight * normalized_loss
+                term = weight * (loss / (self.loss_magnitudes[i] + 1e-8))
                 self.loss_weights[name] = weight / (self.loss_magnitudes[i].item() + 1e-8)
             else:
                 weight = self.loss_dict[name]
-                distortion += weight * loss
+                term = weight * loss
+            if float(weight) == 0.0:
+                continue
+            distortion += term
+            weighted_terms[name] = (float(weight), loss.detach(), self.lmbda * term)
+        weighted_terms["bpp"] = (1.0, out["bpp_loss"].detach(), out["bpp_loss"])
+        self.last_weighted_terms = weighted_terms
 
         # Stockage pour monitoring
-        for name in self.loss_dict.keys():
+        for name in losses_dict:
             out[f"{name}_loss"] = losses_dict[name]
         
         out["ms_ssim_loss"] = None
@@ -1047,11 +1504,11 @@ def error_treshold_based_mse_loss(inputs, outputs, max_value_threshold=3.0):
 
 def weighted_mse_loss(outputs, inputs, max_significant_depth_idx = 10, decay_factor = 1000, use_smoothl1=False):  #decay_factor = 0.1
 
+    max_significant_depth_idx = max(0, min(max_significant_depth_idx, inputs.shape[1]-1))  # Ensure it's within bounds
     signal_length = inputs.shape[1]
 
     weights = torch.ones(signal_length, device=inputs.device, dtype=inputs.dtype)
 
-    #max_significant_depth_idx = torch.searchsorted(depth_tens, significant_depth, right=False)
 
     weights[:max_significant_depth_idx] = 1.0  # Strong emphasis on the first points
     weights[max_significant_depth_idx+1:] = torch.exp(-decay_factor * torch.arange(max_significant_depth_idx+1, signal_length))
@@ -1067,6 +1524,35 @@ def weighted_mse_loss(outputs, inputs, max_significant_depth_idx = 10, decay_fac
 
 
 
+def depth_smoothing_matrix(depth_array, sigma_m, max_depth_m=None, taper_m=100.0,
+                           device=None, dtype=torch.float32):
+    """Gaussian smoothing along depth, of constant width in **metres**, optionally
+    restricted to the upper ocean.
+
+    Built for smoothing the *target* of the derivative term. The diagnostics behind
+    this (notebook section 9) show the reconstruction's dc/dz sitting closer to a
+    10-15 m smoothed reference than to the raw one above ~100 m, while below ~600 m
+    the raw target is already the better one -- so the operator is the identity
+    below ``max_depth_m``, with a linear taper of width ``taper_m`` so the loss has
+    no kink there.
+
+    A matrix rather than a convolution because the depth axis is not uniform: the
+    kernel weights each source level by the depth interval it represents, so the
+    same physical scale is removed at every depth.
+    """
+    z = np.asarray(depth_array, dtype=np.float64).ravel()
+    dz = np.gradient(z)
+    w = np.exp(-0.5 * ((z[:, None] - z[None, :]) / float(sigma_m)) ** 2) * dz[None, :]
+    w /= w.sum(axis=1, keepdims=True)
+
+    if max_depth_m is not None:
+        alpha = np.clip((float(max_depth_m) + float(taper_m) - z) / max(float(taper_m), 1e-9), 0.0, 1.0)
+        w = alpha[:, None] * w + (1.0 - alpha)[:, None] * np.eye(z.size)
+
+    t = torch.as_tensor(w, dtype=dtype)
+    return t if device is None else t.to(device)
+
+
 def weighted_deriv_loss(outputs, inputs, max_significant_depth_idx=10, decay_factor=1000, use_smoothl1=False):
     """Weighted derivative loss with emphasis on first depth indices.
     
@@ -1079,6 +1565,7 @@ def weighted_deriv_loss(outputs, inputs, max_significant_depth_idx=10, decay_fac
     
     # derivative signal length is one less than input
     deriv_length = dp.shape[1]
+    max_significant_depth_idx = max(0, min(max_significant_depth_idx, deriv_length - 1))  # Ensure it's within bounds
     
     weights = torch.ones(deriv_length, device=inputs.device, dtype=inputs.dtype)
     
@@ -1098,6 +1585,26 @@ def weighted_deriv_loss(outputs, inputs, max_significant_depth_idx=10, decay_fac
         weighted_loss = torch.mean(weights * (dp - dt) ** 2)
     
     return weighted_loss
+
+
+def power_spectrum(x, axis=-1, n=None, normalize=True):
+    """Compute a differentiable one-sided power spectrum for real-valued tensors."""
+    X = torch.fft.rfft(x, n=n, dim=axis)
+    ps = X.real.pow(2) + X.imag.pow(2)
+    if normalize:
+        length = x.shape[axis] if n is None else n
+        ps = ps / max(1, int(length))
+    return ps
+
+
+def spectral_loss(outputs, inputs, axis=1, n=None, normalize=True, use_smoothl1=False):
+    """Loss between output and target power spectra along the chosen axis."""
+    outputs_ps = power_spectrum(outputs, axis=axis, n=n, normalize=normalize)
+    inputs_ps = power_spectrum(inputs, axis=axis, n=n, normalize=normalize)
+
+    if use_smoothl1:
+        return F.smooth_l1_loss(outputs_ps, inputs_ps, reduction='mean')
+    return F.mse_loss(outputs_ps, inputs_ps)
 
 
 

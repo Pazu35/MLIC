@@ -1,7 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from scipy.signal import butter, firwin, freqz
 import time
+try:
+    import torchaudio.functional as AF
+except ImportError:
+    AF = None
+
 from compressai.models import CompressionModel
 from compressai.ops import quantize_ste
 from compressai.ans import BufferedRansEncoder, RansDecoder
@@ -11,13 +17,17 @@ from MLIC.MLIC.utils.ckbd import *
 from MLIC.MLIC.modules.transform import *
 
 
+
+
+
 class MLICPlusPlus(CompressionModel):
 
     def __init__(self, config, **kwargs):
         super().__init__(config.N, **kwargs)
         N = config.N
         M = config.M
-        in_channels = getattr(config, "in_channels", 157)
+        #in_channels = getattr(config, "in_channels", 3)
+        self.in_channels = config.get("in_channels", 3)
         context_window = config.context_window
         num_heads_slice = 32
         slice_num = config.slice_num
@@ -49,11 +59,50 @@ class MLICPlusPlus(CompressionModel):
         self.enable_global_inter_context = config.get("enable_global_inter_context", True)
         self.enable_global_intra_context = config.get("enable_global_intra_context", True)
 
+        b_iir, a_iir = butter(N=2, Wn=0.107, btype='low')
+        default_output_lpf = {
+            "use": config.get("output_low_band_filter_use", False),
+            "mode": config.get("output_low_band_filter_mode", "iir"),  # iir|learnable_fir|learnable_dogs|learnable_gauss
+            # SciPy-like Butterworth(2, 0.1) IIR coefficients.
+            "a_coeffs": a_iir,
+            "b_coeffs": b_iir,
+            "numtaps": 20,
+            "init_cutoff": 0.107,
+            "init_sigma": 2.0,
+            "init_sigma1": 1.0,
+            "init_sigma2": 4.0,
+            "radius": 15,
+        }
+        self.output_low_band_filter = config.get("output_low_band_filter", default_output_lpf)
+
+        
+        self.register_buffer(
+            "_output_lpf_a",
+            torch.tensor(self.output_low_band_filter.get("a_coeffs", default_output_lpf["a_coeffs"]), dtype=torch.float32),
+        )
+        self.register_buffer(
+            "_output_lpf_b",
+            torch.tensor(self.output_low_band_filter.get("b_coeffs", default_output_lpf["b_coeffs"]), dtype=torch.float32),
+        )
+        self.learnable_output_lpf = LearnableFIRLowpass(
+            numtaps=int(self.output_low_band_filter.get("numtaps", default_output_lpf["numtaps"])),
+            init_cutoff=float(self.output_low_band_filter.get("init_cutoff", default_output_lpf["init_cutoff"])),
+        )
+        self.learnable_output_dogs = LearnableDoGSmoother(
+            init_sigma1=float(self.output_low_band_filter.get("init_sigma1", default_output_lpf["init_sigma1"])),
+            init_sigma2=float(self.output_low_band_filter.get("init_sigma2", default_output_lpf["init_sigma2"])),
+            radius=int(self.output_low_band_filter.get("radius", default_output_lpf["radius"])),
+        )
+        self.learnable_output_gauss = LearnableGaussianSmoother(
+            init_sigma=float(self.output_low_band_filter.get("init_sigma", default_output_lpf["init_sigma"])),
+            radius=int(self.output_low_band_filter.get("radius", default_output_lpf["radius"])),
+        )
 
 
-        self.g_a = AnalysisTransform(N=N, M=M, in_channels=in_channels)
-        self.g_s = SynthesisTransform(N=N, M=M, out_channels=in_channels)
-        #self.g_s = SynthesisTransformOld(N=N, M=M, out_channels=in_channels)
+
+        self.g_a = AnalysisTransform(N=N, M=M, in_channels=self.in_channels)
+        self.g_s = SynthesisTransform(N=N, M=M, out_channels=self.in_channels)
+        #self.g_s = SynthesisTransformOld(N=N, M=M, out_channels=self.in_channels)
 
         self.h_a = HyperAnalysis(M=M, N=N)
         self.h_s = HyperSynthesis(M=M, N=N)
@@ -147,6 +196,70 @@ class MLICPlusPlus(CompressionModel):
             LatentResidualPrediction(in_dim=M + (i + 1) * slice_ch, out_dim=slice_ch)
             for i in range(slice_num)
         )
+
+    def _apply_output_low_band_filter(self, x_hat):
+        """Apply optional low-pass filtering along channel/depth axis."""
+        if not self.output_low_band_filter.get("use", False):
+            return x_hat
+
+        if x_hat.size(1) < 3:
+            return x_hat
+
+        mode = self.output_low_band_filter.get("mode", "iir")
+        x_perm = x_hat.permute(0, 2, 3, 1).contiguous()
+
+        if mode == "iir":
+
+            x_filt = AF.lfilter(
+                waveform=x_perm,
+                a_coeffs=self._output_lpf_a.to(dtype=x_hat.dtype, device=x_hat.device),
+                b_coeffs=self._output_lpf_b.to(dtype=x_hat.dtype, device=x_hat.device),
+                clamp=False,
+                batching=True,
+            )
+
+        elif mode == "zero_phase_lfilt":
+            b, h, w, c = x_perm.shape
+            flat = x_perm.reshape(b * h * w, c)
+            x_filt = zero_phase_lfilter(
+                flat,
+                a_coeffs=self._output_lpf_a.to(dtype=x_hat.dtype, device=x_hat.device),
+                b_coeffs=self._output_lpf_b.to(dtype=x_hat.dtype, device=x_hat.device),
+                pad_len=30,
+            )
+            x_filt = x_filt.reshape(b, h, w, c)
+        
+        elif mode == "learnable_fir":
+            ##TODO: Debug learnable FIR low-pass filter
+            pass
+            # b, h, w, c = x_perm.shape
+            # flat = x_perm.reshape(b * h * w, c)
+            # flat_filt = self.learnable_output_lpf(flat)
+            # x_filt = flat_filt.reshape(b, h, w, c)
+            
+        elif mode == "learnable_dogs":
+            b, h, w, c = x_perm.shape
+            flat = x_perm.reshape(b * h * w, c)
+            flat_filt = self.learnable_output_dogs(flat)
+            if flat_filt.dim() == 3 and flat_filt.size(1) == 1:
+                flat_filt = flat_filt.squeeze(1)
+            x_filt = flat_filt.reshape(b, h, w, c)
+        elif mode == "learnable_gauss":
+            b, h, w, c = x_perm.shape
+            flat = x_perm.reshape(b * h * w, c)
+            flat_filt = self.learnable_output_gauss(flat)
+            if flat_filt.dim() == 3 and flat_filt.size(1) == 1:
+                flat_filt = flat_filt.squeeze(1)
+            x_filt = flat_filt.reshape(b, h, w, c)
+
+
+        else:
+            raise ValueError(
+                f"Unknown output_low_band_filter.mode={mode!r}. "
+                "Expected one of: 'iir', 'learnable_fir', 'learnable_dogs', 'learnable_gauss'."
+            )
+
+        return x_filt.permute(0, 3, 1, 2).contiguous()
 
     def forward(self, x, season_idx=None, sst=None):
         """
@@ -278,9 +391,12 @@ class MLICPlusPlus(CompressionModel):
         y_likelihoods = torch.cat(y_likelihoods, dim=1)
         x_hat = self.g_s(y_hat)
         x_hat = x_hat[:, :C, :]
+        x_hat = self._apply_output_low_band_filter(x_hat)
 
         return {
             "x_hat": x_hat,
+            "y_hat": y_hat,
+            "z_hat": z_hat,
             "likelihoods": {"y_likelihoods": y_likelihoods, "z_likelihoods": z_likelihoods}
         }
 
@@ -468,6 +584,7 @@ class MLICPlusPlus(CompressionModel):
 
         y_hat = torch.cat(y_hat_slices, dim=1)
         x_hat = self.g_s(y_hat)
+        x_hat = self._apply_output_low_band_filter(x_hat)
         torch.cuda.synchronize()
         end_time = time.time()
 
@@ -475,6 +592,8 @@ class MLICPlusPlus(CompressionModel):
 
         return {
             "x_hat": x_hat,
+            "y_hat": y_hat,
+            "z_hat": z_hat,
             "cost_time": cost_time
         }
 

@@ -1,4 +1,5 @@
 import os
+from contextlib import ExitStack
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -45,6 +46,7 @@ def test_one_epoch(epoch, test_dataloader, model, criterion, save_dir, logger_va
 
             out_net = model(d, season_idx=season_idx, sst=sst)
 
+
             if norm_stats["method"] == "min_max":
                 d_min = norm_stats["params"]["x_min"]
                 d_max = norm_stats["params"]["x_max"]
@@ -63,6 +65,14 @@ def test_one_epoch(epoch, test_dataloader, model, criterion, save_dir, logger_va
                 std = torch.from_numpy(std).to(device=d.device, dtype=d.dtype)
                 out_net['x_hat'] = out_net['x_hat'] * std  + mean
                 d = d * std + mean 
+
+            elif norm_stats["method"] == "min_max_along_depth":
+                d_min = norm_stats["params"]["x_min_along_depth"]
+                d_max = norm_stats["params"]["x_max_along_depth"]
+                d_min = torch.from_numpy(d_min).to(device=d.device, dtype=d.dtype)
+                d_max = torch.from_numpy(d_max).to(device=d.device, dtype=d.dtype)
+                out_net['x_hat'] = out_net['x_hat'] * (d_max - d_min) + d_min
+                d = d * (d_max - d_min) + d_min
 
             if rgb_model is not None:
                 out_net['x_hat'] = rgb_model.model_AE.decoder(out_net['x_hat'].unsqueeze(-1)).squeeze(-1)
@@ -101,12 +111,25 @@ def test_one_epoch(epoch, test_dataloader, model, criterion, save_dir, logger_va
 
             # out_net['x_hat'] = out_net['x_hat'][:,-len(depth_array):,:]
             # d = d[:,-len(depth_array):,:]
-            out_criterion = criterion(out_net, d)
+            # d and x_hat are in m/s here, not the normalised units the criterion
+            # sees in training: tell it, so the structure terms are not
+            # de-normalised a second time.
+            # Zero-weight terms are skipped in training; compute them here (no_grad)
+            # so every run logs the same columns and a baseline carries the value
+            # of the term its comparison run trains.
+            with ExitStack() as stack:
+                for name in ("physical_inputs", "diagnostic_terms"):
+                    ctx = getattr(criterion, name, None)
+                    if ctx is not None:
+                        stack.enter_context(ctx())
+                out_criterion = criterion(out_net, d)
 
             aux_loss.update(model.aux_loss())
-            for v in out_criterion.values():
-                if torch.is_tensor(v) and v is not None:
-                    loss.update(v)
+            # The objective, not the mean of every tensor the criterion returns:
+            # that mean was dominated by whichever term had the largest raw value
+            # (lsd at ~1e8, even at weight 0), and it is what best_checkpoint_loss
+            # was selected on.
+            loss.update(out_criterion["loss"].item())
 
             # rec = torch2img(out_net['x_hat'])
             # img = torch2img(d)
@@ -167,10 +190,8 @@ def test_one_epoch(epoch, test_dataloader, model, criterion, save_dir, logger_va
 
 
 
-    criterion_log = " | ".join(
-    f"{k}: {v.item():.4f}" if torch.is_tensor(v) else f"{k}: {v}"
-    for k, v in out_criterion.items()
-    )
+    # Epoch means, not the last batch's values.
+    criterion_log = " | ".join(f"{k}: {m.avg:.4f}" for k, m in criterion_losses.items())
 
     logger_val.info(
         f"{stage} epoch {epoch}: Average losses: "

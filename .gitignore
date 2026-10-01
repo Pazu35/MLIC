@@ -38,3 +38,5 @@ Thumbs.db
 tb_logger/
 # ignore experiments directory
 experiments/
+*.7z
+graphify-out/cache/

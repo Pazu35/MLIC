@@ -119,6 +119,14 @@ def train_options():
         help="pretrained model path"
     )
     parser.add_argument(
+        "--resume",
+        action="store_true",
+        default=False,
+        help="With --checkpoint: continue that run instead of fine-tuning from it. "
+             "Restores the optimizers, the LR scheduler, the epoch counter and the "
+             "loss weights; --epochs stays the TOTAL epoch count (utils/resume.py)"
+    )
+    parser.add_argument(
         '--world_size',
         default=1,
         type=int,
@@ -134,6 +142,41 @@ def train_options():
         default=1,
         type=int,
         help="Number of gradient accumulation steps (default: %(default)s)"
+    )
+    # Remedies for an auxiliary (structure) loss whose gradient opposes the
+    # reconstruction's -- report section 14.7. Both off by default.
+    parser.add_argument(
+        "--grad_projection",
+        action="store_true",
+        default=False,
+        help="PCGrad-style: project the structure-term gradient off the value-term "
+             "gradient whenever they conflict (utils/grad_surgery.py)"
+    )
+    parser.add_argument(
+        "--grad_weighting",
+        action="store_true",
+        default=False,
+        help="Weight the structure terms by gradient norm (a fraction of recon's) "
+             "instead of by loss value; needs use_factor_weights"
+    )
+    parser.add_argument(
+        "--grad_weight_ratio",
+        default=0.2,
+        type=float,
+        help="Target |grad term| / |grad recon| for --grad_weighting (default: %(default)s)"
+    )
+    parser.add_argument(
+        "--grad_weight_every",
+        default=0,
+        type=int,
+        help="Re-calibrate --grad_weighting every N epochs after warm-up; 0 = once "
+             "(default: %(default)s)"
+    )
+    parser.add_argument(
+        "--grad_weight_batches",
+        default=4,
+        type=int,
+        help="Training batches used per --grad_weighting calibration (default: %(default)s)"
     )
     parser.add_argument(
         "--verbose",
