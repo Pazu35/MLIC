@@ -735,14 +735,14 @@ if __name__ == '__main__':
     sys.argv = [
         "train.py",
         #"--metrics", "mse",
-        "--exp", "back_to_the_future/F1",  #"mlicpp_multi_loss_test_lr_step500",
+        "--exp", "back_to_the_future/I2",  #"mlicpp_multi_loss_test_lr_step500",
         "--gpu_id", "0",
         "--epochs", "2000",
         "--lambda", "1.0",
-        "-lr", "1e-5",
+        "-lr", "1e-6",
         "--num-workers", "10",
         "--clip_max_norm", "1.0",
-        "--seed", "7", #"42", "666" "7"
+        "--seed", "42", #"42", "666" "7"
         "--batch-size", "4",
         "--test-batch-size", "4",
         "--patch-size", "196", "256",
@@ -770,9 +770,9 @@ if __name__ == '__main__':
         # after, weights are normalized so that loss_dict values act as relative factors
         # e.g., weighted_recon=5.0 means 5x the weight of recon after normalization
         "loss_dict":{"recon": 1.0,
-                    "weighted_recon": 1.0, 
-                    "deriv": 1.0,
-                    "weighted_deriv": 1.0,  # weighted derivative loss (emphasis on first depth indices)
+                    "weighted_recon": 0.0, 
+                    "deriv": 0.0,
+                    "weighted_deriv": 0.0,  # weighted derivative loss (emphasis on first depth indices)
                     "curvature_recon": 0.0,
                     "soft_peak": 0.0,  # soft peak localization
                     "lsd": 0.0,  # log spectral distance
