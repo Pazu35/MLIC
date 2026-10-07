@@ -732,18 +732,24 @@ def train_one_epoch(
 
 if __name__ == '__main__':  
 
+    # Launch knobs, overridable from the environment so a sweep needs no file edits:
+    #   SEED=7 N=32 M=48 SLICES=3 python train.py
+    # Defaults = chapter-2 vanilla frame (todo Task 6): recon only, smoother off,
+    # batch 4, lr 1e-5 (smoother_report.md §11-12). EXP defaults to H/off/s{SLICES}.
+    env = os.environ.get
+    SLICES = int(env("SLICES", "6"))
     sys.argv = [
         "train.py",
         #"--metrics", "mse",
-        "--exp", "back_to_the_future/I2",  #"mlicpp_multi_loss_test_lr_step500",
-        "--gpu_id", "0",
-        "--epochs", "2000",
+        "--exp", env("EXP", f"back_to_the_future/H/off/s{SLICES}"),
+        "--gpu_id", env("GPU", "0"),
+        "--epochs", env("EPOCHS", "2000"),
         "--lambda", "1.0",
-        "-lr", "1e-6",
+        "-lr", env("LR", "1e-5"),
         "--num-workers", "10",
         "--clip_max_norm", "1.0",
-        "--seed", "42", #"42", "666" "7"
-        "--batch-size", "4",
+        "--seed", env("SEED", "42"), # 42, 7, 666
+        "--batch-size", env("BATCH", "4"),
         "--test-batch-size", "4",
         "--patch-size", "196", "256",
         "--gradient_accumulation_steps", "1",
@@ -835,10 +841,10 @@ if __name__ == '__main__':
 
    
     cfg = model_config()
-    cfg["N"] = 64 #32 #48 #32 #64 #1600 #192 #128 #192 #640 
-    cfg["M"] = 96 #48 #64 #48 #96 #2400 #320 #192 #320 #960 
-    cfg["slice_num"] = 6  #6 #3 #25 #6 #8 #10
-    ## assert (M//slice_num)%16==0
+    cfg["N"] = 192 #int(os.environ.get("N", "64"))  # 32 / 64 / 96 (192, 640 seen before)
+    cfg["M"] = 320 #int(os.environ.get("M", "96"))  # 48 / 96 / 160
+    cfg["slice_num"] = 10 #SLICES  # 3 / 6 / 10
+    assert cfg["M"] % (16 * cfg["slice_num"]) == 0, "M must be a multiple of 16 x slice_num (global inter-context heads)"
     cfg["context_window"] = 5
     cfg['act'] = torch.nn.GELU
     cfg["enable_channel_context"] = True
@@ -849,7 +855,9 @@ if __name__ == '__main__':
     cfg["add_seasons"] = {"use":False, "mode":"embed"}
     cfg["add_sst"] = False
 
-    cfg['output_low_band_filter_use'] = False  # F1: smoother off (True for PF2 / H)
+    # Smoother off for chapter 2 (vanilla codec, Checkpoint B 7 Oct); it returns with
+    # the gradient multi-task losses of chapter 3. SMOOTHER=1 reproduces PF1 / PF2.
+    cfg['output_low_band_filter_use'] = os.environ.get("SMOOTHER", "0") == "1"
     cfg['output_low_band_filter_mode'] = "learnable_gauss"  # "iir", "learnable_fir" , #learnable_dogs , learnable_gauss #zero_phase_lfilt
 
     rgb = {"use":False, "method":"depth_layers"} #PCA
