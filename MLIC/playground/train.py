@@ -741,7 +741,7 @@ if __name__ == '__main__':
     sys.argv = [
         "train.py",
         #"--metrics", "mse",
-        "--exp", env("EXP", f"back_to_the_future/H/off/s{SLICES}"),
+        "--exp", env("EXP", f"back_to_the_future/H/off/64_96_3"),
         "--gpu_id", env("GPU", "0"),
         "--epochs", env("EPOCHS", "2000"),
         "--lambda", "1.0",
@@ -841,9 +841,9 @@ if __name__ == '__main__':
 
    
     cfg = model_config()
-    cfg["N"] = 192 #int(os.environ.get("N", "64"))  # 32 / 64 / 96 (192, 640 seen before)
-    cfg["M"] = 320 #int(os.environ.get("M", "96"))  # 48 / 96 / 160
-    cfg["slice_num"] = 10 #SLICES  # 3 / 6 / 10
+    cfg["N"] = 64 #int(os.environ.get("N", "64"))  # 32 / 64 / 96 (192, 640 seen before)
+    cfg["M"] = 96 #int(os.environ.get("M", "96"))  # 48 / 96 / 160
+    cfg["slice_num"] = 3 #SLICES  # 3 / 6 / 10
     assert cfg["M"] % (16 * cfg["slice_num"]) == 0, "M must be a multiple of 16 x slice_num (global inter-context heads)"
     cfg["context_window"] = 5
     cfg['act'] = torch.nn.GELU
