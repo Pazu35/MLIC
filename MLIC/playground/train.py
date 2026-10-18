@@ -738,10 +738,11 @@ if __name__ == '__main__':
     # batch 4, lr 1e-5 (smoother_report.md §11-12). EXP defaults to H/off/s{SLICES}.
     env = os.environ.get
     SLICES = int(env("SLICES", "6"))
+    NORM = env("NORM", "min_max")  # min_max | mean_std | min_max_along_depth | mean_std_along_depth
     sys.argv = [
         "train.py",
         #"--metrics", "mse",
-        "--exp", env("EXP", f"back_to_the_future/H/off/cr_100000"),
+        "--exp", env("EXP", f"back_to_the_future/H/off/norm_{NORM}"),
         "--gpu_id", env("GPU", "0"),
         "--epochs", env("EPOCHS", "2000"),
         "--lambda", "1.0",
@@ -821,7 +822,7 @@ if __name__ == '__main__':
         # budget per water column whatever depth grid the model runs on. Before that
         # it referenced the model's own grid, so a 64-level model got 0.2048
         # bits/profile against a 157-level model's 0.5024 for the same number here.
-        "cr_treshold": 100000.0,
+        "cr_treshold": 10000.0,
         # Bits per level in that reference. None = the training tensor's own dtype,
         # which is what every run so far used (float32 -> 32). test_metrics.py builds
         # cr_native against a float32 reference, so on a float64 run set this to 32
@@ -874,7 +875,7 @@ if __name__ == '__main__':
 
     load_datamodule = False
     save_dm = False
-    norm_method = "mean_std_along_depth" #"min_max_along_depth" #"min_max" #"mean_std_along_depth" #mean_std"
+    norm_method = NORM #"min_max_along_depth" #"min_max" #"mean_std_along_depth" #mean_std"
     dm_type = "enatl_natl" #"enatl_natl" #"good_split"
     data_name = "enatl_natl" #enatl_natl", natl, natl_sst
     data_name_dir = data_name if dm_type=="good_split" else ""
