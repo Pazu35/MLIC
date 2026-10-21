@@ -738,7 +738,9 @@ if __name__ == '__main__':
     # batch 4, lr 1e-5 (smoother_report.md §11-12). EXP defaults to H/off/s{SLICES}.
     env = os.environ.get
     SLICES = int(env("SLICES", "6"))
-    NORM = env("NORM", "min_max")  # min_max | mean_std | min_max_along_depth | mean_std_along_depth
+    NORM = env("NORM", "mean_std_along_depth")  # min_max | mean_std | min_max_along_depth | mean_std_along_depth
+    CR = float(env("CR", "10000"))  # cr_treshold (rate floor, native field)
+    CTX_ON = env("CTX", "on") != "off"  # CTX=off: all four entropy-model contexts off
     sys.argv = [
         "train.py",
         #"--metrics", "mse",
@@ -822,7 +824,7 @@ if __name__ == '__main__':
         # budget per water column whatever depth grid the model runs on. Before that
         # it referenced the model's own grid, so a 64-level model got 0.2048
         # bits/profile against a 157-level model's 0.5024 for the same number here.
-        "cr_treshold": 10000.0,
+        "cr_treshold": CR,
         # Bits per level in that reference. None = the training tensor's own dtype,
         # which is what every run so far used (float32 -> 32). test_metrics.py builds
         # cr_native against a float32 reference, so on a float64 run set this to 32
@@ -848,10 +850,10 @@ if __name__ == '__main__':
     assert cfg["M"] % (16 * cfg["slice_num"]) == 0, "M must be a multiple of 16 x slice_num (global inter-context heads)"
     cfg["context_window"] = 5
     cfg['act'] = torch.nn.GELU
-    cfg["enable_channel_context"] = True
-    cfg["enable_local_context"] = True
-    cfg["enable_global_inter_context"] = True
-    cfg["enable_global_intra_context"] = True
+    cfg["enable_channel_context"] = CTX_ON
+    cfg["enable_local_context"] = CTX_ON
+    cfg["enable_global_inter_context"] = CTX_ON
+    cfg["enable_global_intra_context"] = CTX_ON
 
     cfg["add_seasons"] = {"use":False, "mode":"embed"}
     cfg["add_sst"] = False
