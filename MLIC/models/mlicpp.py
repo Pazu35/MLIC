@@ -612,3 +612,49 @@ class MLICPlusPlus(CompressionModel):
         updated = self.gaussian_conditional.update_scale_table(scale_table, force=force)
         updated |= super().update(force=force)
         return updated
+
+
+class MLICTransformOnly(MLICPlusPlus):
+    """g_a / g_s of MLIC++ with no quantisation and no entropy model (transform-only ablation, E5).
+
+    The latent is a float code of M channels at 1/16 resolution, so its ratio counts values, as for
+    the CAE: M = 4 on 192 x 256 gives 4 x 12 x 16 = 768 values, CR = 157 x 192 x 256 / 768 = 10048.
+    forward() returns unit likelihoods, so the rate term of the existing criteria is exactly zero.
+    The base entropy bottleneck and Gaussian conditional are kept only so that update(),
+    aux_loss() and load_state_dict() of the training loop run unchanged.
+    """
+
+    def __init__(self, config, **kwargs):
+        CompressionModel.__init__(self, config.N, **kwargs)
+        self.N, self.M = config.N, config.M
+        self.in_channels = config.get("in_channels", 3)
+        self.add_seasons = {"use": False, "mode": None}
+        self.add_sst = False
+        self.gaussian_conditional = GaussianConditional(None)
+        self.g_a = AnalysisTransform(N=self.N, M=self.M, in_channels=self.in_channels)
+        self.g_s = SynthesisTransform(N=self.N, M=self.M, out_channels=self.in_channels)
+
+    def forward(self, x, season_idx=None, sst=None):
+        y = self.g_a(x)
+        x_hat = self.g_s(y)[:, :x.shape[1]]
+        return {"x_hat": x_hat, "y_hat": y, "likelihoods": {"y_likelihoods": torch.ones_like(y)}}
+
+    def compress(self, x):
+        raise NotImplementedError("transform-only model: the float latent is not entropy coded")
+
+    def decompress(self, strings, shape):
+        raise NotImplementedError("transform-only model: the float latent is not entropy coded")
+
+
+if __name__ == "__main__":
+    # Check: shapes, latent size (CR 10048 at M = 4) and zero rate on a 157-level batch.
+    class _Cfg(dict):
+        __getattr__ = dict.get
+    m = MLICTransformOnly(_Cfg(N=64, M=4, in_channels=157))
+    x = torch.randn(2, 157, 192, 256)
+    out = m(x)
+    assert out["x_hat"].shape == x.shape, out["x_hat"].shape
+    assert out["y_hat"][0].numel() == 768 and 157 * 192 * 256 / 768 == 10048
+    assert sum(torch.log(l).sum() for l in out["likelihoods"].values()).item() == 0.0
+    m.update(force=True)
+    print("MLICTransformOnly ok:", sum(p.numel() for p in m.parameters()) / 1e6, "M params")

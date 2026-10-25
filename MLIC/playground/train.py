@@ -218,7 +218,7 @@ def main(dm,config, loss_params,checkpoint_dir_name):
         # test_dataloader.dataset.input.attrs["depth"] = depth_array
         # train_dataloader.dataset.input.attrs["depth"] = depth_array
 
-    net = MLICPlusPlus(config=config)
+    net = (MLICTransformOnly if config.get("transform_only", False) else MLICPlusPlus)(config=config)
     if args.cuda and torch.cuda.device_count() > 1:
         net = CustomDataParallel(net)
     net = net.to(device)
@@ -741,6 +741,7 @@ if __name__ == '__main__':
     NORM = env("NORM", "mean_std_along_depth")  # min_max | mean_std | min_max_along_depth | mean_std_along_depth
     CR = float(env("CR", "10000"))  # cr_treshold (rate floor, native field)
     CTX_ON = env("CTX", "on") != "off"  # CTX=off: all four entropy-model contexts off
+    TRANSFORM_ONLY = env("QUANT", "1") == "0"  # QUANT=0: g_a/g_s only, float latent M = 4 (CR 10048), no rate (E5)
     sys.argv = [
         "train.py",
         #"--metrics", "mse",
@@ -845,9 +846,10 @@ if __name__ == '__main__':
    
     cfg = model_config()
     cfg["N"] = 64 #int(os.environ.get("N", "64"))  # 32 / 64 / 96 (192, 640 seen before)
-    cfg["M"] = 96 #int(os.environ.get("M", "96"))  # 48 / 96 / 160
-    cfg["slice_num"] = 6 #SLICES  # 3 / 6 / 10
-    assert cfg["M"] % (16 * cfg["slice_num"]) == 0, "M must be a multiple of 16 x slice_num (global inter-context heads)"
+    cfg["M"] = 4 if TRANSFORM_ONLY else 96 #int(os.environ.get("M", "96"))  # 48 / 96 / 160
+    cfg["slice_num"] = 1 if TRANSFORM_ONLY else 6 #SLICES  # 3 / 6 / 10
+    cfg["transform_only"] = TRANSFORM_ONLY  # logged in experiment_config.log; test_metrics.py reads it back
+    assert TRANSFORM_ONLY or cfg["M"] % (16 * cfg["slice_num"]) == 0, "M must be a multiple of 16 x slice_num (global inter-context heads)"
     cfg["context_window"] = 5
     cfg['act'] = torch.nn.GELU
     cfg["enable_channel_context"] = CTX_ON
