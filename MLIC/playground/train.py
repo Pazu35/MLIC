@@ -92,7 +92,7 @@ def log_compression_rate_before_training(net, test_dataloader, device, logger_tr
     
     if total_elements > 0:
         avg_bpe = total_bits / total_elements
-        avg_cr = total_original_bits / total_bits
+        avg_cr = total_original_bits / total_bits if total_bits > 0 else float('inf')  # 0 bits: transform-only (QUANT=0)
         
         logger_train.info("="*50)
         logger_train.info("INITIAL COMPRESSION METRICS")
@@ -845,9 +845,9 @@ if __name__ == '__main__':
 
    
     cfg = model_config()
-    cfg["N"] = 64 #int(os.environ.get("N", "64"))  # 32 / 64 / 96 (192, 640 seen before)
-    cfg["M"] = 4 if TRANSFORM_ONLY else 96 #int(os.environ.get("M", "96"))  # 48 / 96 / 160
-    cfg["slice_num"] = 1 if TRANSFORM_ONLY else 6 #SLICES  # 3 / 6 / 10
+    cfg["N"] = int(os.environ.get("N", "64"))  # 32 / 64 / 96 (192, 640 seen before)
+    cfg["M"] = int(os.environ.get("M", "4" if TRANSFORM_ONLY else "96"))  # 48 / 96 / 160; QUANT=0 with M=96: float-latent floor of 64_96
+    cfg["slice_num"] = 1 if TRANSFORM_ONLY else int(os.environ.get("SLICES", "3"))  # 3 / 6 / 10; reference L = 3 since 28 Oct (F3 used 6)
     cfg["transform_only"] = TRANSFORM_ONLY  # logged in experiment_config.log; test_metrics.py reads it back
     assert TRANSFORM_ONLY or cfg["M"] % (16 * cfg["slice_num"]) == 0, "M must be a multiple of 16 x slice_num (global inter-context heads)"
     cfg["context_window"] = 5

@@ -1,0 +1,512 @@
+/var/spool/slurm/slurmd/job66177/slurm_script: 4: source: not found
+/var/spool/slurm/slurmd/job66177/slurm_script: 4: source: not found
+Managing NaNs for train/test DAs...
+Applying factor_64 padding/interpolation for train/test DAs...
+Selecting days for train/test DAs...
+Computing and applying normalization (normalize_per_split=True)...
+  Computing normalization stats from train split...
+  Computing normalization stats from val split...
+  Computing normalization stats from test split...
+Reconstructing normalized train/test DAs...
+Attaching season_idx and depth attributes to train/test DAs...
+Attaching SST data to train/test DAs...
+Storing final processed train/test DAs...
+Creating torch datasets for train/val/test DAs...
+Experiment configuration saved to: /Odyssey/private/o23gauvr/code/MLIC/experiments/back_to_the_future/cr_config/float_192_320/fixed_weight_loss_192_320_1.0_CR_10000.0_enatl_natl__mean_std_along_depth/20261029_215446/experiment_config.log
+[INFO] loss_params: {'method': 'fixed_weight', 'loss_dict': {'recon': 1.0, 'weighted_recon': 0.0, 'deriv': 0.0, 'weighted_deriv': 0.0, 'curvature_recon': 0.0, 'soft_peak': 0.0, 'lsd': 0.0, 'wasserstein_peak': 0.0, 'soft_max_pos': 0.0, 'matched_extrema_pos': 0.0, 'local_extrema_pos': 0.0, 'prominence_recall': 0.0}, 'structure_params': {'search_m': 10.0, 'capture_m': 40.0, 'local_beta': 4.0, 'pos_scale_m': 50.0, 'prominence_scales_m': [10.0, 25.0, 50.0, 100.0], 'min_prominence_frac': 0.05}, 'extrema_method': 'minmax', 'cr_treshold': 10000.0, 'rate_reference_bits_per_level': None, 'recon_treshold': None, 'lmbda': 1.0, 'use_smoothl1': False, 'use_factor_weights': True, 'factor_warmup_epochs': 150}
+[loss] terms with non-zero weight: {'recon': 1.0}
+26-10-29 21:54:47.319 - INFO: Namespace(experiment='back_to_the_future/cr_config/float_192_320', dataset='/home/npr/dataset/', epochs=2000, learning_rate=1e-05, num_workers=10, lmbda=1.0, metrics='mse', batch_size=4, test_batch_size=4, aux_learning_rate=0.001, loss_learning_rate=0.01, patch_size=[196, 256], gpu_id=0, cuda=True, save=True, seed=42.0, clip_max_norm=1.0, checkpoint=None, resume=False, world_size=1, dist_url='env://', gradient_accumulation_steps=1, grad_projection=False, grad_weighting=False, grad_weight_ratio=0.2, grad_weight_every=0, grad_weight_batches=4, verbose=False)
+26-10-29 21:54:47.319 - INFO: {'N': 192, 'M': 320, 'slice_num': 1, 'context_window': 5, 'act': <class 'torch.nn.modules.activation.GELU'>, 'transform_only': True, 'enable_channel_context': True, 'enable_local_context': True, 'enable_global_inter_context': True, 'enable_global_intra_context': True, 'add_seasons': {'use': False, 'mode': 'embed'}, 'add_sst': False, 'output_low_band_filter_use': False, 'output_low_band_filter_mode': 'learnable_gauss', 'in_channels': 157}
+26-10-29 21:54:47.319 - INFO: MLICTransformOnly(
+  (entropy_bottleneck): EntropyBottleneck(
+    (likelihood_lower_bound): LowerBound()
+    (matrices): ParameterList(
+        (0): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (1): Parameter containing: [torch.float32 of size 192x3x3 (cuda:0)]
+        (2): Parameter containing: [torch.float32 of size 192x3x3 (cuda:0)]
+        (3): Parameter containing: [torch.float32 of size 192x3x3 (cuda:0)]
+        (4): Parameter containing: [torch.float32 of size 192x1x3 (cuda:0)]
+    )
+    (biases): ParameterList(
+        (0): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (1): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (2): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (3): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (4): Parameter containing: [torch.float32 of size 192x1x1 (cuda:0)]
+    )
+    (factors): ParameterList(
+        (0): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (1): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (2): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (3): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+    )
+  )
+  (gaussian_conditional): GaussianConditional(
+    (likelihood_lower_bound): LowerBound()
+    (lower_bound_scale): LowerBound()
+  )
+  (g_a): AnalysisTransform(
+    (analysis_transform): Sequential(
+      (0): ResidualBlockWithStride(
+        (conv1): Conv2d(157, 192, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (gdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (skip): Conv2d(157, 192, kernel_size=(1, 1), stride=(2, 2))
+      )
+      (1): ResidualBlock(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (2): ResidualBlockWithStride(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (gdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (skip): Conv2d(192, 192, kernel_size=(1, 1), stride=(2, 2))
+      )
+      (3): ResidualBlock(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (4): ResidualBlockWithStride(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (gdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (skip): Conv2d(192, 192, kernel_size=(1, 1), stride=(2, 2))
+      )
+      (5): ResidualBlock(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (6): Conv2d(192, 320, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+    )
+  )
+  (g_s): SynthesisTransform(
+    (synthesis_transform): Sequential(
+      (0): ResidualBlock(
+        (conv1): Conv2d(320, 320, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(320, 320, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (1): ResidualBlockUpsample(
+        (subpel_conv): Sequential(
+          (0): Conv2d(320, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+        (act): GELU(approximate='none')
+        (conv): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (igdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (upsample): Sequential(
+          (0): Conv2d(320, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+      )
+      (2): ResidualBlock(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (3): ResidualBlockUpsample(
+        (subpel_conv): Sequential(
+          (0): Conv2d(192, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+        (act): GELU(approximate='none')
+        (conv): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (igdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (upsample): Sequential(
+          (0): Conv2d(192, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+      )
+      (4): ResidualBlock(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (5): ResidualBlockUpsample(
+        (subpel_conv): Sequential(
+          (0): Conv2d(192, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+        (act): GELU(approximate='none')
+        (conv): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (igdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (upsample): Sequential(
+          (0): Conv2d(192, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+      )
+      (6): ResidualBlock(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (7): Sequential(
+        (0): Conv2d(192, 628, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): PixelShuffle(upscale_factor=2)
+      )
+    )
+  )
+)
+26-10-29 21:54:47.321 - INFO: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    initial_lr: 1e-05
+    lr: 1e-05
+    maximize: False
+    weight_decay: 0
+)
+26-10-29 21:54:47.321 - INFO: Computing initial compression rate...
+26-10-29 21:54:49.772 - INFO: ==================================================
+26-10-29 21:54:49.772 - INFO: INITIAL COMPRESSION METRICS
+26-10-29 21:54:49.772 - INFO: ==================================================
+26-10-29 21:54:49.772 - INFO: Average Bits Per Element: 0.000000
+26-10-29 21:54:49.772 - INFO: Average Compression Rate: infx
+26-10-29 21:54:49.772 - INFO: Total compressed bits: 0.00
+26-10-29 21:54:49.772 - INFO: Total original bits: 1234698240.00
+26-10-29 21:54:49.772 - INFO: ==================================================
+26-10-29 21:54:49.908 - INFO: Gradient remedies: projection=False, weighting=False (ratio=0.2, every=0, batches=4)
+Training Progress:   0%|          | 0/2000 [00:00<?, ?epoch/s]26-10-29 21:54:49.910 - INFO: Learning rate: 1e-05
+26-10-29 21:55:00.326 - INFO: Train epoch 0: bpp_loss: 0 | recon_loss: 0.629621 | loss: 0.629621
+/Odyssey/private/o23gauvr/code/MLIC/MLIC/utils/metrics.py:90: RuntimeWarning: invalid value encountered in divide
+  recall_score = np.where(recall_den == 0, 0, num_true_positives / recall_den)
+/Odyssey/private/o23gauvr/code/MLIC/MLIC/utils/metrics.py:94: RuntimeWarning: invalid value encountered in divide
+  f1_score = np.where(sum_scores == 0, 0, 2 * (precision_score * recall_score) / sum_scores)
+26-10-29 21:55:11.157 - INFO: Validation epoch 0: Average losses: Loss: 16.4333 | Deriv loss: 2.038749 | F1 Score: 0.347730 | PSNR: 36.196903 | RMSE: 4.003192 | ECS: 95.632988 | bpp_loss: 0.0000 | recon_loss: 16.4333 | weighted_recon_loss: 15.6260 | deriv_loss: 2.0387 | lsd_loss: 12355498715.4286 | weighted_deriv_loss: 1.9263 | curvature_recon_loss: 16.6991 | soft_peak_loss: 42.8028 | wasserstein_peak_loss: 0.1269 | soft_max_pos_loss: 7.8147 | matched_extrema_pos_loss: 8.2739 | local_extrema_pos_loss: 0.0695 | prominence_recall_loss: 0.2348 | loss: 16.4333 
+/Odyssey/private/o23gauvr/miniforge3/envs/fsc/lib/python3.11/site-packages/torch/optim/lr_scheduler.py:232: UserWarning: The epoch parameter in `scheduler.step()` was not necessary and is being deprecated where possible. Please use `scheduler.step()` to step the scheduler. During the deprecation, if epoch is different from None, the closed form is used instead of the new chainable form, where available. Please open an issue if you are unable to replicate your use case: https://github.com/pytorch/pytorch/issues/new/choose.
+  warnings.warn(EPOCH_DEPRECATION_WARNING, UserWarning)
+26-10-29 21:55:12.978 - INFO: best checkpoint (loss) saved.
+26-10-29 21:55:13.906 - INFO: best checkpoint (ecs) saved.
+26-10-29 21:55:15.346 - INFO: best checkpoint (f1) saved.
+26-10-29 21:55:16.006 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 21:55:16.626 - INFO: best checkpoint (rmse) saved.
+Training Progress:   0%|          | 1/2000 [00:26<14:50:07, 26.72s/epoch]26-10-29 21:55:16.627 - INFO: Learning rate: 1e-05
+26-10-29 21:55:24.561 - INFO: Train epoch 1: bpp_loss: 0 | recon_loss: 0.226084 | loss: 0.226084
+26-10-29 21:55:35.291 - INFO: Validation epoch 1: Average losses: Loss: 7.0198 | Deriv loss: 1.638162 | F1 Score: 0.350617 | PSNR: 39.691628 | RMSE: 2.645824 | ECS: 79.850952 | bpp_loss: 0.0000 | recon_loss: 7.0198 | weighted_recon_loss: 6.5245 | deriv_loss: 1.6382 | lsd_loss: 5338581504.0000 | weighted_deriv_loss: 1.5458 | curvature_recon_loss: 8.7437 | soft_peak_loss: 12.6324 | wasserstein_peak_loss: 0.1103 | soft_max_pos_loss: 5.2086 | matched_extrema_pos_loss: 7.6646 | local_extrema_pos_loss: 0.0666 | prominence_recall_loss: 0.2005 | loss: 7.0198 
+26-10-29 21:55:36.700 - INFO: best checkpoint (loss) saved.
+26-10-29 21:55:37.457 - INFO: best checkpoint (ecs) saved.
+26-10-29 21:55:38.144 - INFO: best checkpoint (f1) saved.
+26-10-29 21:55:39.600 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 21:55:40.505 - INFO: best checkpoint (rmse) saved.
+Training Progress:   0%|          | 2/2000 [00:50<13:54:04, 25.05s/epoch]26-10-29 21:55:40.505 - INFO: Learning rate: 1e-05
+26-10-29 21:55:48.055 - INFO: Train epoch 2: bpp_loss: 0 | recon_loss: 0.121386 | loss: 0.121386
+26-10-29 21:56:03.444 - INFO: Validation epoch 2: Average losses: Loss: 5.4065 | Deriv loss: 1.011292 | F1 Score: 0.361213 | PSNR: 40.813349 | RMSE: 2.323636 | ECS: 70.801010 | bpp_loss: 0.0000 | recon_loss: 5.4065 | weighted_recon_loss: 5.0403 | deriv_loss: 1.0113 | lsd_loss: 3779148397.7143 | weighted_deriv_loss: 0.9524 | curvature_recon_loss: 6.9408 | soft_peak_loss: 9.1732 | wasserstein_peak_loss: 0.1003 | soft_max_pos_loss: 4.0775 | matched_extrema_pos_loss: 6.9234 | local_extrema_pos_loss: 0.0666 | prominence_recall_loss: 0.1958 | loss: 5.4065 
+26-10-29 21:56:04.996 - INFO: best checkpoint (loss) saved.
+26-10-29 21:56:05.661 - INFO: best checkpoint (ecs) saved.
+26-10-29 21:56:06.560 - INFO: best checkpoint (f1) saved.
+26-10-29 21:56:07.446 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 21:56:08.132 - INFO: best checkpoint (rmse) saved.
+Training Progress:   0%|          | 3/2000 [01:18<14:32:51, 26.23s/epoch]26-10-29 21:56:08.133 - INFO: Learning rate: 1e-05
+26-10-29 21:56:15.749 - INFO: Train epoch 3: bpp_loss: 0 | recon_loss: 0.0994594 | loss: 0.0994594
+26-10-29 21:56:27.805 - INFO: Validation epoch 3: Average losses: Loss: 4.5307 | Deriv loss: 0.843265 | F1 Score: 0.367186 | PSNR: 41.583235 | RMSE: 2.126828 | ECS: 64.425194 | bpp_loss: 0.0000 | recon_loss: 4.5307 | weighted_recon_loss: 4.2225 | deriv_loss: 0.8433 | lsd_loss: 3027857846.8571 | weighted_deriv_loss: 0.7963 | curvature_recon_loss: 5.9367 | soft_peak_loss: 7.5344 | wasserstein_peak_loss: 0.0924 | soft_max_pos_loss: 3.3783 | matched_extrema_pos_loss: 6.3705 | local_extrema_pos_loss: 0.0646 | prominence_recall_loss: 0.2074 | loss: 4.5307 
+26-10-29 21:56:29.142 - INFO: best checkpoint (loss) saved.
+26-10-29 21:56:29.791 - INFO: best checkpoint (ecs) saved.
+26-10-29 21:56:30.438 - INFO: best checkpoint (f1) saved.
+26-10-29 21:56:31.294 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 21:56:32.522 - INFO: best checkpoint (rmse) saved.
+Training Progress:   0%|          | 4/2000 [01:42<14:08:19, 25.50s/epoch]26-10-29 21:56:32.523 - INFO: Learning rate: 1e-05
+26-10-29 21:56:40.743 - INFO: Train epoch 4: bpp_loss: 0 | recon_loss: 0.0855682 | loss: 0.0855682
+26-10-29 21:56:51.186 - INFO: Validation epoch 4: Average losses: Loss: 3.8227 | Deriv loss: 0.766003 | F1 Score: 0.371241 | PSNR: 42.321007 | RMSE: 1.953606 | ECS: 60.578709 | bpp_loss: 0.0000 | recon_loss: 3.8227 | weighted_recon_loss: 3.5531 | deriv_loss: 0.7660 | lsd_loss: 2524863378.2857 | weighted_deriv_loss: 0.7238 | curvature_recon_loss: 5.0660 | soft_peak_loss: 6.8997 | wasserstein_peak_loss: 0.0872 | soft_max_pos_loss: 2.9726 | matched_extrema_pos_loss: 5.9981 | local_extrema_pos_loss: 0.0602 | prominence_recall_loss: 0.2221 | loss: 3.8227 
+26-10-29 21:56:52.647 - INFO: best checkpoint (loss) saved.
+26-10-29 21:56:53.463 - INFO: best checkpoint (ecs) saved.
+26-10-29 21:56:54.212 - INFO: best checkpoint (f1) saved.
+26-10-29 21:56:54.904 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 21:56:55.841 - INFO: best checkpoint (rmse) saved.
+Training Progress:   0%|          | 5/2000 [02:05<13:41:44, 24.71s/epoch]26-10-29 21:56:55.841 - INFO: Learning rate: 1e-05
+26-10-29 21:57:03.448 - INFO: Train epoch 5: bpp_loss: 0 | recon_loss: 0.073938 | loss: 0.073938
+26-10-29 21:57:13.414 - INFO: Validation epoch 5: Average losses: Loss: 3.2387 | Deriv loss: 0.660120 | F1 Score: 0.376133 | PSNR: 43.056145 | RMSE: 1.796596 | ECS: 55.315605 | bpp_loss: 0.0000 | recon_loss: 3.2387 | weighted_recon_loss: 2.9755 | deriv_loss: 0.6601 | lsd_loss: 2215318747.4286 | weighted_deriv_loss: 0.6239 | curvature_recon_loss: 4.4134 | soft_peak_loss: 5.8202 | wasserstein_peak_loss: 0.0783 | soft_max_pos_loss: 2.4037 | matched_extrema_pos_loss: 5.6153 | local_extrema_pos_loss: 0.0529 | prominence_recall_loss: 0.2356 | loss: 3.2387 
+26-10-29 21:57:14.954 - INFO: best checkpoint (loss) saved.
+26-10-29 21:57:16.813 - INFO: best checkpoint (ecs) saved.
+26-10-29 21:57:19.508 - INFO: best checkpoint (f1) saved.
+26-10-29 21:57:20.593 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 21:57:21.477 - INFO: best checkpoint (rmse) saved.
+Training Progress:   0%|          | 6/2000 [02:31<13:51:44, 25.03s/epoch]26-10-29 21:57:21.478 - INFO: Learning rate: 1e-05
+26-10-29 21:57:29.138 - INFO: Train epoch 6: bpp_loss: 0 | recon_loss: 0.0648289 | loss: 0.0648289
+26-10-29 21:57:39.071 - INFO: Validation epoch 6: Average losses: Loss: 2.9081 | Deriv loss: 0.623280 | F1 Score: 0.376491 | PSNR: 43.517273 | RMSE: 1.703089 | ECS: 51.931263 | bpp_loss: 0.0000 | recon_loss: 2.9081 | weighted_recon_loss: 2.6719 | deriv_loss: 0.6233 | lsd_loss: 1873297737.1429 | weighted_deriv_loss: 0.5893 | curvature_recon_loss: 3.9809 | soft_peak_loss: 5.1682 | wasserstein_peak_loss: 0.0721 | soft_max_pos_loss: 2.1433 | matched_extrema_pos_loss: 5.2840 | local_extrema_pos_loss: 0.0517 | prominence_recall_loss: 0.2295 | loss: 2.9081 
+26-10-29 21:57:41.198 - INFO: best checkpoint (loss) saved.
+26-10-29 21:57:42.247 - INFO: best checkpoint (ecs) saved.
+26-10-29 21:57:43.059 - INFO: best checkpoint (f1) saved.
+26-10-29 21:57:44.195 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 21:57:45.509 - INFO: best checkpoint (rmse) saved.
+Training Progress:   0%|          | 7/2000 [02:55<13:40:31, 24.70s/epoch]26-10-29 21:57:45.510 - INFO: Learning rate: 9.990604556307082e-06
+26-10-29 21:57:53.010 - INFO: Train epoch 7: bpp_loss: 0 | recon_loss: 0.05872 | loss: 0.05872
+26-10-29 21:58:03.083 - INFO: Validation epoch 7: Average losses: Loss: 2.6599 | Deriv loss: 0.555155 | F1 Score: 0.376676 | PSNR: 43.901923 | RMSE: 1.629057 | ECS: 49.225655 | bpp_loss: 0.0000 | recon_loss: 2.6599 | weighted_recon_loss: 2.4342 | deriv_loss: 0.5552 | lsd_loss: 1690839094.8571 | weighted_deriv_loss: 0.5255 | curvature_recon_loss: 3.6557 | soft_peak_loss: 4.7068 | wasserstein_peak_loss: 0.0689 | soft_max_pos_loss: 1.8815 | matched_extrema_pos_loss: 5.1629 | local_extrema_pos_loss: 0.0520 | prominence_recall_loss: 0.2113 | loss: 2.6599 
+26-10-29 21:58:04.857 - INFO: best checkpoint (loss) saved.
+26-10-29 21:58:06.005 - INFO: best checkpoint (ecs) saved.
+26-10-29 21:58:06.947 - INFO: best checkpoint (f1) saved.
+26-10-29 21:58:07.845 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 21:58:08.701 - INFO: best checkpoint (rmse) saved.
+Training Progress:   0%|          | 8/2000 [03:18<13:24:08, 24.22s/epoch]26-10-29 21:58:08.702 - INFO: Learning rate: 9.980902803578602e-06
+26-10-29 21:58:17.134 - INFO: Train epoch 8: bpp_loss: 0 | recon_loss: 0.053075 | loss: 0.053075
+26-10-29 21:58:26.943 - INFO: Validation epoch 8: Average losses: Loss: 2.4825 | Deriv loss: 0.513868 | F1 Score: 0.376678 | PSNR: 44.202321 | RMSE: 1.573749 | ECS: 49.481361 | bpp_loss: 0.0000 | recon_loss: 2.4825 | weighted_recon_loss: 2.2686 | deriv_loss: 0.5139 | lsd_loss: 1555621595.4286 | weighted_deriv_loss: 0.4863 | curvature_recon_loss: 3.4803 | soft_peak_loss: 4.2736 | wasserstein_peak_loss: 0.0690 | soft_max_pos_loss: 1.9424 | matched_extrema_pos_loss: 4.9025 | local_extrema_pos_loss: 0.0540 | prominence_recall_loss: 0.1919 | loss: 2.4825 
+26-10-29 21:58:28.981 - INFO: best checkpoint (loss) saved.
+26-10-29 21:58:29.995 - INFO: best checkpoint (f1) saved.
+26-10-29 21:58:30.986 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 21:58:32.090 - INFO: best checkpoint (rmse) saved.
+Training Progress:   0%|          | 9/2000 [03:42<13:15:06, 23.96s/epoch]26-10-29 21:58:32.090 - INFO: Learning rate: 9.97089573729802e-06
+26-10-29 21:58:40.093 - INFO: Train epoch 9: bpp_loss: 0 | recon_loss: 0.0492882 | loss: 0.0492882
+26-10-29 21:58:50.371 - INFO: Validation epoch 9: Average losses: Loss: 2.3390 | Deriv loss: 0.481171 | F1 Score: 0.377939 | PSNR: 44.461006 | RMSE: 1.527563 | ECS: 48.840599 | bpp_loss: 0.0000 | recon_loss: 2.3390 | weighted_recon_loss: 2.1447 | deriv_loss: 0.4812 | lsd_loss: 1406247149.7143 | weighted_deriv_loss: 0.4553 | curvature_recon_loss: 3.2519 | soft_peak_loss: 4.0797 | wasserstein_peak_loss: 0.0687 | soft_max_pos_loss: 1.8791 | matched_extrema_pos_loss: 4.6233 | local_extrema_pos_loss: 0.0530 | prominence_recall_loss: 0.1958 | loss: 2.3390 
+26-10-29 21:58:52.201 - INFO: best checkpoint (loss) saved.
+26-10-29 21:58:53.153 - INFO: best checkpoint (ecs) saved.
+26-10-29 21:58:54.022 - INFO: best checkpoint (f1) saved.
+26-10-29 21:58:54.935 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 21:58:55.965 - INFO: best checkpoint (rmse) saved.
+Training Progress:   0%|          | 10/2000 [04:06<13:13:49, 23.93s/epoch]26-10-29 21:58:55.965 - INFO: Learning rate: 9.9605843730989e-06
+26-10-29 21:59:03.998 - INFO: Train epoch 10: bpp_loss: 0 | recon_loss: 0.044844 | loss: 0.044844
+26-10-29 21:59:14.428 - INFO: Validation epoch 10: Average losses: Loss: 2.2035 | Deriv loss: 0.455131 | F1 Score: 0.378928 | PSNR: 44.720960 | RMSE: 1.482593 | ECS: 49.135525 | bpp_loss: 0.0000 | recon_loss: 2.2035 | weighted_recon_loss: 2.0211 | deriv_loss: 0.4551 | lsd_loss: 1297095808.0000 | weighted_deriv_loss: 0.4307 | curvature_recon_loss: 3.0721 | soft_peak_loss: 3.8949 | wasserstein_peak_loss: 0.0694 | soft_max_pos_loss: 1.8955 | matched_extrema_pos_loss: 4.4365 | local_extrema_pos_loss: 0.0522 | prominence_recall_loss: 0.1948 | loss: 2.2035 
+26-10-29 21:59:15.823 - INFO: best checkpoint (loss) saved.
+26-10-29 21:59:16.911 - INFO: best checkpoint (f1) saved.
+26-10-29 21:59:17.523 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 21:59:18.327 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 11/2000 [04:28<12:57:28, 23.45s/epoch]26-10-29 21:59:18.328 - INFO: Learning rate: 9.94996974665078e-06
+26-10-29 21:59:25.685 - INFO: Train epoch 11: bpp_loss: 0 | recon_loss: 0.0418544 | loss: 0.0418544
+26-10-29 21:59:35.463 - INFO: Validation epoch 11: Average losses: Loss: 2.0733 | Deriv loss: 0.441323 | F1 Score: 0.380499 | PSNR: 44.983303 | RMSE: 1.438311 | ECS: 49.683514 | bpp_loss: 0.0000 | recon_loss: 2.0733 | weighted_recon_loss: 1.9074 | deriv_loss: 0.4413 | lsd_loss: 1206656566.8571 | weighted_deriv_loss: 0.4179 | curvature_recon_loss: 2.9073 | soft_peak_loss: 3.9062 | wasserstein_peak_loss: 0.0713 | soft_max_pos_loss: 1.9506 | matched_extrema_pos_loss: 4.3377 | local_extrema_pos_loss: 0.0525 | prominence_recall_loss: 0.1889 | loss: 2.0733 
+26-10-29 21:59:37.447 - INFO: best checkpoint (loss) saved.
+26-10-29 21:59:38.158 - INFO: best checkpoint (f1) saved.
+26-10-29 21:59:38.865 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 21:59:39.852 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 12/2000 [04:49<12:37:38, 22.87s/epoch]26-10-29 21:59:39.852 - INFO: Learning rate: 9.93905291354386e-06
+26-10-29 21:59:47.495 - INFO: Train epoch 12: bpp_loss: 0 | recon_loss: 0.038441 | loss: 0.038441
+26-10-29 21:59:57.881 - INFO: Validation epoch 12: Average losses: Loss: 1.9757 | Deriv loss: 0.423927 | F1 Score: 0.382302 | PSNR: 45.195030 | RMSE: 1.403870 | ECS: 48.265514 | bpp_loss: 0.0000 | recon_loss: 1.9757 | weighted_recon_loss: 1.8140 | deriv_loss: 0.4239 | lsd_loss: 1109323273.1429 | weighted_deriv_loss: 0.4015 | curvature_recon_loss: 2.7373 | soft_peak_loss: 3.8677 | wasserstein_peak_loss: 0.0697 | soft_max_pos_loss: 1.7872 | matched_extrema_pos_loss: 4.1670 | local_extrema_pos_loss: 0.0504 | prominence_recall_loss: 0.1905 | loss: 1.9757 
+26-10-29 21:59:59.207 - INFO: best checkpoint (loss) saved.
+26-10-29 21:59:59.907 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:00:00.578 - INFO: best checkpoint (f1) saved.
+26-10-29 22:00:01.251 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:00:02.278 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 13/2000 [05:12<12:32:51, 22.73s/epoch]26-10-29 22:00:02.279 - INFO: Learning rate: 9.927834949172442e-06
+26-10-29 22:00:09.975 - INFO: Train epoch 13: bpp_loss: 0 | recon_loss: 0.0357751 | loss: 0.0357751
+26-10-29 22:00:20.521 - INFO: Validation epoch 13: Average losses: Loss: 1.9171 | Deriv loss: 0.400164 | F1 Score: 0.384413 | PSNR: 45.329806 | RMSE: 1.382569 | ECS: 47.809391 | bpp_loss: 0.0000 | recon_loss: 1.9171 | weighted_recon_loss: 1.7657 | deriv_loss: 0.4002 | lsd_loss: 1054675538.2857 | weighted_deriv_loss: 0.3790 | curvature_recon_loss: 2.6380 | soft_peak_loss: 3.7999 | wasserstein_peak_loss: 0.0690 | soft_max_pos_loss: 1.7756 | matched_extrema_pos_loss: 4.0584 | local_extrema_pos_loss: 0.0506 | prominence_recall_loss: 0.1876 | loss: 1.9171 
+26-10-29 22:00:22.060 - INFO: best checkpoint (loss) saved.
+26-10-29 22:00:22.775 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:00:23.505 - INFO: best checkpoint (f1) saved.
+26-10-29 22:00:24.323 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:00:25.129 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 14/2000 [05:35<12:33:38, 22.77s/epoch]26-10-29 22:00:25.130 - INFO: Learning rate: 9.91631694861723e-06
+26-10-29 22:00:32.936 - INFO: Train epoch 14: bpp_loss: 0 | recon_loss: 0.0329729 | loss: 0.0329729
+26-10-29 22:00:43.625 - INFO: Validation epoch 14: Average losses: Loss: 1.7956 | Deriv loss: 0.385633 | F1 Score: 0.386429 | PSNR: 45.620672 | RMSE: 1.337540 | ECS: 44.925133 | bpp_loss: 0.0000 | recon_loss: 1.7956 | weighted_recon_loss: 1.6589 | deriv_loss: 0.3856 | lsd_loss: 977290258.2857 | weighted_deriv_loss: 0.3652 | curvature_recon_loss: 2.4671 | soft_peak_loss: 3.7077 | wasserstein_peak_loss: 0.0653 | soft_max_pos_loss: 1.5908 | matched_extrema_pos_loss: 3.8172 | local_extrema_pos_loss: 0.0493 | prominence_recall_loss: 0.1849 | loss: 1.7956 
+26-10-29 22:00:45.049 - INFO: best checkpoint (loss) saved.
+26-10-29 22:00:46.138 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:00:46.824 - INFO: best checkpoint (f1) saved.
+26-10-29 22:00:47.436 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:00:48.121 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 15/2000 [05:58<12:35:29, 22.84s/epoch]26-10-29 22:00:48.122 - INFO: Learning rate: 9.9045000265264e-06
+26-10-29 22:00:56.204 - INFO: Train epoch 15: bpp_loss: 0 | recon_loss: 0.0307943 | loss: 0.0307943
+26-10-29 22:01:06.869 - INFO: Validation epoch 15: Average losses: Loss: 1.7298 | Deriv loss: 0.356264 | F1 Score: 0.390847 | PSNR: 45.781882 | RMSE: 1.312872 | ECS: 42.317299 | bpp_loss: 0.0000 | recon_loss: 1.7298 | weighted_recon_loss: 1.6065 | deriv_loss: 0.3563 | lsd_loss: 975592594.2857 | weighted_deriv_loss: 0.3374 | curvature_recon_loss: 2.3389 | soft_peak_loss: 3.6447 | wasserstein_peak_loss: 0.0615 | soft_max_pos_loss: 1.4526 | matched_extrema_pos_loss: 3.6058 | local_extrema_pos_loss: 0.0479 | prominence_recall_loss: 0.1835 | loss: 1.7298 
+26-10-29 22:01:08.355 - INFO: best checkpoint (loss) saved.
+26-10-29 22:01:09.109 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:01:09.838 - INFO: best checkpoint (f1) saved.
+26-10-29 22:01:10.486 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:01:11.478 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 16/2000 [06:21<12:40:17, 22.99s/epoch]26-10-29 22:01:11.478 - INFO: Learning rate: 9.89238531699555e-06
+26-10-29 22:01:20.284 - INFO: Train epoch 16: bpp_loss: 0 | recon_loss: 0.0287882 | loss: 0.0287882
+26-10-29 22:01:30.638 - INFO: Validation epoch 16: Average losses: Loss: 1.5858 | Deriv loss: 0.329968 | F1 Score: 0.392977 | PSNR: 46.152165 | RMSE: 1.257562 | ECS: 41.221828 | bpp_loss: 0.0000 | recon_loss: 1.5858 | weighted_recon_loss: 1.4686 | deriv_loss: 0.3300 | lsd_loss: 885445732.5714 | weighted_deriv_loss: 0.3126 | curvature_recon_loss: 2.1625 | soft_peak_loss: 3.4034 | wasserstein_peak_loss: 0.0593 | soft_max_pos_loss: 1.3908 | matched_extrema_pos_loss: 3.5338 | local_extrema_pos_loss: 0.0476 | prominence_recall_loss: 0.1779 | loss: 1.5858 
+26-10-29 22:01:32.729 - INFO: best checkpoint (loss) saved.
+26-10-29 22:01:33.364 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:01:34.722 - INFO: best checkpoint (f1) saved.
+26-10-29 22:01:35.851 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:01:36.892 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 17/2000 [06:46<13:03:58, 23.72s/epoch]26-10-29 22:01:36.893 - INFO: Learning rate: 9.879973973446455e-06
+26-10-29 22:01:44.509 - INFO: Train epoch 17: bpp_loss: 0 | recon_loss: 0.026854 | loss: 0.026854
+26-10-29 22:01:55.025 - INFO: Validation epoch 17: Average losses: Loss: 1.5110 | Deriv loss: 0.313805 | F1 Score: 0.396014 | PSNR: 46.360086 | RMSE: 1.227685 | ECS: 40.248089 | bpp_loss: 0.0000 | recon_loss: 1.5110 | weighted_recon_loss: 1.4001 | deriv_loss: 0.3138 | lsd_loss: 842717504.0000 | weighted_deriv_loss: 0.2973 | curvature_recon_loss: 2.0977 | soft_peak_loss: 3.1855 | wasserstein_peak_loss: 0.0572 | soft_max_pos_loss: 1.3665 | matched_extrema_pos_loss: 3.4212 | local_extrema_pos_loss: 0.0451 | prominence_recall_loss: 0.1834 | loss: 1.5110 
+26-10-29 22:01:56.457 - INFO: best checkpoint (loss) saved.
+26-10-29 22:01:57.119 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:01:57.833 - INFO: best checkpoint (f1) saved.
+26-10-29 22:01:58.530 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:01:59.189 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 18/2000 [07:09<12:49:26, 23.29s/epoch]26-10-29 22:01:59.190 - INFO: Learning rate: 9.867267168504688e-06
+26-10-29 22:02:07.227 - INFO: Train epoch 18: bpp_loss: 0 | recon_loss: 0.0262606 | loss: 0.0262606
+26-10-29 22:02:29.804 - INFO: Validation epoch 18: Average losses: Loss: 1.4746 | Deriv loss: 0.298567 | F1 Score: 0.397349 | PSNR: 46.464028 | RMSE: 1.212942 | ECS: 39.633461 | bpp_loss: 0.0000 | recon_loss: 1.4746 | weighted_recon_loss: 1.3628 | deriv_loss: 0.2986 | lsd_loss: 846275977.1429 | weighted_deriv_loss: 0.2828 | curvature_recon_loss: 2.0603 | soft_peak_loss: 3.1949 | wasserstein_peak_loss: 0.0557 | soft_max_pos_loss: 1.3991 | matched_extrema_pos_loss: 3.4013 | local_extrema_pos_loss: 0.0466 | prominence_recall_loss: 0.1753 | loss: 1.4746 
+26-10-29 22:02:31.234 - INFO: best checkpoint (loss) saved.
+26-10-29 22:02:32.403 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:02:33.312 - INFO: best checkpoint (f1) saved.
+26-10-29 22:02:35.229 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:02:35.950 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 19/2000 [07:46<15:02:36, 27.34s/epoch]26-10-29 22:02:35.951 - INFO: Learning rate: 9.854266093876123e-06
+26-10-29 22:02:44.000 - INFO: Train epoch 19: bpp_loss: 0 | recon_loss: 0.0245837 | loss: 0.0245837
+26-10-29 22:02:55.002 - INFO: Validation epoch 19: Average losses: Loss: 1.4022 | Deriv loss: 0.281529 | F1 Score: 0.400867 | PSNR: 46.682157 | RMSE: 1.182817 | ECS: 38.383457 | bpp_loss: 0.0000 | recon_loss: 1.4022 | weighted_recon_loss: 1.2974 | deriv_loss: 0.2815 | lsd_loss: 770228480.0000 | weighted_deriv_loss: 0.2666 | curvature_recon_loss: 1.9346 | soft_peak_loss: 2.9536 | wasserstein_peak_loss: 0.0538 | soft_max_pos_loss: 1.2712 | matched_extrema_pos_loss: 3.3068 | local_extrema_pos_loss: 0.0450 | prominence_recall_loss: 0.1803 | loss: 1.4022 
+26-10-29 22:02:56.488 - INFO: best checkpoint (loss) saved.
+26-10-29 22:02:57.104 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:02:57.828 - INFO: best checkpoint (f1) saved.
+26-10-29 22:02:58.496 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:02:59.313 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 20/2000 [08:09<14:22:46, 26.14s/epoch]26-10-29 22:02:59.314 - INFO: Learning rate: 9.840971960222272e-06
+26-10-29 22:03:07.296 - INFO: Train epoch 20: bpp_loss: 0 | recon_loss: 0.0235974 | loss: 0.0235974
+26-10-29 22:03:17.734 - INFO: Validation epoch 20: Average losses: Loss: 1.3554 | Deriv loss: 0.269368 | F1 Score: 0.401763 | PSNR: 46.834078 | RMSE: 1.162610 | ECS: 38.956898 | bpp_loss: 0.0000 | recon_loss: 1.3554 | weighted_recon_loss: 1.2553 | deriv_loss: 0.2694 | lsd_loss: 757584896.0000 | weighted_deriv_loss: 0.2551 | curvature_recon_loss: 1.8971 | soft_peak_loss: 2.9513 | wasserstein_peak_loss: 0.0549 | soft_max_pos_loss: 1.3224 | matched_extrema_pos_loss: 3.2660 | local_extrema_pos_loss: 0.0449 | prominence_recall_loss: 0.1807 | loss: 1.3554 
+26-10-29 22:03:19.055 - INFO: best checkpoint (loss) saved.
+26-10-29 22:03:19.784 - INFO: best checkpoint (f1) saved.
+26-10-29 22:03:20.838 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:03:21.558 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 21/2000 [08:31<13:43:43, 24.97s/epoch]26-10-29 22:03:21.559 - INFO: Learning rate: 9.827385997034553e-06
+26-10-29 22:03:29.257 - INFO: Train epoch 21: bpp_loss: 0 | recon_loss: 0.0228171 | loss: 0.0228171
+26-10-29 22:03:39.849 - INFO: Validation epoch 21: Average losses: Loss: 1.3298 | Deriv loss: 0.261219 | F1 Score: 0.403414 | PSNR: 46.912596 | RMSE: 1.151867 | ECS: 38.002689 | bpp_loss: 0.0000 | recon_loss: 1.3298 | weighted_recon_loss: 1.2297 | deriv_loss: 0.2612 | lsd_loss: 713910683.4286 | weighted_deriv_loss: 0.2473 | curvature_recon_loss: 1.8508 | soft_peak_loss: 2.8336 | wasserstein_peak_loss: 0.0531 | soft_max_pos_loss: 1.2702 | matched_extrema_pos_loss: 3.2219 | local_extrema_pos_loss: 0.0452 | prominence_recall_loss: 0.1771 | loss: 1.3298 
+26-10-29 22:03:41.132 - INFO: best checkpoint (loss) saved.
+26-10-29 22:03:41.873 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:03:42.538 - INFO: best checkpoint (f1) saved.
+26-10-29 22:03:43.291 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:03:44.046 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 22/2000 [08:54<13:18:43, 24.23s/epoch]26-10-29 22:03:44.047 - INFO: Learning rate: 9.813509452507428e-06
+26-10-29 22:03:51.192 - INFO: Train epoch 22: bpp_loss: 0 | recon_loss: 0.0220718 | loss: 0.0220718
+26-10-29 22:04:11.760 - INFO: Validation epoch 22: Average losses: Loss: 1.2876 | Deriv loss: 0.247899 | F1 Score: 0.405014 | PSNR: 47.052376 | RMSE: 1.133465 | ECS: 37.102657 | bpp_loss: 0.0000 | recon_loss: 1.2876 | weighted_recon_loss: 1.1911 | deriv_loss: 0.2479 | lsd_loss: 687046528.0000 | weighted_deriv_loss: 0.2346 | curvature_recon_loss: 1.7844 | soft_peak_loss: 2.7675 | wasserstein_peak_loss: 0.0517 | soft_max_pos_loss: 1.2033 | matched_extrema_pos_loss: 3.1711 | local_extrema_pos_loss: 0.0453 | prominence_recall_loss: 0.1761 | loss: 1.2876 
+26-10-29 22:04:13.087 - INFO: best checkpoint (loss) saved.
+26-10-29 22:04:13.718 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:04:14.690 - INFO: best checkpoint (f1) saved.
+26-10-29 22:04:15.309 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:04:15.929 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 23/2000 [09:26<14:34:00, 26.53s/epoch]26-10-29 22:04:15.930 - INFO: Learning rate: 9.79934359341047e-06
+26-10-29 22:04:23.706 - INFO: Train epoch 23: bpp_loss: 0 | recon_loss: 0.0215802 | loss: 0.0215802
+26-10-29 22:04:34.335 - INFO: Validation epoch 23: Average losses: Loss: 1.2626 | Deriv loss: 0.238561 | F1 Score: 0.406271 | PSNR: 47.142320 | RMSE: 1.122101 | ECS: 36.984379 | bpp_loss: 0.0000 | recon_loss: 1.2626 | weighted_recon_loss: 1.1685 | deriv_loss: 0.2386 | lsd_loss: 664588260.5714 | weighted_deriv_loss: 0.2258 | curvature_recon_loss: 1.7658 | soft_peak_loss: 2.6566 | wasserstein_peak_loss: 0.0515 | soft_max_pos_loss: 1.1960 | matched_extrema_pos_loss: 3.0941 | local_extrema_pos_loss: 0.0441 | prominence_recall_loss: 0.1790 | loss: 1.2626 
+26-10-29 22:04:35.853 - INFO: best checkpoint (loss) saved.
+26-10-29 22:04:36.485 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:04:37.168 - INFO: best checkpoint (f1) saved.
+26-10-29 22:04:37.810 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:04:38.627 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 24/2000 [09:48<13:55:44, 25.38s/epoch]26-10-29 22:04:38.628 - INFO: Learning rate: 9.784889704959322e-06
+26-10-29 22:04:46.412 - INFO: Train epoch 24: bpp_loss: 0 | recon_loss: 0.0213313 | loss: 0.0213313
+26-10-29 22:04:57.274 - INFO: Validation epoch 24: Average losses: Loss: 1.2245 | Deriv loss: 0.231821 | F1 Score: 0.408220 | PSNR: 47.274480 | RMSE: 1.105089 | ECS: 36.399746 | bpp_loss: 0.0000 | recon_loss: 1.2245 | weighted_recon_loss: 1.1343 | deriv_loss: 0.2318 | lsd_loss: 653846866.2857 | weighted_deriv_loss: 0.2194 | curvature_recon_loss: 1.7166 | soft_peak_loss: 2.6962 | wasserstein_peak_loss: 0.0506 | soft_max_pos_loss: 1.1845 | matched_extrema_pos_loss: 3.1045 | local_extrema_pos_loss: 0.0443 | prominence_recall_loss: 0.1771 | loss: 1.2245 
+26-10-29 22:04:59.234 - INFO: best checkpoint (loss) saved.
+26-10-29 22:05:00.026 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:05:02.394 - INFO: best checkpoint (f1) saved.
+26-10-29 22:05:03.577 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:05:04.265 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|▏         | 25/2000 [10:14<13:57:53, 25.46s/epoch]26-10-29 22:05:04.266 - INFO: Learning rate: 9.77014909068563e-06
+26-10-29 22:05:12.696 - INFO: Train epoch 25: bpp_loss: 0 | recon_loss: 0.0201765 | loss: 0.0201765
+26-10-29 22:05:23.071 - INFO: Validation epoch 25: Average losses: Loss: 1.2089 | Deriv loss: 0.227319 | F1 Score: 0.408906 | PSNR: 47.328012 | RMSE: 1.098169 | ECS: 36.360149 | bpp_loss: 0.0000 | recon_loss: 1.2089 | weighted_recon_loss: 1.1190 | deriv_loss: 0.2273 | lsd_loss: 617956955.4286 | weighted_deriv_loss: 0.2151 | curvature_recon_loss: 1.6898 | soft_peak_loss: 2.6352 | wasserstein_peak_loss: 0.0506 | soft_max_pos_loss: 1.1543 | matched_extrema_pos_loss: 3.0069 | local_extrema_pos_loss: 0.0438 | prominence_recall_loss: 0.1803 | loss: 1.2089 
+26-10-29 22:05:25.065 - INFO: best checkpoint (loss) saved.
+26-10-29 22:05:25.997 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:05:26.874 - INFO: best checkpoint (f1) saved.
+26-10-29 22:05:27.601 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:05:28.304 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|▏         | 26/2000 [10:38<13:43:29, 25.03s/epoch]26-10-29 22:05:28.305 - INFO: Learning rate: 9.755123072305867e-06
+26-10-29 22:05:36.186 - INFO: Train epoch 26: bpp_loss: 0 | recon_loss: 0.0195579 | loss: 0.0195579
+26-10-29 22:05:47.775 - INFO: Validation epoch 26: Average losses: Loss: 1.1721 | Deriv loss: 0.220233 | F1 Score: 0.410028 | PSNR: 47.459484 | RMSE: 1.081507 | ECS: 36.253147 | bpp_loss: 0.0000 | recon_loss: 1.1721 | weighted_recon_loss: 1.0854 | deriv_loss: 0.2202 | lsd_loss: 600645677.7143 | weighted_deriv_loss: 0.2084 | curvature_recon_loss: 1.6318 | soft_peak_loss: 2.6253 | wasserstein_peak_loss: 0.0504 | soft_max_pos_loss: 1.1553 | matched_extrema_pos_loss: 2.9845 | local_extrema_pos_loss: 0.0434 | prominence_recall_loss: 0.1775 | loss: 1.1721 
+26-10-29 22:05:49.265 - INFO: best checkpoint (loss) saved.
+26-10-29 22:05:49.949 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:05:50.644 - INFO: best checkpoint (f1) saved.
+26-10-29 22:05:51.355 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:05:52.008 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|▏         | 27/2000 [11:02<13:29:59, 24.63s/epoch]26-10-29 22:05:52.009 - INFO: Learning rate: 9.73981298958918e-06
+26-10-29 22:05:59.617 - INFO: Train epoch 27: bpp_loss: 0 | recon_loss: 0.0190213 | loss: 0.0190213
+26-10-29 22:06:10.329 - INFO: Validation epoch 27: Average losses: Loss: 1.1433 | Deriv loss: 0.213711 | F1 Score: 0.410544 | PSNR: 47.571244 | RMSE: 1.067895 | ECS: 35.785297 | bpp_loss: 0.0000 | recon_loss: 1.1433 | weighted_recon_loss: 1.0588 | deriv_loss: 0.2137 | lsd_loss: 580489947.4286 | weighted_deriv_loss: 0.2022 | curvature_recon_loss: 1.6125 | soft_peak_loss: 2.5811 | wasserstein_peak_loss: 0.0497 | soft_max_pos_loss: 1.1263 | matched_extrema_pos_loss: 2.9285 | local_extrema_pos_loss: 0.0429 | prominence_recall_loss: 0.1801 | loss: 1.1433 
+26-10-29 22:06:11.976 - INFO: best checkpoint (loss) saved.
+26-10-29 22:06:12.691 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:06:13.460 - INFO: best checkpoint (f1) saved.
+26-10-29 22:06:14.115 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:06:15.654 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|▏         | 28/2000 [11:25<13:19:51, 24.34s/epoch]26-10-29 22:06:15.655 - INFO: Learning rate: 9.724220200224129e-06
+26-10-29 22:06:23.560 - INFO: Train epoch 28: bpp_loss: 0 | recon_loss: 0.0185934 | loss: 0.0185934
+26-10-29 22:06:35.115 - INFO: Validation epoch 28: Average losses: Loss: 1.1387 | Deriv loss: 0.210806 | F1 Score: 0.412818 | PSNR: 47.586922 | RMSE: 1.065855 | ECS: 35.721413 | bpp_loss: 0.0000 | recon_loss: 1.1387 | weighted_recon_loss: 1.0555 | deriv_loss: 0.2108 | lsd_loss: 577954157.7143 | weighted_deriv_loss: 0.1994 | curvature_recon_loss: 1.6132 | soft_peak_loss: 2.5603 | wasserstein_peak_loss: 0.0500 | soft_max_pos_loss: 1.1282 | matched_extrema_pos_loss: 2.9074 | local_extrema_pos_loss: 0.0431 | prominence_recall_loss: 0.1808 | loss: 1.1387 
+26-10-29 22:06:37.871 - INFO: best checkpoint (loss) saved.
+26-10-29 22:06:38.564 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:06:39.170 - INFO: best checkpoint (f1) saved.
+26-10-29 22:06:39.974 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:06:40.700 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|▏         | 29/2000 [11:50<13:26:26, 24.55s/epoch]26-10-29 22:06:40.701 - INFO: Learning rate: 9.70834607968447e-06
+26-10-29 22:06:48.872 - INFO: Train epoch 29: bpp_loss: 0 | recon_loss: 0.0181393 | loss: 0.0181393
+26-10-29 22:07:13.704 - INFO: Validation epoch 29: Average losses: Loss: 1.1060 | Deriv loss: 0.204426 | F1 Score: 0.412608 | PSNR: 47.717117 | RMSE: 1.050229 | ECS: 34.767685 | bpp_loss: 0.0000 | recon_loss: 1.1060 | weighted_recon_loss: 1.0243 | deriv_loss: 0.2044 | lsd_loss: 551116516.5714 | weighted_deriv_loss: 0.1934 | curvature_recon_loss: 1.5579 | soft_peak_loss: 2.5102 | wasserstein_peak_loss: 0.0476 | soft_max_pos_loss: 1.1350 | matched_extrema_pos_loss: 2.8523 | local_extrema_pos_loss: 0.0420 | prominence_recall_loss: 0.1780 | loss: 1.1060 
+26-10-29 22:07:15.068 - INFO: best checkpoint (loss) saved.
+26-10-29 22:07:16.374 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:07:16.987 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:07:17.934 - INFO: best checkpoint (rmse) saved.
+Training Progress:   2%|▏         | 30/2000 [12:28<15:30:58, 28.35s/epoch]26-10-29 22:07:17.934 - INFO: Learning rate: 9.69219202109388e-06
+26-10-29 22:07:26.314 - INFO: Train epoch 30: bpp_loss: 0 | recon_loss: 0.0177311 | loss: 0.0177311
+26-10-29 22:07:37.427 - INFO: Validation epoch 30: Average losses: Loss: 1.0858 | Deriv loss: 0.197751 | F1 Score: 0.415166 | PSNR: 47.790430 | RMSE: 1.040989 | ECS: 35.097633 | bpp_loss: 0.0000 | recon_loss: 1.0858 | weighted_recon_loss: 1.0052 | deriv_loss: 0.1978 | lsd_loss: 548841417.1429 | weighted_deriv_loss: 0.1871 | curvature_recon_loss: 1.5124 | soft_peak_loss: 2.4704 | wasserstein_peak_loss: 0.0490 | soft_max_pos_loss: 1.0969 | matched_extrema_pos_loss: 2.9521 | local_extrema_pos_loss: 0.0426 | prominence_recall_loss: 0.1764 | loss: 1.0858 
+26-10-29 22:07:38.970 - INFO: best checkpoint (loss) saved.
+26-10-29 22:07:39.636 - INFO: best checkpoint (f1) saved.
+26-10-29 22:07:40.340 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:07:41.261 - INFO: best checkpoint (rmse) saved.
+Training Progress:   2%|▏         | 31/2000 [12:51<14:41:00, 26.85s/epoch]26-10-29 22:07:41.261 - INFO: Learning rate: 9.675759435089723e-06
+26-10-29 22:07:49.638 - INFO: Train epoch 31: bpp_loss: 0 | recon_loss: 0.0175334 | loss: 0.0175334
+26-10-29 22:08:00.150 - INFO: Validation epoch 31: Average losses: Loss: 1.0598 | Deriv loss: 0.195121 | F1 Score: 0.414366 | PSNR: 47.896607 | RMSE: 1.028389 | ECS: 34.525272 | bpp_loss: 0.0000 | recon_loss: 1.0598 | weighted_recon_loss: 0.9774 | deriv_loss: 0.1951 | lsd_loss: 539453590.8571 | weighted_deriv_loss: 0.1846 | curvature_recon_loss: 1.5151 | soft_peak_loss: 2.4145 | wasserstein_peak_loss: 0.0476 | soft_max_pos_loss: 1.1614 | matched_extrema_pos_loss: 2.8457 | local_extrema_pos_loss: 0.0421 | prominence_recall_loss: 0.1762 | loss: 1.0598 
+26-10-29 22:08:01.473 - INFO: best checkpoint (loss) saved.
+26-10-29 22:08:02.147 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:08:02.794 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:08:03.428 - INFO: best checkpoint (rmse) saved.
+Training Progress:   2%|▏         | 32/2000 [13:13<13:54:31, 25.44s/epoch]26-10-29 22:08:03.429 - INFO: Learning rate: 9.659049749685796e-06
+26-10-29 22:08:11.417 - INFO: Train epoch 32: bpp_loss: 0 | recon_loss: 0.016779 | loss: 0.016779
+26-10-29 22:08:22.939 - INFO: Validation epoch 32: Average losses: Loss: 1.0429 | Deriv loss: 0.190648 | F1 Score: 0.416581 | PSNR: 47.967519 | RMSE: 1.020101 | ECS: 34.410564 | bpp_loss: 0.0000 | recon_loss: 1.0429 | weighted_recon_loss: 0.9653 | deriv_loss: 0.1906 | lsd_loss: 512169677.7143 | weighted_deriv_loss: 0.1804 | curvature_recon_loss: 1.4831 | soft_peak_loss: 2.4237 | wasserstein_peak_loss: 0.0473 | soft_max_pos_loss: 1.1870 | matched_extrema_pos_loss: 2.7840 | local_extrema_pos_loss: 0.0401 | prominence_recall_loss: 0.1791 | loss: 1.0429 
+26-10-29 22:08:24.670 - INFO: best checkpoint (loss) saved.
+26-10-29 22:08:25.271 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:08:25.911 - INFO: best checkpoint (f1) saved.
+26-10-29 22:08:26.560 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:08:27.227 - INFO: best checkpoint (rmse) saved.
+Training Progress:   2%|▏         | 33/2000 [13:37<13:37:55, 24.95s/epoch]26-10-29 22:08:27.228 - INFO: Learning rate: 9.64206441013413e-06
+26-10-29 22:08:35.198 - INFO: Train epoch 33: bpp_loss: 0 | recon_loss: 0.016784 | loss: 0.016784
+26-10-29 22:08:45.795 - INFO: Validation epoch 33: Average losses: Loss: 1.0589 | Deriv loss: 0.184712 | F1 Score: 0.419473 | PSNR: 47.900403 | RMSE: 1.027949 | ECS: 33.500507 | bpp_loss: 0.0000 | recon_loss: 1.0589 | weighted_recon_loss: 0.9768 | deriv_loss: 0.1847 | lsd_loss: 570096512.0000 | weighted_deriv_loss: 0.1747 | curvature_recon_loss: 1.5174 | soft_peak_loss: 2.5151 | wasserstein_peak_loss: 0.0458 | soft_max_pos_loss: 1.1522 | matched_extrema_pos_loss: 2.7602 | local_extrema_pos_loss: 0.0401 | prominence_recall_loss: 0.1801 | loss: 1.0589 
+26-10-29 22:08:47.207 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:08:48.004 - INFO: best checkpoint (f1) saved.
+26-10-29 22:08:49.090 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:   2%|▏         | 34/2000 [13:59<13:07:10, 24.02s/epoch]26-10-29 22:08:49.091 - INFO: Learning rate: 9.624804878785802e-06
+26-10-29 22:08:57.088 - INFO: Train epoch 34: bpp_loss: 0 | recon_loss: 0.0161973 | loss: 0.0161973
+26-10-29 22:09:07.534 - INFO: Validation epoch 34: Average losses: Loss: 1.0230 | Deriv loss: 0.181280 | F1 Score: 0.418020 | PSNR: 48.053193 | RMSE: 1.010220 | ECS: 33.587814 | bpp_loss: 0.0000 | recon_loss: 1.0230 | weighted_recon_loss: 0.9462 | deriv_loss: 0.1813 | lsd_loss: 507575648.0000 | weighted_deriv_loss: 0.1715 | curvature_recon_loss: 1.4629 | soft_peak_loss: 2.3900 | wasserstein_peak_loss: 0.0460 | soft_max_pos_loss: 1.1129 | matched_extrema_pos_loss: 2.7379 | local_extrema_pos_loss: 0.0404 | prominence_recall_loss: 0.1767 | loss: 1.0230 
+26-10-29 22:09:08.937 - INFO: best checkpoint (loss) saved.
+26-10-29 22:09:09.607 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:09:10.333 - INFO: best checkpoint (rmse) saved.
+Training Progress:   2%|▏         | 35/2000 [14:20<12:39:27, 23.19s/epoch]26-10-29 22:09:10.334 - INFO: Learning rate: 9.607272634950827e-06
+26-10-29 22:09:18.203 - INFO: Train epoch 35: bpp_loss: 0 | recon_loss: 0.0156475 | loss: 0.0156475
+26-10-29 22:09:28.709 - INFO: Validation epoch 35: Average losses: Loss: 0.9815 | Deriv loss: 0.176076 | F1 Score: 0.419770 | PSNR: 48.233556 | RMSE: 0.989475 | ECS: 33.272888 | bpp_loss: 0.0000 | recon_loss: 0.9815 | weighted_recon_loss: 0.9094 | deriv_loss: 0.1761 | lsd_loss: 457889517.7143 | weighted_deriv_loss: 0.1666 | curvature_recon_loss: 1.3964 | soft_peak_loss: 2.3077 | wasserstein_peak_loss: 0.0454 | soft_max_pos_loss: 1.0945 | matched_extrema_pos_loss: 2.6990 | local_extrema_pos_loss: 0.0397 | prominence_recall_loss: 0.1789 | loss: 0.9815 
+26-10-29 22:09:30.331 - INFO: best checkpoint (loss) saved.
+26-10-29 22:09:31.177 - INFO: best checkpoint (ecs) saved.
+26-10-29 22:09:31.842 - INFO: best checkpoint (f1) saved.
+26-10-29 22:09:32.539 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 22:09:33.234 - INFO: best checkpoint (rmse) saved.
+Training Progress:   2%|▏         | 36/2000 [14:43<12:36:13, 23.10s/epoch]26-10-29 22:09:33.234 - INFO: Learning rate: 9.589469174757084e-06
+26-10-29 22:09:41.170 - INFO: Train epoch 36: bpp_loss: 0 | recon_loss: 0.0152693 | loss: 0.0152693
+26-10-29 22:09:52.955 - INFO: Validation epoch 36: Average losses: Loss: 0.9833 | Deriv loss: 0.171743 | F1 Score: 0.420935 | PSNR: 48.227685 | RMSE: 0.990277 | ECS: 33.517147 | bpp_loss: 0.0000 | recon_loss: 0.9833 | weighted_recon_loss: 0.9119 | deriv_loss: 0.1717 | lsd_loss: 453413170.2857 | weighted_deriv_loss: 0.1625 | curvature_recon_loss: 1.3903 | soft_peak_loss: 2.2920 | wasserstein_peak_loss: 0.0464 | soft_max_pos_loss: 1.0376 | matched_extrema_pos_loss: 2.7291 | local_extrema_pos_loss: 0.0407 | prominence_recall_loss: 0.1762 | loss: 0.9833 
+26-10-29 22:09:54.302 - INFO: best checkpoint (f1) saved.
+26-10-29 22:09:54.978 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:   2%|▏         | 37/2000 [15:05<12:22:30, 22.70s/epoch]26-10-29 22:09:54.979 - INFO: Learning rate: 9.571396011008327e-06
+26-10-29 22:10:03.102 - INFO: Train epoch 37: bpp_loss: 0 | recon_loss: 0.0148644 | loss: 0.0148644

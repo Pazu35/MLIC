@@ -1,0 +1,248 @@
+/var/spool/slurm/slurmd/job66175/slurm_script: 4: source: not found
+/var/spool/slurm/slurmd/job66175/slurm_script: 4: source: not found
+Managing NaNs for train/test DAs...
+Applying factor_64 padding/interpolation for train/test DAs...
+Selecting days for train/test DAs...
+Computing and applying normalization (normalize_per_split=True)...
+  Computing normalization stats from train split...
+  Computing normalization stats from val split...
+  Computing normalization stats from test split...
+Reconstructing normalized train/test DAs...
+Attaching season_idx and depth attributes to train/test DAs...
+Attaching SST data to train/test DAs...
+Storing final processed train/test DAs...
+Creating torch datasets for train/val/test DAs...
+Experiment configuration saved to: /Odyssey/private/o23gauvr/code/MLIC/experiments/back_to_the_future/cr_config/float_smoke/fixed_weight_loss_64_96_1.0_CR_10000.0_enatl_natl__mean_std_along_depth/20261029_203329/experiment_config.log
+[INFO] loss_params: {'method': 'fixed_weight', 'loss_dict': {'recon': 1.0, 'weighted_recon': 0.0, 'deriv': 0.0, 'weighted_deriv': 0.0, 'curvature_recon': 0.0, 'soft_peak': 0.0, 'lsd': 0.0, 'wasserstein_peak': 0.0, 'soft_max_pos': 0.0, 'matched_extrema_pos': 0.0, 'local_extrema_pos': 0.0, 'prominence_recall': 0.0}, 'structure_params': {'search_m': 10.0, 'capture_m': 40.0, 'local_beta': 4.0, 'pos_scale_m': 50.0, 'prominence_scales_m': [10.0, 25.0, 50.0, 100.0], 'min_prominence_frac': 0.05}, 'extrema_method': 'minmax', 'cr_treshold': 10000.0, 'rate_reference_bits_per_level': None, 'recon_treshold': None, 'lmbda': 1.0, 'use_smoothl1': False, 'use_factor_weights': True, 'factor_warmup_epochs': 150}
+[loss] terms with non-zero weight: {'recon': 1.0}
+26-10-29 20:33:30.392 - INFO: Namespace(experiment='back_to_the_future/cr_config/float_smoke', dataset='/home/npr/dataset/', epochs=2, learning_rate=1e-05, num_workers=10, lmbda=1.0, metrics='mse', batch_size=4, test_batch_size=4, aux_learning_rate=0.001, loss_learning_rate=0.01, patch_size=[196, 256], gpu_id=0, cuda=True, save=True, seed=42.0, clip_max_norm=1.0, checkpoint=None, resume=False, world_size=1, dist_url='env://', gradient_accumulation_steps=1, grad_projection=False, grad_weighting=False, grad_weight_ratio=0.2, grad_weight_every=0, grad_weight_batches=4, verbose=False)
+26-10-29 20:33:30.393 - INFO: {'N': 64, 'M': 96, 'slice_num': 1, 'context_window': 5, 'act': <class 'torch.nn.modules.activation.GELU'>, 'transform_only': True, 'enable_channel_context': True, 'enable_local_context': True, 'enable_global_inter_context': True, 'enable_global_intra_context': True, 'add_seasons': {'use': False, 'mode': 'embed'}, 'add_sst': False, 'output_low_band_filter_use': False, 'output_low_band_filter_mode': 'learnable_gauss', 'in_channels': 157}
+26-10-29 20:33:30.393 - INFO: MLICTransformOnly(
+  (entropy_bottleneck): EntropyBottleneck(
+    (likelihood_lower_bound): LowerBound()
+    (matrices): ParameterList(
+        (0): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (1): Parameter containing: [torch.float32 of size 64x3x3 (cuda:0)]
+        (2): Parameter containing: [torch.float32 of size 64x3x3 (cuda:0)]
+        (3): Parameter containing: [torch.float32 of size 64x3x3 (cuda:0)]
+        (4): Parameter containing: [torch.float32 of size 64x1x3 (cuda:0)]
+    )
+    (biases): ParameterList(
+        (0): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (1): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (2): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (3): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (4): Parameter containing: [torch.float32 of size 64x1x1 (cuda:0)]
+    )
+    (factors): ParameterList(
+        (0): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (1): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (2): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (3): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+    )
+  )
+  (gaussian_conditional): GaussianConditional(
+    (likelihood_lower_bound): LowerBound()
+    (lower_bound_scale): LowerBound()
+  )
+  (g_a): AnalysisTransform(
+    (analysis_transform): Sequential(
+      (0): ResidualBlockWithStride(
+        (conv1): Conv2d(157, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (gdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (skip): Conv2d(157, 64, kernel_size=(1, 1), stride=(2, 2))
+      )
+      (1): ResidualBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (2): ResidualBlockWithStride(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (gdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (skip): Conv2d(64, 64, kernel_size=(1, 1), stride=(2, 2))
+      )
+      (3): ResidualBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (4): ResidualBlockWithStride(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (gdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (skip): Conv2d(64, 64, kernel_size=(1, 1), stride=(2, 2))
+      )
+      (5): ResidualBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (6): Conv2d(64, 96, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+    )
+  )
+  (g_s): SynthesisTransform(
+    (synthesis_transform): Sequential(
+      (0): ResidualBlock(
+        (conv1): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (1): ResidualBlockUpsample(
+        (subpel_conv): Sequential(
+          (0): Conv2d(96, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+        (act): GELU(approximate='none')
+        (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (igdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (upsample): Sequential(
+          (0): Conv2d(96, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+      )
+      (2): ResidualBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (3): ResidualBlockUpsample(
+        (subpel_conv): Sequential(
+          (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+        (act): GELU(approximate='none')
+        (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (igdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (upsample): Sequential(
+          (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+      )
+      (4): ResidualBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (5): ResidualBlockUpsample(
+        (subpel_conv): Sequential(
+          (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+        (act): GELU(approximate='none')
+        (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (igdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (upsample): Sequential(
+          (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+      )
+      (6): ResidualBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (7): Sequential(
+        (0): Conv2d(64, 628, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): PixelShuffle(upscale_factor=2)
+      )
+    )
+  )
+)
+26-10-29 20:33:30.394 - INFO: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    initial_lr: 1e-05
+    lr: 1e-05
+    maximize: False
+    weight_decay: 0
+)
+26-10-29 20:33:30.394 - INFO: Computing initial compression rate...
+26-10-29 20:33:33.211 - INFO: ==================================================
+26-10-29 20:33:33.211 - INFO: INITIAL COMPRESSION METRICS
+26-10-29 20:33:33.211 - INFO: ==================================================
+26-10-29 20:33:33.212 - INFO: Average Bits Per Element: 0.000000
+26-10-29 20:33:33.212 - INFO: Average Compression Rate: infx
+26-10-29 20:33:33.213 - INFO: Total compressed bits: 0.00
+26-10-29 20:33:33.213 - INFO: Total original bits: 1234698240.00
+26-10-29 20:33:33.213 - INFO: ==================================================
+26-10-29 20:33:33.235 - INFO: Gradient remedies: projection=False, weighting=False (ratio=0.2, every=0, batches=4)
+Training Progress:   0%|          | 0/2 [00:00<?, ?epoch/s]26-10-29 20:33:33.236 - INFO: Learning rate: 1e-05
+26-10-29 20:33:43.162 - INFO: Train epoch 0: bpp_loss: 0 | recon_loss: 0.897469 | loss: 0.897469
+/Odyssey/private/o23gauvr/code/MLIC/MLIC/utils/metrics.py:94: RuntimeWarning: invalid value encountered in divide
+  f1_score = np.where(sum_scores == 0, 0, 2 * (precision_score * recall_score) / sum_scores)
+/Odyssey/private/o23gauvr/code/MLIC/MLIC/utils/metrics.py:90: RuntimeWarning: invalid value encountered in divide
+  recall_score = np.where(recall_den == 0, 0, num_true_positives / recall_den)
+26-10-29 20:33:54.645 - INFO: Validation epoch 0: Average losses: Loss: 36.5300 | Deriv loss: 16.579277 | F1 Score: 0.319311 | PSNR: 32.546709 | RMSE: 6.029395 | ECS: 97.600883 | bpp_loss: 0.0000 | recon_loss: 36.5300 | weighted_recon_loss: 33.0878 | deriv_loss: 16.5793 | lsd_loss: 35543567798.8571 | weighted_deriv_loss: 15.7410 | curvature_recon_loss: 41.6020 | soft_peak_loss: 118.5661 | wasserstein_peak_loss: 0.1300 | soft_max_pos_loss: 8.1300 | matched_extrema_pos_loss: 11.4458 | local_extrema_pos_loss: 0.0927 | prominence_recall_loss: 0.1752 | loss: 36.5300 
+/Odyssey/private/o23gauvr/miniforge3/envs/fsc/lib/python3.11/site-packages/torch/optim/lr_scheduler.py:232: UserWarning: The epoch parameter in `scheduler.step()` was not necessary and is being deprecated where possible. Please use `scheduler.step()` to step the scheduler. During the deprecation, if epoch is different from None, the closed form is used instead of the new chainable form, where available. Please open an issue if you are unable to replicate your use case: https://github.com/pytorch/pytorch/issues/new/choose.
+  warnings.warn(EPOCH_DEPRECATION_WARNING, UserWarning)
+26-10-29 20:33:54.960 - INFO: best checkpoint (loss) saved.
+26-10-29 20:33:55.014 - INFO: best checkpoint (ecs) saved.
+26-10-29 20:33:55.089 - INFO: best checkpoint (f1) saved.
+26-10-29 20:33:55.154 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 20:33:55.212 - INFO: best checkpoint (rmse) saved.
+Training Progress:  50%|█████     | 1/2 [00:21<00:21, 21.98s/epoch]26-10-29 20:33:55.212 - INFO: Learning rate: 1e-05
+26-10-29 20:34:02.443 - INFO: Train epoch 1: bpp_loss: 0 | recon_loss: 0.448557 | loss: 0.448557
+26-10-29 20:34:12.514 - INFO: Validation epoch 1: Average losses: Loss: 18.0028 | Deriv loss: 4.211856 | F1 Score: 0.341063 | PSNR: 35.769774 | RMSE: 4.197198 | ECS: 97.219894 | bpp_loss: 0.0000 | recon_loss: 18.0028 | weighted_recon_loss: 17.0215 | deriv_loss: 4.2119 | lsd_loss: 12617812992.0000 | weighted_deriv_loss: 4.0029 | curvature_recon_loss: 18.0741 | soft_peak_loss: 62.1887 | wasserstein_peak_loss: 0.1258 | soft_max_pos_loss: 8.0786 | matched_extrema_pos_loss: 8.8556 | local_extrema_pos_loss: 0.0800 | prominence_recall_loss: 0.1986 | loss: 18.0028 
+26-10-29 20:34:12.691 - INFO: best checkpoint (loss) saved.
+26-10-29 20:34:12.764 - INFO: best checkpoint (ecs) saved.
+26-10-29 20:34:12.824 - INFO: best checkpoint (f1) saved.
+26-10-29 20:34:12.881 - INFO: best checkpoint (bpp_loss) saved.
+26-10-29 20:34:12.940 - INFO: best checkpoint (rmse) saved.
+Training Progress: 100%|██████████| 2/2 [00:39<00:00, 19.48s/epoch]Training Progress: 100%|██████████| 2/2 [00:39<00:00, 19.85s/epoch]
+26-10-29 20:34:12.941 - INFO: Evaluating on test set after training...
+26-10-29 20:35:27.565 - INFO: Test epoch 2: Average losses: Loss: 18.0698 | Deriv loss: 4.195812 | F1 Score: 0.361093 | PSNR: 35.689837 | RMSE: 4.220243 | ECS: 107.059372 | bpp_loss: 0.0000 | recon_loss: 18.0698 | weighted_recon_loss: 17.0898 | deriv_loss: 4.1958 | lsd_loss: 11758960733.8667 | weighted_deriv_loss: 3.9882 | curvature_recon_loss: 19.2929 | soft_peak_loss: 64.4625 | wasserstein_peak_loss: 0.1363 | soft_max_pos_loss: 9.4303 | matched_extrema_pos_loss: 11.3165 | local_extrema_pos_loss: 0.0809 | prominence_recall_loss: 0.1930 | loss: 18.0698 
+26-10-29 20:35:27.589 - INFO: Test set metrics after training: {'loss': 18.06982445716858, 'bpp_loss': 0.0, 'deriv_loss': tensor(4.1958, device='cuda:0'), 'f1_score': np.float64(0.361093080847492), 'psnr': np.float64(35.68983710367991), 'rmse_loss': tensor(4.2202, device='cuda:0'), 'ecs_loss': np.float32(107.05937), 'rgb_psnr': 0, 'rgb_rmse_loss': 0}
