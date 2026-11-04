@@ -1,4 +1,5 @@
-import os 
+import os
+import re
 import sys
 
 from numpy import astype
@@ -240,6 +241,10 @@ def main(dm,config, loss_params,checkpoint_dir_name):
     # bits per water column whatever grid the model uses. Identical behaviour when the
     # model already runs on the native axis.
     native_levels = len(native_depth_array) if native_depth_array is not None else None
+    if config["in_channels"] == 3:
+        # RGB depth triplets (C3): one profile = 52 three-level images, so the budget per triplet pixel is
+        # 3 x 32 / cr_treshold, i.e. cr_treshold over the 156 coded levels (CR 1e4 -> native CR 10064).
+        native_levels = 3
     if native_levels and depth_array is not None and len(depth_array) != native_levels:
         print(f"[rate] model grid has {len(depth_array)} levels, native has "
               f"{native_levels}; cr_treshold targets the native field.", flush=True)
@@ -320,6 +325,12 @@ def main(dm,config, loss_params,checkpoint_dir_name):
 
     if args.checkpoint != None:
         checkpoint = torch.load(args.checkpoint, map_location=device, weights_only=False)
+        # Released MLIC++ weights use the old EntropyBottleneck names (_bias0, ...); strict=False below would
+        # silently skip them (same renaming as test_metrics.py, ORIGINAL_RGB_MLIC).
+        plural = {"bias": "biases", "factor": "factors", "matrix": "matrices"}
+        checkpoint['state_dict'] = {re.sub(r"entropy_bottleneck\._(bias|factor|matrix)(\d+)",
+                                           lambda m: f"entropy_bottleneck.{plural[m[1]]}.{m[2]}", k): v
+                                    for k, v in checkpoint['state_dict'].items()}
         
         # # Define layers to skip due to size mismatch
         set_up_layers = [               
@@ -378,6 +389,10 @@ def main(dm,config, loss_params,checkpoint_dir_name):
     best_f1 = 0.0
     best_bpp_loss = 1e10
     best_rmse = 1e10
+    best_rmse_in_budget = 1e10
+    budget_tol = float(os.environ.get("BUDGET_TOL", "0.10"))
+    cr_floor = getattr(criterion, "cr_treshold", None)
+    rate_budget = (native_levels or len(depth_array)) * 32 / cr_floor if cr_floor else None  # bits/profile, float32 reference
 
     # --resume: continue the run instead of fine-tuning from it (utils/resume.py).
     # The weights are already loaded above; restore everything else.
@@ -410,6 +425,7 @@ def main(dm,config, loss_params,checkpoint_dir_name):
         best_f1 = best.get("f1", best_f1)
         best_bpp_loss = best.get("bpp_loss", best_bpp_loss)
         best_rmse = best.get("rmse", best_rmse)
+        best_rmse_in_budget = best.get("rmse_in_budget", best_rmse_in_budget)
         msg = (f"[resume] {args.checkpoint}: epoch {start_epoch} -> {args.epochs}, "
                f"lr {args.learning_rate:.4g}, best values "
                f"{'restored' if best else 'reset (legacy checkpoint)'}")
@@ -481,6 +497,9 @@ def main(dm,config, loss_params,checkpoint_dir_name):
             if epoch == criterion.factor_warmup_epochs and not criterion._factor_weights_applied:
                 logger_train.info(f"Applying factor-based weights at epoch {epoch}...")
                 criterion.apply_factor_weights(net, train_dataloader, device, logger_train)
+                # The total loss changes scale here: best_checkpoint_loss restarts on the balanced
+                # objective (best RMSE / ECS / F1 are in physical units and keep their history).
+                best_loss = 1e10
                 if args.grad_weighting:
                     criterion.apply_gradient_weights(
                         net, train_dataloader, device, ratio=args.grad_weight_ratio,
@@ -527,6 +546,14 @@ def main(dm,config, loss_params,checkpoint_dir_name):
         is_best_rmse = loss_dict['rmse_loss'] <= best_rmse
         is_best_f1 = loss_dict['f1_score'] >= best_f1
         is_best_bpp = loss_dict['bpp_loss'] <= best_bpp_loss
+        # Best RMSE among the epochs whose validation rate is within BUDGET_TOL (default 10 %, author 2 Nov) above
+        # the CR floor; bpp_loss is the hinge, i.e. the bits above it. best_checkpoint_rmse ignores the rate: with a
+        # binding floor it picked epochs above budget (CR 3e3: 1.79 bits for 1.67; CR 1e5 96_160: 0.098 for 0.050).
+        # The lower side of the band (rate far below target = another CR) is checked at scoring, not here.
+        cr_floor = getattr(criterion, "cr_treshold", None)
+        is_best_rmse_in_budget = (cr_floor is not None
+                                  and loss_dict['bpp_loss'] <= budget_tol * rate_budget
+                                  and loss_dict['rmse_loss'] <= best_rmse_in_budget)
 
 
         if is_best_loss:
@@ -539,6 +566,8 @@ def main(dm,config, loss_params,checkpoint_dir_name):
             best_rmse = loss_dict['rmse_loss']
         if is_best_f1:
             best_f1 = loss_dict['f1_score']
+        if is_best_rmse_in_budget:
+            best_rmse_in_budget = loss_dict['rmse_loss']
 
         net.update(force=True)
 
@@ -558,7 +587,7 @@ def main(dm,config, loss_params,checkpoint_dir_name):
             "model": "MLIC",
             "criterion_state": criterion_state(criterion),
             "best": {"loss": best_loss, "ecs": best_ecs, "f1": best_f1,
-                     "bpp_loss": best_bpp_loss, "rmse": best_rmse},
+                     "bpp_loss": best_bpp_loss, "rmse": best_rmse, "rmse_in_budget": best_rmse_in_budget},
         }
 
         if args.save:
@@ -608,6 +637,14 @@ def main(dm,config, loss_params,checkpoint_dir_name):
                 filename="best_checkpoint_rmse.pth.tar"
             )
             logger_val.info('best checkpoint (rmse) saved.')
+
+        if args.save and is_best_rmse_in_budget:
+            save_checkpoint(
+                state= state,
+                dir_path=dir_path,
+                filename="best_checkpoint_rmse_in_budget.pth.tar"
+            )
+            logger_val.info('best checkpoint (rmse within the rate budget) saved.')
 
 
     # --- Evaluate on test set after training ---
@@ -766,6 +803,8 @@ if __name__ == '__main__':
         #"--grad_projection",
         #"--grad_weighting", "--grad_weight_ratio", "0.2", "--grad_weight_every", "100",
     ]
+    if env("CKPT"):  # fine-tune from these weights (C3: MLIC/checkpoints/mlicpp_mse_q5_2960000.pth.tar)
+        sys.argv += ["--checkpoint", env("CKPT")]
 
     # Parse dm_type from sys.argv
     # if "--dm-type" in sys.argv:
@@ -836,8 +875,15 @@ if __name__ == '__main__':
         "use_smoothl1": False,
         #"auto_normalize": False,
         "use_factor_weights": True,
-        "factor_warmup_epochs": 150,  # Only used when method="factor"
+        "factor_warmup_epochs": int(env("WARMUP", "150")),  # recon only before; WARMUP=1 for a smoke test
     }
+    if env("RGB", "0") == "1":
+        # C3: the depth-structure diagnostics (soft_max_pos, ...) need 157 levels per sample, a triplet has 3.
+        loss_params["loss_dict"] = {"recon": 1.0}
+    if env("MT", "0") == "1":
+        # T8a: MSE + SMSE + EMSE of Liang et al. (2024). recon only for the warm-up, then each term is
+        # rescaled to the recon magnitude on 10 training batches (apply_factor_weights), factors 1 / 1 / 1.
+        loss_params["loss_dict"].update(smse=1.0, emse=1.0)
 
 
 #        "lambda_deriv": 0.1,
@@ -865,7 +911,7 @@ if __name__ == '__main__':
     cfg['output_low_band_filter_use'] = os.environ.get("SMOOTHER", "0") == "1"
     cfg['output_low_band_filter_mode'] = "learnable_gauss"  # "iir", "learnable_fir" , #learnable_dogs , learnable_gauss #zero_phase_lfilt
 
-    rgb = {"use":False, "method":"depth_layers"} #PCA
+    rgb = {"use": env("RGB", "0") == "1", "method": "depth_layers"}  # RGB=1: 52 depth triplets, global min-max (C3)
     chn = "3" if rgb["use"] else "157"  # Number of channels
     dtype_str = "float32"
     # if rgb["use"] and rgb["method"] == "CAE":

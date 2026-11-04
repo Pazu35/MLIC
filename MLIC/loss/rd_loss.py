@@ -964,6 +964,27 @@ class FixedWeightSSPLoss(StructureLossMixin, nn.Module):
         self.register_buffer('loss_magnitudes', torch.ones(len(loss_dict)))
         self.register_buffer('magnitude_count', torch.tensor(0))
 
+    def _liang_terms(self, pred, target, wanted):
+        """SMSE (levels with z <= 200 m) and EMSE (errors > 3 m/s) of Liang et al. (2024), for T8a.
+
+        Both are in the space of `recon` (normalised in training, m/s under physical_inputs), so the
+        factor calibration balances them against it; only the EMSE selection uses the physical error.
+        `weighted_recon` is not SMSE-200: it cuts at 762 m with a soft tail and divides by all levels.
+        """
+        terms = {}
+        if "smse" in wanted:
+            if self._depth_m.numel() == 0:
+                raise ValueError("smse needs depth_array in the loss constructor")
+            keep = self._depth_m.to(pred.device) <= 200.0
+            terms["smse"] = (pred - target)[:, keep].square().mean()
+        if "emse" in wanted:
+            if self._norm_scale.numel() == 0 and not getattr(self, "_inputs_are_physical", False):
+                raise ValueError("emse needs norm_stats: its 3 m/s threshold is on the physical error")
+            err = pred - target
+            selected = (self._physical(pred) - self._physical(target)).abs() > 3.0
+            terms["emse"] = err.square()[selected].mean() if selected.any() else err.sum() * 0.0
+        return terms
+
     @contextmanager
     def diagnostic_terms(self):
         """Also compute the zero-weight terms of the configured loss_dict.
@@ -1119,6 +1140,8 @@ class FixedWeightSSPLoss(StructureLossMixin, nn.Module):
                 # magnitude is estimated as 1.0 and the factor weight is wrong.
                 for _name, _val in self._structure_terms(
                         pred, target, self.loss_dict).items():
+                    losses_accum[_name].append(_val.item())
+                for _name, _val in self._liang_terms(pred, target, self.loss_dict).items():
                     losses_accum[_name].append(_val.item())
         
         # Compute mean magnitudes
@@ -1354,6 +1377,7 @@ class FixedWeightSSPLoss(StructureLossMixin, nn.Module):
                 losses_dict["extrema_value"] = extrema_value_loss
 
         losses_dict.update(self._structure_terms(pred, target, wanted))
+        losses_dict.update(self._liang_terms(pred, target, wanted))
 
         # Met à jour les magnitudes moyennes
         self.update_magnitudes(losses_dict)
@@ -1906,3 +1930,27 @@ def curvature_weighted_loss(
     
     weighted = weights * se
     return weighted.mean()
+
+
+if __name__ == "__main__":
+    # T8a-0 check (cae_ablation/plan.md): one 4 m/s error at 100 m, one 2 m/s error at 500 m.
+    z = np.array([0.5, 50., 100., 150., 200., 300., 500., 1000.])
+    k100, k500, k200 = 2, 6, 5
+    rng = np.random.default_rng(0)
+    lo = rng.uniform(1480, 1500, 8); hi = lo + rng.uniform(5, 60, 8); std = rng.uniform(0.5, 12, 8)
+    params = {"mean_along_depth": lo + 10, "std_along_depth": std, "mean": 1505.0, "std": 15.5,
+              "x_min_along_depth": lo, "x_max_along_depth": hi, "x_min": lo.min(), "x_max": hi.max()}
+    for method in ("mean_std_along_depth", "mean_std", "min_max_along_depth", "min_max"):
+        crit = FixedWeightSSPLoss(loss_dict={"recon": 1.0, "smse": 1.0, "emse": 1.0}, use_smoothl1=False,
+                                  lmbda=1.0, depth_array=z, norm_stats={"method": method, "params": params})
+        s_k = crit._norm_scale.expand(1, 8, 1, 1)[0, :, 0, 0]
+        truth = torch.randn(2, 8, 3, 4)
+        pred = truth.clone()
+        pred[0, k100, 1, 1] += 4.0 / s_k[k100]
+        pred[1, k500, 2, 3] += 2.0 / s_k[k500]
+        t = crit._liang_terms(pred, truth, {"smse", "emse"})
+        assert torch.isclose(t["smse"], (4.0 / s_k[k100]) ** 2 / (2 * k200 * 3 * 4)), method
+        assert torch.isclose(t["emse"], (4.0 / s_k[k100]) ** 2), method
+        out = crit({"x_hat": pred, "likelihoods": {"y": torch.ones(2, 4, 1, 1)}}, truth)
+        assert torch.isclose(out["loss"], out["recon_loss"] + out["smse_loss"] + out["emse_loss"]), method
+    print("smse / emse ok for the four normalisations; both enter out['loss']")

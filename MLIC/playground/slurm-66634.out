@@ -1,0 +1,1244 @@
+/var/spool/slurm/slurmd/job66634/slurm_script: 4: source: Permission denied
+/var/spool/slurm/slurmd/job66634/slurm_script: 4: source: Permission denied
+mkdir -p failed for path /homes/o23gauvr/.config/matplotlib: [Errno 13] Permission denied: '/homes/o23gauvr/.config/matplotlib'
+Matplotlib created a temporary cache directory at /tmp/matplotlib-x0r252cq because there was an issue with the default path (/homes/o23gauvr/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+Matplotlib is building the font cache; this may take a moment.
+Managing NaNs for train/test DAs...
+Applying factor_64 padding/interpolation for train/test DAs...
+Applying RGB depth_layers method for train/test DAs
+Selecting days for train/test DAs...
+Computing and applying normalization (normalize_per_split=True)...
+  Computing normalization stats from train split...
+  Computing normalization stats from val split...
+  Computing normalization stats from test split...
+Reconstructing normalized train/test DAs...
+Attaching season_idx and depth attributes to train/test DAs...
+Storing final processed train/test DAs...
+Creating torch datasets for train/val/test DAs...
+Experiment configuration saved to: /Odyssey/private/o23gauvr/code/MLIC/experiments/back_to_the_future/C3/mlicpp_q5_cr1e4/fixed_weight_loss_192_320_1.0_CR_10000.0_enatl_natl__min_max/20261101_235805/experiment_config.log
+[INFO] loss_params: {'method': 'fixed_weight', 'loss_dict': {'recon': 1.0}, 'structure_params': {'search_m': 10.0, 'capture_m': 40.0, 'local_beta': 4.0, 'pos_scale_m': 50.0, 'prominence_scales_m': [10.0, 25.0, 50.0, 100.0], 'min_prominence_frac': 0.05}, 'extrema_method': 'minmax', 'cr_treshold': 10000.0, 'rate_reference_bits_per_level': None, 'recon_treshold': None, 'lmbda': 1.0, 'use_smoothl1': False, 'use_factor_weights': True, 'factor_warmup_epochs': 150}
+/Odyssey/private/o23gauvr/miniforge3/envs/fsc/lib/python3.11/site-packages/torch/functional.py:513: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1720538435607/work/aten/src/ATen/native/TensorShape.cpp:3609.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+[rate] model grid has 157 levels, native has 3; cr_treshold targets the native field.
+[loss] terms with non-zero weight: {'recon': 1.0}
+26-11-01 23:58:10.836 - INFO: Namespace(experiment='back_to_the_future/C3/mlicpp_q5_cr1e4', dataset='/home/npr/dataset/', epochs=100, learning_rate=1e-05, num_workers=10, lmbda=1.0, metrics='mse', batch_size=4, test_batch_size=4, aux_learning_rate=0.001, loss_learning_rate=0.01, patch_size=[196, 256], gpu_id=0, cuda=True, save=True, seed=42.0, clip_max_norm=1.0, checkpoint='/Odyssey/private/o23gauvr/code/MLIC/checkpoints/mlicpp_mse_q5_2960000.pth.tar', resume=False, world_size=1, dist_url='env://', gradient_accumulation_steps=1, grad_projection=False, grad_weighting=False, grad_weight_ratio=0.2, grad_weight_every=0, grad_weight_batches=4, verbose=False)
+26-11-01 23:58:10.837 - INFO: {'N': 192, 'M': 320, 'slice_num': 10, 'context_window': 5, 'act': <class 'torch.nn.modules.activation.GELU'>, 'transform_only': False, 'enable_channel_context': True, 'enable_local_context': True, 'enable_global_inter_context': True, 'enable_global_intra_context': True, 'add_seasons': {'use': False, 'mode': 'embed'}, 'add_sst': False, 'output_low_band_filter_use': False, 'output_low_band_filter_mode': 'learnable_gauss', 'in_channels': 3}
+26-11-01 23:58:10.837 - INFO: MLICPlusPlus(
+  (entropy_bottleneck): EntropyBottleneck(
+    (likelihood_lower_bound): LowerBound()
+    (matrices): ParameterList(
+        (0): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (1): Parameter containing: [torch.float32 of size 192x3x3 (cuda:0)]
+        (2): Parameter containing: [torch.float32 of size 192x3x3 (cuda:0)]
+        (3): Parameter containing: [torch.float32 of size 192x3x3 (cuda:0)]
+        (4): Parameter containing: [torch.float32 of size 192x1x3 (cuda:0)]
+    )
+    (biases): ParameterList(
+        (0): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (1): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (2): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (3): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (4): Parameter containing: [torch.float32 of size 192x1x1 (cuda:0)]
+    )
+    (factors): ParameterList(
+        (0): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (1): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (2): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+        (3): Parameter containing: [torch.float32 of size 192x3x1 (cuda:0)]
+    )
+  )
+  (learnable_output_lpf): LearnableFIRLowpass()
+  (learnable_output_dogs): LearnableDoGSmoother()
+  (learnable_output_gauss): LearnableGaussianSmoother()
+  (g_a): AnalysisTransform(
+    (analysis_transform): Sequential(
+      (0): ResidualBlockWithStride(
+        (conv1): Conv2d(3, 192, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (gdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (skip): Conv2d(3, 192, kernel_size=(1, 1), stride=(2, 2))
+      )
+      (1): ResidualBlock(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (2): ResidualBlockWithStride(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (gdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (skip): Conv2d(192, 192, kernel_size=(1, 1), stride=(2, 2))
+      )
+      (3): ResidualBlock(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (4): ResidualBlockWithStride(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (gdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (skip): Conv2d(192, 192, kernel_size=(1, 1), stride=(2, 2))
+      )
+      (5): ResidualBlock(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (6): Conv2d(192, 320, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+    )
+  )
+  (g_s): SynthesisTransform(
+    (synthesis_transform): Sequential(
+      (0): ResidualBlock(
+        (conv1): Conv2d(320, 320, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(320, 320, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (1): ResidualBlockUpsample(
+        (subpel_conv): Sequential(
+          (0): Conv2d(320, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+        (act): GELU(approximate='none')
+        (conv): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (igdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (upsample): Sequential(
+          (0): Conv2d(320, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+      )
+      (2): ResidualBlock(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (3): ResidualBlockUpsample(
+        (subpel_conv): Sequential(
+          (0): Conv2d(192, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+        (act): GELU(approximate='none')
+        (conv): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (igdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (upsample): Sequential(
+          (0): Conv2d(192, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+      )
+      (4): ResidualBlock(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (5): ResidualBlockUpsample(
+        (subpel_conv): Sequential(
+          (0): Conv2d(192, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+        (act): GELU(approximate='none')
+        (conv): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (igdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (upsample): Sequential(
+          (0): Conv2d(192, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+      )
+      (6): ResidualBlock(
+        (conv1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (7): Sequential(
+        (0): Conv2d(192, 12, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): PixelShuffle(upscale_factor=2)
+      )
+    )
+  )
+  (h_a): HyperAnalysis(
+    (reduction): Sequential(
+      (0): Conv2d(320, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): GELU(approximate='none')
+      (2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (3): GELU(approximate='none')
+      (4): Conv2d(192, 192, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (5): GELU(approximate='none')
+      (6): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (7): GELU(approximate='none')
+      (8): Conv2d(192, 192, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+    )
+  )
+  (h_s): HyperSynthesis(
+    (increase): Sequential(
+      (0): Conv2d(192, 320, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): GELU(approximate='none')
+      (2): Sequential(
+        (0): Conv2d(320, 1280, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): PixelShuffle(upscale_factor=2)
+      )
+      (3): GELU(approximate='none')
+      (4): Conv2d(320, 480, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (5): GELU(approximate='none')
+      (6): Sequential(
+        (0): Conv2d(480, 1920, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): PixelShuffle(upscale_factor=2)
+      )
+      (7): GELU(approximate='none')
+      (8): Conv2d(480, 640, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (gaussian_conditional): GaussianConditional(
+    (likelihood_lower_bound): LowerBound()
+    (lower_bound_scale): LowerBound()
+  )
+  (local_context): ModuleList(
+    (0-9): 10 x LocalContext(
+      (qkv_proj): Linear(in_features=32, out_features=96, bias=True)
+      (unfold): Unfold(kernel_size=5, dilation=1, padding=2, stride=1)
+      (softmax): Softmax(dim=-1)
+      (proj): Linear(in_features=64, out_features=64, bias=True)
+      (mlp): MLP(
+        (fc1): Linear(in_features=64, out_features=128, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=128, out_features=64, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+      (norm1): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+      (fusion): Conv2d(32, 64, kernel_size=(5, 5), stride=(1, 1))
+    )
+  )
+  (channel_context): ModuleList(
+    (0): None
+    (1): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(32, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (2): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(64, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (3): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(96, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (4): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(128, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (5): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(160, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (6): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (7): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(224, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (8): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(256, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (9): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(288, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+  )
+  (global_inter_context): ModuleList(
+    (0): None
+    (1): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+      )
+      (queries): Sequential(
+        (0): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+      )
+      (values): Sequential(
+        (0): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+      )
+      (reprojection): Conv2d(32, 96, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(96, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(96, 64, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (2): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+      )
+      (queries): Sequential(
+        (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+      )
+      (values): Sequential(
+        (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+      )
+      (reprojection): Conv2d(64, 96, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(96, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(96, 64, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (3): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(96, 96, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96)
+      )
+      (queries): Sequential(
+        (0): Conv2d(96, 96, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96)
+      )
+      (values): Sequential(
+        (0): Conv2d(96, 96, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96)
+      )
+      (reprojection): Conv2d(96, 96, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(96, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(96, 64, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (4): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+      )
+      (queries): Sequential(
+        (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+      )
+      (values): Sequential(
+        (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+      )
+      (reprojection): Conv2d(128, 96, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(96, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(96, 64, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (5): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(160, 160, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(160, 160, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=160)
+      )
+      (queries): Sequential(
+        (0): Conv2d(160, 160, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(160, 160, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=160)
+      )
+      (values): Sequential(
+        (0): Conv2d(160, 160, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(160, 160, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=160)
+      )
+      (reprojection): Conv2d(160, 96, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(96, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(96, 64, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (6): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(192, 192, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=192)
+      )
+      (queries): Sequential(
+        (0): Conv2d(192, 192, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=192)
+      )
+      (values): Sequential(
+        (0): Conv2d(192, 192, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=192)
+      )
+      (reprojection): Conv2d(192, 96, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(96, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(96, 64, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (7): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(224, 224, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(224, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=224)
+      )
+      (queries): Sequential(
+        (0): Conv2d(224, 224, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(224, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=224)
+      )
+      (values): Sequential(
+        (0): Conv2d(224, 224, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(224, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=224)
+      )
+      (reprojection): Conv2d(224, 96, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(96, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(96, 64, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (8): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(256, 256, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=256)
+      )
+      (queries): Sequential(
+        (0): Conv2d(256, 256, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=256)
+      )
+      (values): Sequential(
+        (0): Conv2d(256, 256, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=256)
+      )
+      (reprojection): Conv2d(256, 96, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(96, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(96, 64, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (9): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(288, 288, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(288, 288, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=288)
+      )
+      (queries): Sequential(
+        (0): Conv2d(288, 288, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(288, 288, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=288)
+      )
+      (values): Sequential(
+        (0): Conv2d(288, 288, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(288, 288, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=288)
+      )
+      (reprojection): Conv2d(288, 96, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(96, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(96, 64, kernel_size=(1, 1), stride=(1, 1))
+    )
+  )
+  (global_intra_context): ModuleList(
+    (0): None
+    (1-9): 9 x LinearGlobalIntraContext(
+      (keys): Sequential(
+        (0): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+      )
+      (queries): Sequential(
+        (0): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+      )
+      (values): Sequential(
+        (0): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+      )
+      (reprojection): Conv2d(32, 64, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(64, 128, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+  )
+  (entropy_parameters_anchor): ModuleList(
+    (0): EntropyParameters(
+      (fusion): Sequential(
+        (0): Conv2d(640, 320, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(320, 256, kernel_size=(1, 1), stride=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+        (5): GELU(approximate='none')
+        (6): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (1-9): 9 x EntropyParameters(
+      (fusion): Sequential(
+        (0): Conv2d(832, 320, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(320, 256, kernel_size=(1, 1), stride=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+        (5): GELU(approximate='none')
+        (6): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+  )
+  (entropy_parameters_nonanchor): ModuleList(
+    (0): EntropyParameters(
+      (fusion): Sequential(
+        (0): Conv2d(704, 320, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(320, 256, kernel_size=(1, 1), stride=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+        (5): GELU(approximate='none')
+        (6): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (1-9): 9 x EntropyParameters(
+      (fusion): Sequential(
+        (0): Conv2d(960, 320, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(320, 256, kernel_size=(1, 1), stride=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+        (5): GELU(approximate='none')
+        (6): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+  )
+  (lrp_anchor): ModuleList(
+    (0): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(352, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (1): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(384, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (2): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(416, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (3): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(448, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (4): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(480, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (5): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(512, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (6): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(544, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (7): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(576, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (8): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(608, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (9): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(640, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+  )
+  (lrp_nonanchor): ModuleList(
+    (0): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(352, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (1): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(384, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (2): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(416, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (3): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(448, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (4): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(480, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (5): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(512, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (6): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(544, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (7): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(576, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (8): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(608, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (9): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(640, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+  )
+)
+26-11-01 23:58:10.843 - INFO: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    initial_lr: 1e-05
+    lr: 1e-05
+    maximize: False
+    weight_decay: 0
+)
+26-11-01 23:58:10.845 - INFO: Computing initial compression rate...
+/Odyssey/private/o23gauvr/code/compressai/compressai/entropy_models/entropy_models.py:630: UserWarning: Specified kernel cache directory could not be created! This disables kernel caching. Specified directory is /homes/o23gauvr/.cache/torch/kernels. This warning will appear only once per process. (Triggered internally at /opt/conda/conda-bld/pytorch_1720538435607/work/aten/src/ATen/native/cuda/jit_utils.cpp:1442.)
+  cumulative = torch.erfc(const * inputs)
+26-11-01 23:58:12.957 - INFO: ==================================================
+26-11-01 23:58:12.958 - INFO: INITIAL COMPRESSION METRICS
+26-11-01 23:58:12.958 - INFO: ==================================================
+26-11-01 23:58:12.958 - INFO: Average Bits Per Element: 0.025359
+26-11-01 23:58:12.958 - INFO: Average Compression Rate: 315.47x
+26-11-01 23:58:12.958 - INFO: Total compressed bits: 74786.81
+26-11-01 23:58:12.958 - INFO: Total original bits: 23592960.00
+26-11-01 23:58:12.958 - INFO: ==================================================
+26-11-01 23:58:12.970 - INFO: Gradient remedies: projection=False, weighting=False (ratio=0.2, every=0, batches=4)
+Training Progress:   0%|          | 0/100 [00:00<?, ?epoch/s]26-11-01 23:58:12.972 - INFO: Learning rate: 1e-05
+26-11-02 00:12:26.715 - INFO: Train epoch 0: bpp_loss: 0.195605 | recon_loss: 0.000453028 | loss: 0.196058
+/Odyssey/private/o23gauvr/code/MLIC/MLIC/utils/metrics.py:89: RuntimeWarning: invalid value encountered in divide
+  precision_score = np.where(precision_den == 0, 0, num_true_positives / precision_den)
+/Odyssey/private/o23gauvr/code/MLIC/MLIC/utils/metrics.py:90: RuntimeWarning: invalid value encountered in divide
+  recall_score = np.where(recall_den == 0, 0, num_true_positives / recall_den)
+/Odyssey/private/o23gauvr/code/MLIC/MLIC/utils/metrics.py:94: RuntimeWarning: invalid value encountered in divide
+  f1_score = np.where(sum_scores == 0, 0, 2 * (precision_score * recall_score) / sum_scores)
+26-11-02 00:12:53.817 - INFO: Validation epoch 0: Average losses: Loss: 4.2616 | Deriv loss: 0.027353 | F1 Score: 0.002996 | PSNR: 43.484326 | RMSE: 1.919935 | ECS: 0.380517 | bpp_loss: 0.0000 | recon_loss: 4.2616 | loss: 4.2616 
+/Odyssey/private/o23gauvr/miniforge3/envs/fsc/lib/python3.11/site-packages/torch/optim/lr_scheduler.py:232: UserWarning: The epoch parameter in `scheduler.step()` was not necessary and is being deprecated where possible. Please use `scheduler.step()` to step the scheduler. During the deprecation, if epoch is different from None, the closed form is used instead of the new chainable form, where available. Please open an issue if you are unable to replicate your use case: https://github.com/pytorch/pytorch/issues/new/choose.
+  warnings.warn(EPOCH_DEPRECATION_WARNING, UserWarning)
+26-11-02 00:12:59.068 - INFO: best checkpoint (loss) saved.
+26-11-02 00:13:01.948 - INFO: best checkpoint (ecs) saved.
+26-11-02 00:13:04.334 - INFO: best checkpoint (f1) saved.
+26-11-02 00:13:06.905 - INFO: best checkpoint (bpp_loss) saved.
+26-11-02 00:13:09.706 - INFO: best checkpoint (rmse) saved.
+Training Progress:   1%|          | 1/100 [14:56<24:39:36, 896.73s/epoch]26-11-02 00:13:09.707 - INFO: Learning rate: 1e-05
+26-11-02 00:26:45.387 - INFO: Train epoch 1: bpp_loss: 0.187671 | recon_loss: 0.000877865 | loss: 0.188548
+26-11-02 00:27:11.381 - INFO: Validation epoch 1: Average losses: Loss: 5.9898 | Deriv loss: 0.034557 | F1 Score: 0.006547 | PSNR: 41.712712 | RMSE: 2.300623 | ECS: 0.326769 | bpp_loss: 0.0002 | recon_loss: 5.9896 | loss: 5.9898 
+26-11-02 00:27:16.899 - INFO: best checkpoint (ecs) saved.
+26-11-02 00:27:19.780 - INFO: best checkpoint (f1) saved.
+Training Progress:   2%|▏         | 2/100 [29:06<23:39:50, 869.29s/epoch]26-11-02 00:27:19.781 - INFO: Learning rate: 1e-05
+26-11-02 00:40:50.369 - INFO: Train epoch 2: bpp_loss: 0.186221 | recon_loss: 0.00101941 | loss: 0.187241
+26-11-02 00:41:16.812 - INFO: Validation epoch 2: Average losses: Loss: 8.8170 | Deriv loss: 0.046705 | F1 Score: 0.003955 | PSNR: 40.417242 | RMSE: 2.762129 | ECS: 0.450842 | bpp_loss: 0.0000 | recon_loss: 8.8170 | loss: 8.8170 
+26-11-02 00:41:22.119 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:   3%|▎         | 3/100 [43:09<23:05:27, 856.98s/epoch]26-11-02 00:41:22.120 - INFO: Learning rate: 1e-05
+26-11-02 00:54:40.487 - INFO: Train epoch 3: bpp_loss: 0.185467 | recon_loss: 0.00105246 | loss: 0.186519
+26-11-02 00:55:06.892 - INFO: Validation epoch 3: Average losses: Loss: 9.8634 | Deriv loss: 0.052723 | F1 Score: 0.004715 | PSNR: 40.419445 | RMSE: 2.872598 | ECS: 0.446948 | bpp_loss: 0.0000 | recon_loss: 9.8634 | loss: 9.8634 
+26-11-02 00:55:12.299 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:   4%|▍         | 4/100 [56:59<22:34:14, 846.40s/epoch]26-11-02 00:55:12.300 - INFO: Learning rate: 1e-05
+26-11-02 01:08:30.416 - INFO: Train epoch 4: bpp_loss: 0.184894 | recon_loss: 0.00106108 | loss: 0.185955
+26-11-02 01:08:56.810 - INFO: Validation epoch 4: Average losses: Loss: 11.8481 | Deriv loss: 0.054671 | F1 Score: 0.006082 | PSNR: 39.557650 | RMSE: 3.152574 | ECS: 0.400562 | bpp_loss: 0.0000 | recon_loss: 11.8481 | loss: 11.8481 
+26-11-02 01:09:01.983 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:   5%|▌         | 5/100 [1:10:49<22:10:35, 840.37s/epoch]26-11-02 01:09:01.984 - INFO: Learning rate: 1e-05
+26-11-02 01:22:18.789 - INFO: Train epoch 5: bpp_loss: 0.184401 | recon_loss: 0.0010521 | loss: 0.185453
+26-11-02 01:22:45.119 - INFO: Validation epoch 5: Average losses: Loss: 13.9811 | Deriv loss: 0.059879 | F1 Score: 0.005564 | PSNR: 38.768302 | RMSE: 3.427268 | ECS: 0.424318 | bpp_loss: 0.0000 | recon_loss: 13.9811 | loss: 13.9811 
+26-11-02 01:22:50.889 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:   6%|▌         | 6/100 [1:24:37<21:50:28, 836.47s/epoch]26-11-02 01:22:50.890 - INFO: Learning rate: 1e-05
+26-11-02 01:36:07.672 - INFO: Train epoch 6: bpp_loss: 0.18401 | recon_loss: 0.00103024 | loss: 0.18504
+26-11-02 01:36:34.182 - INFO: Validation epoch 6: Average losses: Loss: 16.4506 | Deriv loss: 0.064168 | F1 Score: 0.004763 | PSNR: 38.249918 | RMSE: 3.713590 | ECS: 0.413896 | bpp_loss: 0.0000 | recon_loss: 16.4506 | loss: 16.4506 
+26-11-02 01:36:39.531 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:   7%|▋         | 7/100 [1:38:26<21:32:33, 833.91s/epoch]26-11-02 01:36:39.532 - INFO: Learning rate: 9.990604556307082e-06
+26-11-02 01:49:58.088 - INFO: Train epoch 7: bpp_loss: 0.183698 | recon_loss: 0.000995781 | loss: 0.184693
+26-11-02 01:50:24.487 - INFO: Validation epoch 7: Average losses: Loss: 17.2499 | Deriv loss: 0.058116 | F1 Score: 0.005303 | PSNR: 38.521292 | RMSE: 3.734954 | ECS: 0.403733 | bpp_loss: 0.0000 | recon_loss: 17.2499 | loss: 17.2499 
+26-11-02 01:50:30.258 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:   8%|▊         | 8/100 [1:52:17<21:17:06, 832.90s/epoch]26-11-02 01:50:30.259 - INFO: Learning rate: 9.980902803578602e-06
+26-11-02 02:03:48.539 - INFO: Train epoch 8: bpp_loss: 0.183395 | recon_loss: 0.000954279 | loss: 0.184349
+26-11-02 02:04:14.912 - INFO: Validation epoch 8: Average losses: Loss: 16.4731 | Deriv loss: 0.054961 | F1 Score: 0.006524 | PSNR: 38.623715 | RMSE: 3.660750 | ECS: 0.357564 | bpp_loss: 0.0000 | recon_loss: 16.4731 | loss: 16.4731 
+26-11-02 02:04:20.743 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:   9%|▉         | 9/100 [2:06:07<21:02:05, 832.14s/epoch]26-11-02 02:04:20.744 - INFO: Learning rate: 9.97089573729802e-06
+26-11-02 02:17:40.419 - INFO: Train epoch 9: bpp_loss: 0.183152 | recon_loss: 0.000924218 | loss: 0.184076
+26-11-02 02:18:06.585 - INFO: Validation epoch 9: Average losses: Loss: 17.1303 | Deriv loss: 0.057805 | F1 Score: 0.005315 | PSNR: 38.405963 | RMSE: 3.743066 | ECS: 0.401488 | bpp_loss: 0.0000 | recon_loss: 17.1303 | loss: 17.1303 
+26-11-02 02:18:12.776 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  10%|█         | 10/100 [2:19:59<20:48:09, 832.11s/epoch]26-11-02 02:18:12.777 - INFO: Learning rate: 9.9605843730989e-06
+26-11-02 02:31:28.481 - INFO: Train epoch 10: bpp_loss: 0.182941 | recon_loss: 0.000876605 | loss: 0.183818
+26-11-02 02:31:54.541 - INFO: Validation epoch 10: Average losses: Loss: 18.3292 | Deriv loss: 0.064113 | F1 Score: 0.004754 | PSNR: 38.012598 | RMSE: 3.866780 | ECS: 0.434806 | bpp_loss: 0.0000 | recon_loss: 18.3292 | loss: 18.3292 
+26-11-02 02:32:01.128 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  11%|█         | 11/100 [2:33:48<20:32:35, 830.96s/epoch]26-11-02 02:32:01.130 - INFO: Learning rate: 9.94996974665078e-06
+26-11-02 02:45:18.577 - INFO: Train epoch 11: bpp_loss: 0.182741 | recon_loss: 0.000848334 | loss: 0.183589
+26-11-02 02:45:44.305 - INFO: Validation epoch 11: Average losses: Loss: 17.9654 | Deriv loss: 0.059726 | F1 Score: 0.005691 | PSNR: 38.462262 | RMSE: 3.800371 | ECS: 0.403275 | bpp_loss: 0.0000 | recon_loss: 17.9654 | loss: 17.9654 
+26-11-02 02:45:49.622 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  12%|█▏        | 12/100 [2:47:36<20:17:38, 830.21s/epoch]26-11-02 02:45:49.623 - INFO: Learning rate: 9.93905291354386e-06
+26-11-02 02:59:00.458 - INFO: Train epoch 12: bpp_loss: 0.182571 | recon_loss: 0.000819727 | loss: 0.183391
+26-11-02 02:59:26.702 - INFO: Validation epoch 12: Average losses: Loss: 20.3035 | Deriv loss: 0.058361 | F1 Score: 0.005484 | PSNR: 38.005669 | RMSE: 4.037733 | ECS: 0.408195 | bpp_loss: 0.0000 | recon_loss: 20.3035 | loss: 20.3035 
+26-11-02 02:59:32.478 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  13%|█▎        | 13/100 [3:01:19<20:00:34, 827.98s/epoch]26-11-02 02:59:32.479 - INFO: Learning rate: 9.927834949172442e-06
+26-11-02 03:12:52.958 - INFO: Train epoch 13: bpp_loss: 0.182416 | recon_loss: 0.000795531 | loss: 0.183212
+26-11-02 03:13:19.204 - INFO: Validation epoch 13: Average losses: Loss: 18.5448 | Deriv loss: 0.060272 | F1 Score: 0.004366 | PSNR: 38.129036 | RMSE: 3.880304 | ECS: 0.419320 | bpp_loss: 0.0000 | recon_loss: 18.5448 | loss: 18.5448 
+26-11-02 03:13:24.692 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  14%|█▍        | 14/100 [3:15:11<19:48:36, 829.26s/epoch]26-11-02 03:13:24.693 - INFO: Learning rate: 9.91631694861723e-06
+26-11-02 03:26:42.081 - INFO: Train epoch 14: bpp_loss: 0.182315 | recon_loss: 0.000779752 | loss: 0.183095
+26-11-02 03:27:08.424 - INFO: Validation epoch 14: Average losses: Loss: 19.0600 | Deriv loss: 0.062096 | F1 Score: 0.004336 | PSNR: 38.087184 | RMSE: 3.937674 | ECS: 0.407665 | bpp_loss: 0.0000 | recon_loss: 19.0600 | loss: 19.0600 
+26-11-02 03:27:13.806 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  15%|█▌        | 15/100 [3:29:00<19:34:43, 829.22s/epoch]26-11-02 03:27:13.808 - INFO: Learning rate: 9.9045000265264e-06
+26-11-02 03:40:30.426 - INFO: Train epoch 15: bpp_loss: 0.182173 | recon_loss: 0.000752043 | loss: 0.182925
+26-11-02 03:40:56.994 - INFO: Validation epoch 15: Average losses: Loss: 19.2116 | Deriv loss: 0.054066 | F1 Score: 0.005604 | PSNR: 38.045782 | RMSE: 3.932971 | ECS: 0.384371 | bpp_loss: 0.0000 | recon_loss: 19.2116 | loss: 19.2116 
+26-11-02 03:41:02.569 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  16%|█▌        | 16/100 [3:42:49<19:20:42, 829.08s/epoch]26-11-02 03:41:02.570 - INFO: Learning rate: 9.89238531699555e-06
+26-11-02 03:54:17.487 - INFO: Train epoch 16: bpp_loss: 0.182089 | recon_loss: 0.000737254 | loss: 0.182826
+26-11-02 03:54:43.708 - INFO: Validation epoch 16: Average losses: Loss: 20.6636 | Deriv loss: 0.058115 | F1 Score: 0.005610 | PSNR: 37.744702 | RMSE: 4.076365 | ECS: 0.398872 | bpp_loss: 0.0000 | recon_loss: 20.6636 | loss: 20.6636 
+26-11-02 03:54:48.815 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  17%|█▋        | 17/100 [3:56:35<19:05:42, 828.23s/epoch]26-11-02 03:54:48.817 - INFO: Learning rate: 9.879973973446455e-06
+26-11-02 04:08:04.825 - INFO: Train epoch 17: bpp_loss: 0.18197 | recon_loss: 0.000701567 | loss: 0.182672
+26-11-02 04:08:31.121 - INFO: Validation epoch 17: Average losses: Loss: 20.4081 | Deriv loss: 0.053727 | F1 Score: 0.004925 | PSNR: 37.867054 | RMSE: 4.032974 | ECS: 0.394272 | bpp_loss: 0.0000 | recon_loss: 20.4081 | loss: 20.4081 
+26-11-02 04:08:36.317 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  18%|█▊        | 18/100 [4:10:23<18:51:36, 828.01s/epoch]26-11-02 04:08:36.318 - INFO: Learning rate: 9.867267168504688e-06
+26-11-02 04:21:53.031 - INFO: Train epoch 18: bpp_loss: 0.181889 | recon_loss: 0.000696146 | loss: 0.182585
+26-11-02 04:22:19.494 - INFO: Validation epoch 18: Average losses: Loss: 22.5997 | Deriv loss: 0.056429 | F1 Score: 0.004785 | PSNR: 37.547196 | RMSE: 4.239071 | ECS: 0.387913 | bpp_loss: 0.0000 | recon_loss: 22.5997 | loss: 22.5997 
+26-11-02 04:22:24.954 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  19%|█▉        | 19/100 [4:24:11<18:38:04, 828.20s/epoch]26-11-02 04:22:24.955 - INFO: Learning rate: 9.854266093876123e-06
+26-11-02 04:35:41.031 - INFO: Train epoch 19: bpp_loss: 0.181792 | recon_loss: 0.000662423 | loss: 0.182454
+26-11-02 04:36:07.743 - INFO: Validation epoch 19: Average losses: Loss: 22.9125 | Deriv loss: 0.056130 | F1 Score: 0.005380 | PSNR: 37.383568 | RMSE: 4.281328 | ECS: 0.360944 | bpp_loss: 0.0000 | recon_loss: 22.9125 | loss: 22.9125 
+26-11-02 04:36:13.126 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  20%|██        | 20/100 [4:38:00<18:24:15, 828.19s/epoch]26-11-02 04:36:13.128 - INFO: Learning rate: 9.840971960222272e-06
+26-11-02 04:49:31.902 - INFO: Train epoch 20: bpp_loss: 0.181719 | recon_loss: 0.000647593 | loss: 0.182366
+26-11-02 04:49:58.057 - INFO: Validation epoch 20: Average losses: Loss: 22.8089 | Deriv loss: 0.057559 | F1 Score: 0.004431 | PSNR: 37.606636 | RMSE: 4.254802 | ECS: 0.396773 | bpp_loss: 0.0000 | recon_loss: 22.8089 | loss: 22.8089 
+26-11-02 04:50:03.461 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  21%|██        | 21/100 [4:51:50<18:11:17, 828.83s/epoch]26-11-02 04:50:03.462 - INFO: Learning rate: 9.827385997034553e-06
+26-11-02 05:03:21.280 - INFO: Train epoch 21: bpp_loss: 0.181648 | recon_loss: 0.000627518 | loss: 0.182276
+26-11-02 05:03:47.443 - INFO: Validation epoch 21: Average losses: Loss: 23.5192 | Deriv loss: 0.050511 | F1 Score: 0.004861 | PSNR: 37.603944 | RMSE: 4.301291 | ECS: 0.374299 | bpp_loss: 0.0000 | recon_loss: 23.5192 | loss: 23.5192 
+26-11-02 05:03:53.172 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  22%|██▏       | 22/100 [5:05:40<17:57:49, 829.10s/epoch]26-11-02 05:03:53.173 - INFO: Learning rate: 9.813509452507428e-06
+26-11-02 05:17:09.040 - INFO: Train epoch 22: bpp_loss: 0.181579 | recon_loss: 0.000610956 | loss: 0.18219
+26-11-02 05:17:35.341 - INFO: Validation epoch 22: Average losses: Loss: 23.6917 | Deriv loss: 0.055084 | F1 Score: 0.005040 | PSNR: 37.532269 | RMSE: 4.316576 | ECS: 0.396164 | bpp_loss: 0.0000 | recon_loss: 23.6917 | loss: 23.6917 
+26-11-02 05:17:40.808 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  23%|██▎       | 23/100 [5:19:27<17:43:26, 828.66s/epoch]26-11-02 05:17:40.809 - INFO: Learning rate: 9.79934359341047e-06
+26-11-02 05:30:59.546 - INFO: Train epoch 23: bpp_loss: 0.181541 | recon_loss: 0.000600997 | loss: 0.182142
+26-11-02 05:31:25.906 - INFO: Validation epoch 23: Average losses: Loss: 23.5884 | Deriv loss: 0.054321 | F1 Score: 0.004617 | PSNR: 37.157715 | RMSE: 4.341615 | ECS: 0.375594 | bpp_loss: 0.0000 | recon_loss: 23.5884 | loss: 23.5884 
+26-11-02 05:31:31.325 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  24%|██▍       | 24/100 [5:33:18<17:30:20, 829.22s/epoch]26-11-02 05:31:31.328 - INFO: Learning rate: 9.784889704959322e-06
+26-11-02 05:44:48.818 - INFO: Train epoch 24: bpp_loss: 0.181488 | recon_loss: 0.000594575 | loss: 0.182082
+26-11-02 05:45:15.000 - INFO: Validation epoch 24: Average losses: Loss: 26.4502 | Deriv loss: 0.065074 | F1 Score: 0.003190 | PSNR: 36.918851 | RMSE: 4.592623 | ECS: 0.454817 | bpp_loss: 0.0000 | recon_loss: 26.4502 | loss: 26.4502 
+26-11-02 05:45:20.499 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  25%|██▌       | 25/100 [5:47:07<17:16:30, 829.20s/epoch]26-11-02 05:45:20.501 - INFO: Learning rate: 9.77014909068563e-06
+26-11-02 05:58:36.070 - INFO: Train epoch 25: bpp_loss: 0.181449 | recon_loss: 0.000577956 | loss: 0.182027
+26-11-02 05:59:02.318 - INFO: Validation epoch 25: Average losses: Loss: 23.7663 | Deriv loss: 0.052415 | F1 Score: 0.004979 | PSNR: 37.639978 | RMSE: 4.309275 | ECS: 0.384633 | bpp_loss: 0.0000 | recon_loss: 23.7663 | loss: 23.7663 
+26-11-02 05:59:08.636 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  26%|██▌       | 26/100 [6:00:55<17:02:17, 828.88s/epoch]26-11-02 05:59:08.637 - INFO: Learning rate: 9.755123072305867e-06
+26-11-02 06:12:23.318 - INFO: Train epoch 26: bpp_loss: 0.181389 | recon_loss: 0.000565857 | loss: 0.181955
+26-11-02 06:12:49.624 - INFO: Validation epoch 26: Average losses: Loss: 23.6812 | Deriv loss: 0.052953 | F1 Score: 0.004227 | PSNR: 37.537549 | RMSE: 4.314460 | ECS: 0.408850 | bpp_loss: 0.0000 | recon_loss: 23.6812 | loss: 23.6812 
+26-11-02 06:12:55.649 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  27%|██▋       | 27/100 [6:14:42<16:47:47, 828.32s/epoch]26-11-02 06:12:55.650 - INFO: Learning rate: 9.73981298958918e-06
+26-11-02 06:26:11.198 - INFO: Train epoch 27: bpp_loss: 0.181357 | recon_loss: 0.000560151 | loss: 0.181917
+26-11-02 06:26:37.525 - INFO: Validation epoch 27: Average losses: Loss: 24.4017 | Deriv loss: 0.052251 | F1 Score: 0.004748 | PSNR: 37.488243 | RMSE: 4.368456 | ECS: 0.401805 | bpp_loss: 0.0000 | recon_loss: 24.4017 | loss: 24.4017 
+26-11-02 06:26:42.714 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  28%|██▊       | 28/100 [6:28:29<16:33:32, 827.94s/epoch]26-11-02 06:26:42.715 - INFO: Learning rate: 9.724220200224129e-06
+26-11-02 06:39:57.349 - INFO: Train epoch 28: bpp_loss: 0.181304 | recon_loss: 0.000538532 | loss: 0.181842
+26-11-02 06:40:23.429 - INFO: Validation epoch 28: Average losses: Loss: 24.7956 | Deriv loss: 0.054955 | F1 Score: 0.003579 | PSNR: 37.511793 | RMSE: 4.394151 | ECS: 0.435116 | bpp_loss: 0.0000 | recon_loss: 24.7956 | loss: 24.7956 
+26-11-02 06:40:28.781 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  29%|██▉       | 29/100 [6:42:15<16:19:04, 827.38s/epoch]26-11-02 06:40:28.783 - INFO: Learning rate: 9.70834607968447e-06
+26-11-02 06:53:42.240 - INFO: Train epoch 29: bpp_loss: 0.181298 | recon_loss: 0.000540515 | loss: 0.181839
+26-11-02 06:54:08.472 - INFO: Validation epoch 29: Average losses: Loss: 26.0228 | Deriv loss: 0.053319 | F1 Score: 0.004535 | PSNR: 37.169086 | RMSE: 4.520475 | ECS: 0.384634 | bpp_loss: 0.0000 | recon_loss: 26.0228 | loss: 26.0228 
+26-11-02 06:54:13.910 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  30%|███       | 30/100 [6:56:00<16:04:29, 826.71s/epoch]26-11-02 06:54:13.911 - INFO: Learning rate: 9.69219202109388e-06
+26-11-02 07:07:33.126 - INFO: Train epoch 30: bpp_loss: 0.18125 | recon_loss: 0.000526042 | loss: 0.181776
+26-11-02 07:07:59.494 - INFO: Validation epoch 30: Average losses: Loss: 24.9589 | Deriv loss: 0.054173 | F1 Score: 0.004657 | PSNR: 37.665702 | RMSE: 4.392610 | ECS: 0.384003 | bpp_loss: 0.0000 | recon_loss: 24.9589 | loss: 24.9589 
+26-11-02 07:08:05.156 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  31%|███       | 31/100 [7:09:52<15:52:16, 828.07s/epoch]26-11-02 07:08:05.157 - INFO: Learning rate: 9.675759435089723e-06
+26-11-02 07:21:23.192 - INFO: Train epoch 31: bpp_loss: 0.181229 | recon_loss: 0.000514919 | loss: 0.181744
+26-11-02 07:21:49.422 - INFO: Validation epoch 31: Average losses: Loss: 25.5308 | Deriv loss: 0.054200 | F1 Score: 0.004386 | PSNR: 37.212228 | RMSE: 4.473818 | ECS: 0.395259 | bpp_loss: 0.0000 | recon_loss: 25.5308 | loss: 25.5308 
+26-11-02 07:21:54.726 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  32%|███▏      | 32/100 [7:23:41<15:38:59, 828.52s/epoch]26-11-02 07:21:54.727 - INFO: Learning rate: 9.659049749685796e-06
+26-11-02 07:35:13.289 - INFO: Train epoch 32: bpp_loss: 0.181228 | recon_loss: 0.000525014 | loss: 0.181753
+26-11-02 07:35:39.408 - INFO: Validation epoch 32: Average losses: Loss: 25.4172 | Deriv loss: 0.053485 | F1 Score: 0.004653 | PSNR: 37.083807 | RMSE: 4.472353 | ECS: 0.396042 | bpp_loss: 0.0000 | recon_loss: 25.4172 | loss: 25.4172 
+26-11-02 07:35:45.380 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  33%|███▎      | 33/100 [7:37:32<15:25:53, 829.16s/epoch]26-11-02 07:35:45.381 - INFO: Learning rate: 9.64206441013413e-06
+26-11-02 07:49:02.609 - INFO: Train epoch 33: bpp_loss: 0.181181 | recon_loss: 0.000503008 | loss: 0.181684
+26-11-02 07:49:28.878 - INFO: Validation epoch 33: Average losses: Loss: 25.5401 | Deriv loss: 0.051817 | F1 Score: 0.004968 | PSNR: 37.313933 | RMSE: 4.465501 | ECS: 0.386407 | bpp_loss: 0.0000 | recon_loss: 25.5401 | loss: 25.5401 
+26-11-02 07:49:33.961 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  34%|███▍      | 34/100 [7:51:20<15:11:53, 828.99s/epoch]26-11-02 07:49:33.962 - INFO: Learning rate: 9.624804878785802e-06
+26-11-02 08:02:51.967 - INFO: Train epoch 34: bpp_loss: 0.181147 | recon_loss: 0.000499412 | loss: 0.181646
+26-11-02 08:03:18.431 - INFO: Validation epoch 34: Average losses: Loss: 26.1083 | Deriv loss: 0.055438 | F1 Score: 0.004110 | PSNR: 37.200625 | RMSE: 4.515090 | ECS: 0.403204 | bpp_loss: 0.0000 | recon_loss: 26.1083 | loss: 26.1083 
+26-11-02 08:03:23.832 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  35%|███▌      | 35/100 [8:05:10<14:58:21, 829.25s/epoch]26-11-02 08:03:23.833 - INFO: Learning rate: 9.607272634950827e-06
+26-11-02 08:16:41.118 - INFO: Train epoch 35: bpp_loss: 0.181131 | recon_loss: 0.000493934 | loss: 0.181625
+26-11-02 08:17:07.112 - INFO: Validation epoch 35: Average losses: Loss: 26.7626 | Deriv loss: 0.053728 | F1 Score: 0.004087 | PSNR: 37.049280 | RMSE: 4.580305 | ECS: 0.395734 | bpp_loss: 0.0000 | recon_loss: 26.7626 | loss: 26.7626 
+26-11-02 08:17:12.472 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  36%|███▌      | 36/100 [8:18:59<14:44:20, 829.07s/epoch]26-11-02 08:17:12.474 - INFO: Learning rate: 9.589469174757084e-06
+26-11-02 08:30:30.506 - INFO: Train epoch 36: bpp_loss: 0.181115 | recon_loss: 0.000490687 | loss: 0.181606
+26-11-02 08:30:56.884 - INFO: Validation epoch 36: Average losses: Loss: 25.5578 | Deriv loss: 0.055562 | F1 Score: 0.003759 | PSNR: 37.426909 | RMSE: 4.456309 | ECS: 0.428085 | bpp_loss: 0.0000 | recon_loss: 25.5578 | loss: 25.5578 
+26-11-02 08:31:02.328 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  37%|███▋      | 37/100 [8:32:49<14:30:46, 829.30s/epoch]26-11-02 08:31:02.329 - INFO: Learning rate: 9.571396011008327e-06
+26-11-02 08:44:15.798 - INFO: Train epoch 37: bpp_loss: 0.181084 | recon_loss: 0.00047681 | loss: 0.18156
+26-11-02 08:44:41.997 - INFO: Validation epoch 37: Average losses: Loss: 25.4910 | Deriv loss: 0.051947 | F1 Score: 0.003913 | PSNR: 37.367223 | RMSE: 4.448575 | ECS: 0.404786 | bpp_loss: 0.0000 | recon_loss: 25.4910 | loss: 25.4910 
+26-11-02 08:44:47.772 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  38%|███▊      | 38/100 [8:46:34<14:15:45, 828.15s/epoch]26-11-02 08:44:47.774 - INFO: Learning rate: 9.553054673041293e-06
+26-11-02 08:58:04.650 - INFO: Train epoch 38: bpp_loss: 0.181089 | recon_loss: 0.000469763 | loss: 0.181559
+26-11-02 08:58:30.866 - INFO: Validation epoch 38: Average losses: Loss: 26.4236 | Deriv loss: 0.053932 | F1 Score: 0.004423 | PSNR: 37.157372 | RMSE: 4.529968 | ECS: 0.387579 | bpp_loss: 0.0000 | recon_loss: 26.4236 | loss: 26.4236 
+26-11-02 08:58:36.146 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  39%|███▉      | 39/100 [9:00:23<14:02:01, 828.21s/epoch]26-11-02 08:58:36.147 - INFO: Learning rate: 9.534446706581887e-06
+26-11-02 09:11:56.152 - INFO: Train epoch 39: bpp_loss: 0.181055 | recon_loss: 0.000464843 | loss: 0.18152
+26-11-02 09:12:22.712 - INFO: Validation epoch 39: Average losses: Loss: 25.8894 | Deriv loss: 0.054104 | F1 Score: 0.004254 | PSNR: 37.359208 | RMSE: 4.478981 | ECS: 0.392804 | bpp_loss: 0.0000 | recon_loss: 25.8894 | loss: 25.8894 
+26-11-02 09:12:28.182 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  40%|████      | 40/100 [9:14:15<13:49:21, 829.36s/epoch]26-11-02 09:12:28.183 - INFO: Learning rate: 9.515573673600495e-06
+26-11-02 09:25:44.404 - INFO: Train epoch 40: bpp_loss: 0.181051 | recon_loss: 0.000466645 | loss: 0.181518
+26-11-02 09:26:10.726 - INFO: Validation epoch 40: Average losses: Loss: 26.2974 | Deriv loss: 0.053430 | F1 Score: 0.004478 | PSNR: 37.204086 | RMSE: 4.520154 | ECS: 0.390427 | bpp_loss: 0.0000 | recon_loss: 26.2974 | loss: 26.2974 
+26-11-02 09:26:18.941 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  41%|████      | 41/100 [9:28:05<13:35:57, 829.78s/epoch]26-11-02 09:26:18.943 - INFO: Learning rate: 9.496437152166408e-06
+26-11-02 09:39:35.838 - INFO: Train epoch 41: bpp_loss: 0.181 | recon_loss: 0.00044821 | loss: 0.181448
+26-11-02 09:40:02.163 - INFO: Validation epoch 41: Average losses: Loss: 26.4770 | Deriv loss: 0.054484 | F1 Score: 0.003411 | PSNR: 37.145115 | RMSE: 4.538884 | ECS: 0.437033 | bpp_loss: 0.0000 | recon_loss: 26.4770 | loss: 26.4770 
+26-11-02 09:40:08.196 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  42%|████▏     | 42/100 [9:41:55<13:21:58, 829.62s/epoch]26-11-02 09:40:08.197 - INFO: Learning rate: 9.477038736301394e-06
+26-11-02 09:53:24.648 - INFO: Train epoch 42: bpp_loss: 0.181023 | recon_loss: 0.000458774 | loss: 0.181481
+26-11-02 09:53:50.674 - INFO: Validation epoch 42: Average losses: Loss: 26.1812 | Deriv loss: 0.053633 | F1 Score: 0.004521 | PSNR: 37.078186 | RMSE: 4.521904 | ECS: 0.411204 | bpp_loss: 0.0000 | recon_loss: 26.1812 | loss: 26.1812 
+26-11-02 09:53:56.021 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  43%|████▎     | 43/100 [9:55:43<13:07:37, 829.08s/epoch]26-11-02 09:53:56.023 - INFO: Learning rate: 9.457380035832398e-06
+26-11-02 10:07:11.976 - INFO: Train epoch 43: bpp_loss: 0.180962 | recon_loss: 0.000436091 | loss: 0.181398
+26-11-02 10:07:38.311 - INFO: Validation epoch 43: Average losses: Loss: 27.5450 | Deriv loss: 0.054280 | F1 Score: 0.004620 | PSNR: 36.937038 | RMSE: 4.621452 | ECS: 0.394266 | bpp_loss: 0.0000 | recon_loss: 27.5450 | loss: 27.5450 
+26-11-02 10:07:45.445 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  44%|████▍     | 44/100 [10:09:32<12:53:54, 829.19s/epoch]26-11-02 10:07:45.446 - INFO: Learning rate: 9.437462676243414e-06
+26-11-02 10:21:01.164 - INFO: Train epoch 44: bpp_loss: 0.180962 | recon_loss: 0.000435976 | loss: 0.181398
+26-11-02 10:21:27.392 - INFO: Validation epoch 44: Average losses: Loss: 26.6583 | Deriv loss: 0.053148 | F1 Score: 0.004291 | PSNR: 37.237377 | RMSE: 4.538357 | ECS: 0.395955 | bpp_loss: 0.0000 | recon_loss: 26.6583 | loss: 26.6583 
+26-11-02 10:21:37.022 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  45%|████▌     | 45/100 [10:23:24<12:40:44, 829.90s/epoch]26-11-02 10:21:37.024 - INFO: Learning rate: 9.417288298526545e-06
+26-11-02 10:34:54.673 - INFO: Train epoch 45: bpp_loss: 0.180949 | recon_loss: 0.0004413 | loss: 0.181391
+26-11-02 10:35:20.976 - INFO: Validation epoch 45: Average losses: Loss: 27.4393 | Deriv loss: 0.054175 | F1 Score: 0.004368 | PSNR: 37.253314 | RMSE: 4.590287 | ECS: 0.392244 | bpp_loss: 0.0000 | recon_loss: 27.4393 | loss: 27.4393 
+26-11-02 10:35:26.861 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  46%|████▌     | 46/100 [10:37:13<12:26:53, 829.88s/epoch]26-11-02 10:35:26.862 - INFO: Learning rate: 9.3968585590322e-06
+26-11-02 10:48:44.039 - INFO: Train epoch 46: bpp_loss: 0.180938 | recon_loss: 0.000426779 | loss: 0.181364
+26-11-02 10:49:09.985 - INFO: Validation epoch 46: Average losses: Loss: 27.4408 | Deriv loss: 0.054582 | F1 Score: 0.003487 | PSNR: 37.246764 | RMSE: 4.593180 | ECS: 0.435237 | bpp_loss: 0.0000 | recon_loss: 27.4408 | loss: 27.4408 
+26-11-02 10:49:15.624 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  47%|████▋     | 47/100 [10:51:02<12:12:46, 829.55s/epoch]26-11-02 10:49:15.625 - INFO: Learning rate: 9.376175129318545e-06
+26-11-02 11:02:33.776 - INFO: Train epoch 47: bpp_loss: 0.180907 | recon_loss: 0.000431036 | loss: 0.181338
+26-11-02 11:02:59.501 - INFO: Validation epoch 47: Average losses: Loss: 26.9772 | Deriv loss: 0.054687 | F1 Score: 0.004627 | PSNR: 37.227843 | RMSE: 4.562908 | ECS: 0.376572 | bpp_loss: 0.0000 | recon_loss: 26.9772 | loss: 26.9772 
+26-11-02 11:03:06.309 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  48%|████▊     | 48/100 [11:04:53<11:59:14, 829.89s/epoch]26-11-02 11:03:06.311 - INFO: Learning rate: 9.355239696000117e-06
+26-11-02 11:16:25.108 - INFO: Train epoch 48: bpp_loss: 0.180898 | recon_loss: 0.000416084 | loss: 0.181315
+26-11-02 11:16:51.163 - INFO: Validation epoch 48: Average losses: Loss: 29.1681 | Deriv loss: 0.056328 | F1 Score: 0.004348 | PSNR: 37.038800 | RMSE: 4.722671 | ECS: 0.394701 | bpp_loss: 0.0000 | recon_loss: 29.1681 | loss: 29.1681 
+26-11-02 11:16:58.276 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  49%|████▉     | 49/100 [11:18:45<11:45:56, 830.51s/epoch]26-11-02 11:16:58.277 - INFO: Learning rate: 9.33405396059569e-06
+26-11-02 11:30:14.734 - INFO: Train epoch 49: bpp_loss: 0.180887 | recon_loss: 0.000425675 | loss: 0.181313
+26-11-02 11:30:41.053 - INFO: Validation epoch 49: Average losses: Loss: 27.7905 | Deriv loss: 0.053783 | F1 Score: 0.004081 | PSNR: 37.107166 | RMSE: 4.622032 | ECS: 0.418878 | bpp_loss: 0.0000 | recon_loss: 27.7905 | loss: 27.7905 
+26-11-02 11:30:48.229 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  50%|█████     | 50/100 [11:32:35<11:31:57, 830.34s/epoch]26-11-02 11:30:48.230 - INFO: Learning rate: 9.312619639375354e-06
+26-11-02 11:44:15.033 - INFO: Train epoch 50: bpp_loss: 0.180865 | recon_loss: 0.00040638 | loss: 0.181272
+26-11-02 11:44:41.516 - INFO: Validation epoch 50: Average losses: Loss: 26.7616 | Deriv loss: 0.052733 | F1 Score: 0.003935 | PSNR: 37.222205 | RMSE: 4.546544 | ECS: 0.390386 | bpp_loss: 0.0000 | recon_loss: 26.7616 | loss: 26.7616 
+26-11-02 11:44:48.435 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  51%|█████     | 51/100 [11:46:35<11:20:31, 833.30s/epoch]26-11-02 11:44:48.437 - INFO: Learning rate: 9.29093846320686e-06
+26-11-02 11:58:04.592 - INFO: Train epoch 51: bpp_loss: 0.180876 | recon_loss: 0.000409767 | loss: 0.181286
+26-11-02 11:58:30.762 - INFO: Validation epoch 51: Average losses: Loss: 28.9034 | Deriv loss: 0.054465 | F1 Score: 0.003779 | PSNR: 36.947357 | RMSE: 4.721271 | ECS: 0.404211 | bpp_loss: 0.0000 | recon_loss: 28.9034 | loss: 28.9034 
+26-11-02 11:58:36.794 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  52%|█████▏    | 52/100 [12:00:23<11:05:27, 831.82s/epoch]26-11-02 11:58:36.795 - INFO: Learning rate: 9.269012177401208e-06
+26-11-02 12:11:50.197 - INFO: Train epoch 52: bpp_loss: 0.180861 | recon_loss: 0.000406039 | loss: 0.181267
+26-11-02 12:12:16.488 - INFO: Validation epoch 52: Average losses: Loss: 27.6977 | Deriv loss: 0.052191 | F1 Score: 0.003907 | PSNR: 37.178786 | RMSE: 4.613564 | ECS: 0.404136 | bpp_loss: 0.0000 | recon_loss: 27.6977 | loss: 27.6977 
+26-11-02 12:12:21.803 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  53%|█████▎    | 53/100 [12:14:08<10:49:59, 829.78s/epoch]26-11-02 12:12:21.804 - INFO: Learning rate: 9.246842541557517e-06
+26-11-02 12:25:35.223 - INFO: Train epoch 53: bpp_loss: 0.180812 | recon_loss: 0.000393649 | loss: 0.181206
+26-11-02 12:26:01.292 - INFO: Validation epoch 53: Average losses: Loss: 27.4289 | Deriv loss: 0.052940 | F1 Score: 0.003648 | PSNR: 37.042482 | RMSE: 4.611167 | ECS: 0.409489 | bpp_loss: 0.0000 | recon_loss: 27.4289 | loss: 27.4289 
+26-11-02 12:26:06.574 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  54%|█████▍    | 54/100 [12:27:53<10:35:00, 828.28s/epoch]26-11-02 12:26:06.576 - INFO: Learning rate: 9.224431329407177e-06
+26-11-02 12:39:22.908 - INFO: Train epoch 54: bpp_loss: 0.180843 | recon_loss: 0.000417518 | loss: 0.18126
+26-11-02 12:39:49.180 - INFO: Validation epoch 54: Average losses: Loss: 25.9336 | Deriv loss: 0.059611 | F1 Score: 0.005780 | PSNR: 36.755622 | RMSE: 4.525534 | ECS: 0.381672 | bpp_loss: 0.0000 | recon_loss: 25.9336 | loss: 25.9336 
+26-11-02 12:39:55.251 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  55%|█████▌    | 55/100 [12:41:42<10:21:17, 828.40s/epoch]26-11-02 12:39:55.253 - INFO: Learning rate: 9.201780328657297e-06
+26-11-02 12:53:13.976 - INFO: Train epoch 55: bpp_loss: 0.180825 | recon_loss: 0.000396152 | loss: 0.181221
+26-11-02 12:53:40.377 - INFO: Validation epoch 55: Average losses: Loss: 27.9133 | Deriv loss: 0.054631 | F1 Score: 0.003892 | PSNR: 37.250958 | RMSE: 4.618915 | ECS: 0.412290 | bpp_loss: 0.0000 | recon_loss: 27.9133 | loss: 27.9133 
+26-11-02 12:53:46.631 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  56%|█████▌    | 56/100 [12:55:33<10:08:08, 829.29s/epoch]26-11-02 12:53:46.632 - INFO: Learning rate: 9.178891340833464e-06
+26-11-02 13:07:03.049 - INFO: Train epoch 56: bpp_loss: 0.1808 | recon_loss: 0.000385852 | loss: 0.181186
+26-11-02 13:07:29.308 - INFO: Validation epoch 56: Average losses: Loss: 26.9688 | Deriv loss: 0.052419 | F1 Score: 0.003300 | PSNR: 37.283078 | RMSE: 4.559376 | ECS: 0.410209 | bpp_loss: 0.0000 | recon_loss: 26.9688 | loss: 26.9688 
+26-11-02 13:07:35.530 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  57%|█████▋    | 57/100 [13:09:22<9:54:14, 829.17s/epoch] 26-11-02 13:07:35.532 - INFO: Learning rate: 9.155766181121831e-06
+26-11-02 13:20:49.566 - INFO: Train epoch 57: bpp_loss: 0.180805 | recon_loss: 0.000386949 | loss: 0.181192
+26-11-02 13:21:15.923 - INFO: Validation epoch 57: Average losses: Loss: 27.1006 | Deriv loss: 0.051845 | F1 Score: 0.003908 | PSNR: 37.277944 | RMSE: 4.570054 | ECS: 0.393371 | bpp_loss: 0.0000 | recon_loss: 27.1006 | loss: 27.1006 
+26-11-02 13:21:21.583 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  58%|█████▊    | 58/100 [13:23:08<9:39:45, 828.24s/epoch]26-11-02 13:21:21.585 - INFO: Learning rate: 9.132406678210523e-06
+26-11-02 13:34:37.314 - INFO: Train epoch 58: bpp_loss: 0.180805 | recon_loss: 0.000395037 | loss: 0.1812
+26-11-02 13:35:04.656 - INFO: Validation epoch 58: Average losses: Loss: 27.2214 | Deriv loss: 0.052414 | F1 Score: 0.003633 | PSNR: 37.470978 | RMSE: 4.563333 | ECS: 0.395192 | bpp_loss: 0.0000 | recon_loss: 27.2214 | loss: 27.2214 
+26-11-02 13:35:18.856 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  59%|█████▉    | 59/100 [13:37:05<9:27:48, 830.95s/epoch]26-11-02 13:35:18.857 - INFO: Learning rate: 9.108814674130416e-06
+26-11-02 13:48:34.695 - INFO: Train epoch 59: bpp_loss: 0.180792 | recon_loss: 0.000377448 | loss: 0.181169
+26-11-02 13:49:00.719 - INFO: Validation epoch 59: Average losses: Loss: 27.4548 | Deriv loss: 0.052760 | F1 Score: 0.003954 | PSNR: 37.167149 | RMSE: 4.602677 | ECS: 0.376117 | bpp_loss: 0.0000 | recon_loss: 27.4548 | loss: 27.4548 
+26-11-02 13:49:06.006 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  60%|██████    | 60/100 [13:50:53<9:13:12, 829.81s/epoch]26-11-02 13:49:06.008 - INFO: Learning rate: 9.084992024095253e-06
+26-11-02 14:02:24.403 - INFO: Train epoch 60: bpp_loss: 0.18078 | recon_loss: 0.000380965 | loss: 0.181161
+26-11-02 14:02:50.613 - INFO: Validation epoch 60: Average losses: Loss: 27.8199 | Deriv loss: 0.052977 | F1 Score: 0.003934 | PSNR: 37.150050 | RMSE: 4.628491 | ECS: 0.390375 | bpp_loss: 0.0000 | recon_loss: 27.8199 | loss: 27.8199 
+26-11-02 14:02:56.534 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  61%|██████    | 61/100 [14:04:43<8:59:30, 830.02s/epoch]26-11-02 14:02:56.535 - INFO: Learning rate: 9.060940596341159e-06
+26-11-02 14:16:15.947 - INFO: Train epoch 61: bpp_loss: 0.180769 | recon_loss: 0.000373398 | loss: 0.181142
+26-11-02 14:16:42.338 - INFO: Validation epoch 61: Average losses: Loss: 27.7400 | Deriv loss: 0.052505 | F1 Score: 0.003950 | PSNR: 37.216676 | RMSE: 4.612678 | ECS: 0.382255 | bpp_loss: 0.0000 | recon_loss: 27.7400 | loss: 27.7400 
+26-11-02 14:16:48.176 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  62%|██████▏   | 62/100 [14:18:35<8:45:59, 830.51s/epoch]26-11-02 14:16:48.180 - INFO: Learning rate: 9.036662271965515e-06
+26-11-02 14:30:06.713 - INFO: Train epoch 62: bpp_loss: 0.180769 | recon_loss: 0.000381902 | loss: 0.181151
+26-11-02 14:30:33.429 - INFO: Validation epoch 62: Average losses: Loss: 26.7237 | Deriv loss: 0.051201 | F1 Score: 0.004141 | PSNR: 37.454170 | RMSE: 4.525642 | ECS: 0.378409 | bpp_loss: 0.0000 | recon_loss: 26.7237 | loss: 26.7237 
+26-11-02 14:30:39.922 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  63%|██████▎   | 63/100 [14:32:26<8:32:22, 830.88s/epoch]26-11-02 14:30:39.923 - INFO: Learning rate: 9.01215894476526e-06
+26-11-02 14:43:57.083 - INFO: Train epoch 63: bpp_loss: 0.180771 | recon_loss: 0.000372428 | loss: 0.181144
+26-11-02 14:44:23.411 - INFO: Validation epoch 63: Average losses: Loss: 27.1422 | Deriv loss: 0.054050 | F1 Score: 0.003064 | PSNR: 37.157395 | RMSE: 4.588917 | ECS: 0.419952 | bpp_loss: 0.0000 | recon_loss: 27.1422 | loss: 27.1422 
+26-11-02 14:44:34.865 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  64%|██████▍   | 64/100 [14:46:21<8:19:15, 832.10s/epoch]26-11-02 14:44:34.866 - INFO: Learning rate: 8.987432521074578e-06
+26-11-02 14:57:48.770 - INFO: Train epoch 64: bpp_loss: 0.180745 | recon_loss: 0.000365674 | loss: 0.18111
+26-11-02 14:58:14.854 - INFO: Validation epoch 64: Average losses: Loss: 27.9347 | Deriv loss: 0.054363 | F1 Score: 0.003950 | PSNR: 36.972940 | RMSE: 4.647435 | ECS: 0.377799 | bpp_loss: 0.0000 | recon_loss: 27.9347 | loss: 27.9347 
+26-11-02 14:58:28.673 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  65%|██████▌   | 65/100 [15:00:15<8:05:41, 832.61s/epoch]26-11-02 14:58:28.675 - INFO: Learning rate: 8.962484919602033e-06
+26-11-02 15:11:44.467 - INFO: Train epoch 65: bpp_loss: 0.18075 | recon_loss: 0.000364999 | loss: 0.181115
+26-11-02 15:12:10.506 - INFO: Validation epoch 65: Average losses: Loss: 27.0361 | Deriv loss: 0.052819 | F1 Score: 0.003426 | PSNR: 37.321654 | RMSE: 4.558168 | ECS: 0.398646 | bpp_loss: 0.0000 | recon_loss: 27.0361 | loss: 27.0361 
+26-11-02 15:12:16.482 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  66%|██████▌   | 66/100 [15:14:03<7:50:59, 831.17s/epoch]26-11-02 15:12:16.484 - INFO: Learning rate: 8.937318071267134e-06
+26-11-02 15:25:31.957 - INFO: Train epoch 66: bpp_loss: 0.180733 | recon_loss: 0.000363804 | loss: 0.181097
+26-11-02 15:25:58.161 - INFO: Validation epoch 66: Average losses: Loss: 28.6995 | Deriv loss: 0.051484 | F1 Score: 0.003488 | PSNR: 36.999205 | RMSE: 4.699956 | ECS: 0.379828 | bpp_loss: 0.0000 | recon_loss: 28.6995 | loss: 28.6995 
+26-11-02 15:26:04.766 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  67%|██████▋   | 67/100 [15:27:51<7:36:40, 830.30s/epoch]26-11-02 15:26:04.767 - INFO: Learning rate: 8.91193391903635e-06
+26-11-02 15:39:20.474 - INFO: Train epoch 67: bpp_loss: 0.180743 | recon_loss: 0.000371828 | loss: 0.181115
+26-11-02 15:39:46.274 - INFO: Validation epoch 67: Average losses: Loss: 27.9214 | Deriv loss: 0.055114 | F1 Score: 0.003719 | PSNR: 37.101739 | RMSE: 4.629131 | ECS: 0.390745 | bpp_loss: 0.0000 | recon_loss: 27.9214 | loss: 27.9214 
+26-11-02 15:39:53.944 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  68%|██████▊   | 68/100 [15:41:40<7:22:38, 829.97s/epoch]26-11-02 15:39:53.946 - INFO: Learning rate: 8.886334417758584e-06
+26-11-02 15:53:09.969 - INFO: Train epoch 68: bpp_loss: 0.18073 | recon_loss: 0.000358456 | loss: 0.181088
+26-11-02 15:53:35.731 - INFO: Validation epoch 68: Average losses: Loss: 28.0286 | Deriv loss: 0.053510 | F1 Score: 0.002946 | PSNR: 36.985973 | RMSE: 4.650169 | ECS: 0.409169 | bpp_loss: 0.0000 | recon_loss: 28.0286 | loss: 28.0286 
+26-11-02 15:53:42.188 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  69%|██████▉   | 69/100 [15:55:29<7:08:32, 829.45s/epoch]26-11-02 15:53:42.189 - INFO: Learning rate: 8.860521534000138e-06
+26-11-02 16:07:00.802 - INFO: Train epoch 69: bpp_loss: 0.180734 | recon_loss: 0.0003681 | loss: 0.181102
+26-11-02 16:07:27.962 - INFO: Validation epoch 69: Average losses: Loss: 27.9181 | Deriv loss: 0.055509 | F1 Score: 0.003746 | PSNR: 37.156902 | RMSE: 4.619327 | ECS: 0.380921 | bpp_loss: 0.0000 | recon_loss: 27.9181 | loss: 27.9181 
+26-11-02 16:07:36.948 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  70%|███████   | 70/100 [16:09:23<6:55:31, 831.04s/epoch]26-11-02 16:07:36.949 - INFO: Learning rate: 8.834497245879163e-06
+26-11-02 16:21:58.311 - INFO: Train epoch 70: bpp_loss: 0.180723 | recon_loss: 0.00036131 | loss: 0.181084
+26-11-02 16:22:25.210 - INFO: Validation epoch 70: Average losses: Loss: 27.6195 | Deriv loss: 0.052786 | F1 Score: 0.003142 | PSNR: 37.454878 | RMSE: 4.581700 | ECS: 0.408442 | bpp_loss: 0.0000 | recon_loss: 27.6195 | loss: 27.6195 
+26-11-02 16:22:32.160 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  71%|███████   | 71/100 [16:24:19<6:50:58, 850.29s/epoch]26-11-02 16:22:32.161 - INFO: Learning rate: 8.808263542899602e-06
+26-11-02 16:36:49.619 - INFO: Train epoch 71: bpp_loss: 0.180717 | recon_loss: 0.000358948 | loss: 0.181076
+26-11-02 16:37:16.486 - INFO: Validation epoch 71: Average losses: Loss: 28.3473 | Deriv loss: 0.055033 | F1 Score: 0.003812 | PSNR: 37.172402 | RMSE: 4.657645 | ECS: 0.374167 | bpp_loss: 0.0000 | recon_loss: 28.3473 | loss: 28.3473 
+26-11-02 16:37:22.764 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  72%|███████▏  | 72/100 [16:39:09<6:42:26, 862.39s/epoch]26-11-02 16:37:22.766 - INFO: Learning rate: 8.781822425784655e-06
+26-11-02 16:51:39.569 - INFO: Train epoch 72: bpp_loss: 0.180729 | recon_loss: 0.000352055 | loss: 0.181082
+26-11-02 16:52:06.114 - INFO: Validation epoch 72: Average losses: Loss: 27.8261 | Deriv loss: 0.052601 | F1 Score: 0.003451 | PSNR: 37.055285 | RMSE: 4.634199 | ECS: 0.381602 | bpp_loss: 0.0000 | recon_loss: 27.8261 | loss: 27.8261 
+26-11-02 16:52:13.618 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  73%|███████▎  | 73/100 [16:54:00<6:31:55, 870.93s/epoch]26-11-02 16:52:13.620 - INFO: Learning rate: 8.755175906309799e-06
+26-11-02 17:06:22.567 - INFO: Train epoch 73: bpp_loss: 0.180707 | recon_loss: 0.000348842 | loss: 0.181055
+26-11-02 17:06:48.876 - INFO: Validation epoch 73: Average losses: Loss: 28.5675 | Deriv loss: 0.055625 | F1 Score: 0.003020 | PSNR: 36.995682 | RMSE: 4.691135 | ECS: 0.409651 | bpp_loss: 0.0000 | recon_loss: 28.5675 | loss: 28.5675 
+26-11-02 17:06:56.199 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  74%|███████▍  | 74/100 [17:08:43<6:18:54, 874.42s/epoch]26-11-02 17:06:56.200 - INFO: Learning rate: 8.728326007135289e-06
+26-11-02 17:20:08.993 - INFO: Train epoch 74: bpp_loss: 0.180712 | recon_loss: 0.000349969 | loss: 0.181062
+26-11-02 17:20:35.357 - INFO: Validation epoch 74: Average losses: Loss: 28.5276 | Deriv loss: 0.052277 | F1 Score: 0.003047 | PSNR: 37.108813 | RMSE: 4.667740 | ECS: 0.391867 | bpp_loss: 0.0000 | recon_loss: 28.5276 | loss: 28.5276 
+26-11-02 17:20:42.278 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  75%|███████▌  | 75/100 [17:22:29<5:58:17, 859.92s/epoch]26-11-02 17:20:42.279 - INFO: Learning rate: 8.701274761638287e-06
+26-11-02 17:33:54.107 - INFO: Train epoch 75: bpp_loss: 0.1807 | recon_loss: 0.000362667 | loss: 0.181063
+26-11-02 17:34:20.435 - INFO: Validation epoch 75: Average losses: Loss: 27.8022 | Deriv loss: 0.052495 | F1 Score: 0.003818 | PSNR: 37.145670 | RMSE: 4.620518 | ECS: 0.380692 | bpp_loss: 0.0000 | recon_loss: 27.8022 | loss: 27.8022 
+26-11-02 17:34:26.742 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  76%|███████▌  | 76/100 [17:36:13<5:39:42, 849.28s/epoch]26-11-02 17:34:26.744 - INFO: Learning rate: 8.674024213744498e-06
+26-11-02 17:47:40.881 - INFO: Train epoch 76: bpp_loss: 0.180689 | recon_loss: 0.000342514 | loss: 0.181031
+26-11-02 17:48:06.965 - INFO: Validation epoch 76: Average losses: Loss: 29.1063 | Deriv loss: 0.052612 | F1 Score: 0.003295 | PSNR: 37.085047 | RMSE: 4.711622 | ECS: 0.385658 | bpp_loss: 0.0000 | recon_loss: 29.1063 | loss: 29.1063 
+26-11-02 17:48:12.835 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  77%|███████▋  | 77/100 [17:49:59<5:22:53, 842.33s/epoch]26-11-02 17:48:12.836 - INFO: Learning rate: 8.646576417759432e-06
+26-11-02 18:01:31.212 - INFO: Train epoch 77: bpp_loss: 0.180664 | recon_loss: 0.00034733 | loss: 0.181011
+26-11-02 18:01:57.626 - INFO: Validation epoch 77: Average losses: Loss: 28.8268 | Deriv loss: 0.053949 | F1 Score: 0.003096 | PSNR: 37.122549 | RMSE: 4.687086 | ECS: 0.398913 | bpp_loss: 0.0000 | recon_loss: 28.8268 | loss: 28.8268 
+Training Progress:  78%|███████▊  | 78/100 [18:03:48<5:07:17, 838.08s/epoch]26-11-02 18:02:00.994 - INFO: Learning rate: 8.618933438199227e-06
+26-11-02 18:15:19.879 - INFO: Train epoch 78: bpp_loss: 0.180694 | recon_loss: 0.000341916 | loss: 0.181036
+26-11-02 18:15:46.041 - INFO: Validation epoch 78: Average losses: Loss: 28.7355 | Deriv loss: 0.052542 | F1 Score: 0.003114 | PSNR: 36.828713 | RMSE: 4.709328 | ECS: 0.403110 | bpp_loss: 0.0000 | recon_loss: 28.7355 | loss: 28.7355 
+26-11-02 18:15:53.315 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  79%|███████▉  | 79/100 [18:17:40<4:52:43, 836.35s/epoch]26-11-02 18:15:53.316 - INFO: Learning rate: 8.59109734962111e-06
+26-11-02 18:29:06.587 - INFO: Train epoch 79: bpp_loss: 0.180684 | recon_loss: 0.000356008 | loss: 0.18104
+26-11-02 18:29:32.976 - INFO: Validation epoch 79: Average losses: Loss: 28.1840 | Deriv loss: 0.051394 | F1 Score: 0.002800 | PSNR: 37.115538 | RMSE: 4.650990 | ECS: 0.403590 | bpp_loss: 0.0000 | recon_loss: 28.1840 | loss: 28.1840 
+26-11-02 18:29:39.077 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  80%|████████  | 80/100 [18:31:26<4:37:43, 833.17s/epoch]26-11-02 18:29:39.078 - INFO: Learning rate: 8.563070236453442e-06
+26-11-02 18:42:52.514 - INFO: Train epoch 80: bpp_loss: 0.180678 | recon_loss: 0.000343737 | loss: 0.181022
+26-11-02 18:43:18.583 - INFO: Validation epoch 80: Average losses: Loss: 28.5901 | Deriv loss: 0.053340 | F1 Score: 0.003317 | PSNR: 36.867764 | RMSE: 4.690273 | ECS: 0.400447 | bpp_loss: 0.0000 | recon_loss: 28.5901 | loss: 28.5901 
+26-11-02 18:43:24.611 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  81%|████████  | 81/100 [18:45:11<4:23:06, 830.88s/epoch]26-11-02 18:43:24.614 - INFO: Learning rate: 8.534854192825432e-06
+26-11-02 18:56:36.866 - INFO: Train epoch 81: bpp_loss: 0.180677 | recon_loss: 0.000340105 | loss: 0.181017
+26-11-02 18:57:02.755 - INFO: Validation epoch 81: Average losses: Loss: 28.2863 | Deriv loss: 0.054064 | F1 Score: 0.002991 | PSNR: 37.194619 | RMSE: 4.646145 | ECS: 0.389712 | bpp_loss: 0.0000 | recon_loss: 28.2863 | loss: 28.2863 
+Training Progress:  82%|████████▏ | 82/100 [18:58:53<4:08:27, 828.19s/epoch]26-11-02 18:57:06.508 - INFO: Learning rate: 8.506451322396478e-06
+26-11-02 19:10:17.625 - INFO: Train epoch 82: bpp_loss: 0.180668 | recon_loss: 0.000337384 | loss: 0.181006
+26-11-02 19:10:43.621 - INFO: Validation epoch 82: Average losses: Loss: 27.4589 | Deriv loss: 0.050858 | F1 Score: 0.002898 | PSNR: 37.293475 | RMSE: 4.589169 | ECS: 0.393308 | bpp_loss: 0.0000 | recon_loss: 27.4589 | loss: 27.4589 
+Training Progress:  83%|████████▎ | 83/100 [19:12:33<3:53:56, 825.67s/epoch]26-11-02 19:10:46.307 - INFO: Learning rate: 8.477863738185164e-06
+26-11-02 19:23:57.237 - INFO: Train epoch 83: bpp_loss: 0.180691 | recon_loss: 0.000343193 | loss: 0.181034
+26-11-02 19:24:23.343 - INFO: Validation epoch 83: Average losses: Loss: 28.3122 | Deriv loss: 0.052944 | F1 Score: 0.003320 | PSNR: 37.078364 | RMSE: 4.658063 | ECS: 0.384824 | bpp_loss: 0.0000 | recon_loss: 28.3122 | loss: 28.3122 
+26-11-02 19:24:29.219 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  84%|████████▍ | 84/100 [19:26:16<3:39:57, 824.84s/epoch]26-11-02 19:24:29.220 - INFO: Learning rate: 8.449093562397955e-06
+26-11-02 19:37:41.306 - INFO: Train epoch 84: bpp_loss: 0.180661 | recon_loss: 0.000329899 | loss: 0.180991
+26-11-02 19:38:07.292 - INFO: Validation epoch 84: Average losses: Loss: 29.2771 | Deriv loss: 0.053979 | F1 Score: 0.002777 | PSNR: 37.098291 | RMSE: 4.705696 | ECS: 0.395270 | bpp_loss: 0.0000 | recon_loss: 29.2771 | loss: 29.2771 
+Training Progress:  85%|████████▌ | 85/100 [19:39:56<3:25:53, 823.59s/epoch]26-11-02 19:38:09.884 - INFO: Learning rate: 8.420142926257535e-06
+26-11-02 19:51:21.352 - INFO: Train epoch 85: bpp_loss: 0.180642 | recon_loss: 0.000339279 | loss: 0.180982
+26-11-02 19:51:47.380 - INFO: Validation epoch 85: Average losses: Loss: 28.3978 | Deriv loss: 0.050199 | F1 Score: 0.002900 | PSNR: 37.199623 | RMSE: 4.658108 | ECS: 0.392348 | bpp_loss: 0.0000 | recon_loss: 28.3978 | loss: 28.3978 
+26-11-02 19:51:53.409 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  86%|████████▌ | 86/100 [19:53:40<3:12:09, 823.57s/epoch]26-11-02 19:51:53.410 - INFO: Learning rate: 8.391013969830885e-06
+26-11-02 20:05:06.929 - INFO: Train epoch 86: bpp_loss: 0.18065 | recon_loss: 0.000331996 | loss: 0.180982
+26-11-02 20:05:33.005 - INFO: Validation epoch 86: Average losses: Loss: 28.5784 | Deriv loss: 0.051281 | F1 Score: 0.002627 | PSNR: 36.981348 | RMSE: 4.686780 | ECS: 0.407298 | bpp_loss: 0.0000 | recon_loss: 28.5784 | loss: 28.5784 
+26-11-02 20:05:38.374 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  87%|████████▋ | 87/100 [20:07:25<2:58:31, 823.99s/epoch]26-11-02 20:05:38.376 - INFO: Learning rate: 8.361708841857054e-06
+26-11-02 20:18:49.011 - INFO: Train epoch 87: bpp_loss: 0.18065 | recon_loss: 0.00034183 | loss: 0.180992
+26-11-02 20:19:14.856 - INFO: Validation epoch 87: Average losses: Loss: 28.5971 | Deriv loss: 0.054053 | F1 Score: 0.003262 | PSNR: 37.051320 | RMSE: 4.671532 | ECS: 0.378403 | bpp_loss: 0.0000 | recon_loss: 28.5971 | loss: 28.5971 
+26-11-02 20:19:20.096 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  88%|████████▊ | 88/100 [20:21:07<2:44:39, 823.31s/epoch]26-11-02 20:19:20.097 - INFO: Learning rate: 8.332229699574644e-06
+26-11-02 20:32:32.104 - INFO: Train epoch 88: bpp_loss: 0.180646 | recon_loss: 0.000328682 | loss: 0.180975
+26-11-02 20:32:58.422 - INFO: Validation epoch 88: Average losses: Loss: 29.8359 | Deriv loss: 0.052691 | F1 Score: 0.003060 | PSNR: 36.976995 | RMSE: 4.762403 | ECS: 0.400767 | bpp_loss: 0.0000 | recon_loss: 29.8358 | loss: 29.8359 
+Training Progress:  89%|████████▉ | 89/100 [20:34:48<2:30:49, 822.71s/epoch]26-11-02 20:33:01.403 - INFO: Learning rate: 8.302578708549065e-06
+26-11-02 20:46:15.966 - INFO: Train epoch 89: bpp_loss: 0.180658 | recon_loss: 0.000339025 | loss: 0.180997
+26-11-02 20:46:42.165 - INFO: Validation epoch 89: Average losses: Loss: 27.7851 | Deriv loss: 0.051253 | F1 Score: 0.002753 | PSNR: 37.263067 | RMSE: 4.607602 | ECS: 0.392366 | bpp_loss: 0.0000 | recon_loss: 27.7851 | loss: 27.7851 
+26-11-02 20:46:47.168 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  90%|█████████ | 90/100 [20:48:34<2:17:16, 823.63s/epoch]26-11-02 20:46:47.169 - INFO: Learning rate: 8.272758042499497e-06
+26-11-02 21:00:02.135 - INFO: Train epoch 90: bpp_loss: 0.180655 | recon_loss: 0.000330009 | loss: 0.180985
+26-11-02 21:00:28.341 - INFO: Validation epoch 90: Average losses: Loss: 28.8247 | Deriv loss: 0.053231 | F1 Score: 0.002919 | PSNR: 37.065712 | RMSE: 4.693688 | ECS: 0.389460 | bpp_loss: 0.0000 | recon_loss: 28.8247 | loss: 28.8247 
+26-11-02 21:00:33.391 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  91%|█████████ | 91/100 [21:02:20<2:03:39, 824.40s/epoch]26-11-02 21:00:33.392 - INFO: Learning rate: 8.242769883125653e-06
+26-11-02 21:13:48.130 - INFO: Train epoch 91: bpp_loss: 0.180663 | recon_loss: 0.000322245 | loss: 0.180985
+26-11-02 21:14:14.205 - INFO: Validation epoch 91: Average losses: Loss: 28.4853 | Deriv loss: 0.051513 | F1 Score: 0.002850 | PSNR: 36.994668 | RMSE: 4.676540 | ECS: 0.382565 | bpp_loss: 0.0000 | recon_loss: 28.4853 | loss: 28.4853 
+26-11-02 21:14:19.587 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  92%|█████████▏| 92/100 [21:16:06<1:49:59, 824.94s/epoch]26-11-02 21:14:19.588 - INFO: Learning rate: 8.212616419934309e-06
+26-11-02 21:27:34.440 - INFO: Train epoch 92: bpp_loss: 0.180633 | recon_loss: 0.000330165 | loss: 0.180964
+26-11-02 21:28:00.538 - INFO: Validation epoch 92: Average losses: Loss: 28.6116 | Deriv loss: 0.050525 | F1 Score: 0.002779 | PSNR: 37.132341 | RMSE: 4.675976 | ECS: 0.381801 | bpp_loss: 0.0000 | recon_loss: 28.6116 | loss: 28.6116 
+26-11-02 21:28:05.654 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  93%|█████████▎| 93/100 [21:29:52<1:36:16, 825.28s/epoch]26-11-02 21:28:05.655 - INFO: Learning rate: 8.182299850065598e-06
+26-11-02 21:41:20.591 - INFO: Train epoch 93: bpp_loss: 0.18062 | recon_loss: 0.000314889 | loss: 0.180935
+26-11-02 21:41:46.534 - INFO: Validation epoch 93: Average losses: Loss: 28.8368 | Deriv loss: 0.052603 | F1 Score: 0.003045 | PSNR: 37.145531 | RMSE: 4.686090 | ECS: 0.392167 | bpp_loss: 0.0000 | recon_loss: 28.8368 | loss: 28.8368 
+26-11-02 21:41:51.779 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  94%|█████████▍| 94/100 [21:43:38<1:22:33, 825.53s/epoch]26-11-02 21:41:51.780 - INFO: Learning rate: 8.151822378119149e-06
+26-11-02 21:55:06.852 - INFO: Train epoch 94: bpp_loss: 0.180641 | recon_loss: 0.000336635 | loss: 0.180978
+26-11-02 21:55:32.946 - INFO: Validation epoch 94: Average losses: Loss: 28.7171 | Deriv loss: 0.050279 | F1 Score: 0.002777 | PSNR: 37.124718 | RMSE: 4.682021 | ECS: 0.399700 | bpp_loss: 0.0000 | recon_loss: 28.7171 | loss: 28.7171 
+26-11-02 21:55:39.430 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  95%|█████████▌| 95/100 [21:57:26<1:08:50, 826.17s/epoch]26-11-02 21:55:39.432 - INFO: Learning rate: 8.121186215980013e-06
+26-11-02 22:08:54.208 - INFO: Train epoch 95: bpp_loss: 0.180613 | recon_loss: 0.000316759 | loss: 0.180929
+26-11-02 22:09:20.369 - INFO: Validation epoch 95: Average losses: Loss: 29.8643 | Deriv loss: 0.051687 | F1 Score: 0.002665 | PSNR: 36.897538 | RMSE: 4.761373 | ECS: 0.392431 | bpp_loss: 0.0000 | recon_loss: 29.8643 | loss: 29.8643 
+26-11-02 22:09:26.407 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  96%|█████████▌| 96/100 [22:11:13<55:05, 826.41s/epoch]  26-11-02 22:09:26.408 - INFO: Learning rate: 8.090393582644414e-06
+26-11-02 22:22:39.433 - INFO: Train epoch 96: bpp_loss: 0.180635 | recon_loss: 0.000331513 | loss: 0.180967
+26-11-02 22:23:05.888 - INFO: Validation epoch 96: Average losses: Loss: 27.5889 | Deriv loss: 0.053678 | F1 Score: 0.003070 | PSNR: 37.357116 | RMSE: 4.588459 | ECS: 0.378471 | bpp_loss: 0.0000 | recon_loss: 27.5889 | loss: 27.5889 
+26-11-02 22:23:11.818 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  97%|█████████▋| 97/100 [22:24:58<41:18, 826.11s/epoch]26-11-02 22:23:11.820 - INFO: Learning rate: 8.059446704045367e-06
+26-11-02 22:36:23.987 - INFO: Train epoch 97: bpp_loss: 0.180662 | recon_loss: 0.000322849 | loss: 0.180984
+26-11-02 22:36:50.295 - INFO: Validation epoch 97: Average losses: Loss: 27.9312 | Deriv loss: 0.052311 | F1 Score: 0.002854 | PSNR: 37.067626 | RMSE: 4.635970 | ECS: 0.390644 | bpp_loss: 0.0000 | recon_loss: 27.9312 | loss: 27.9312 
+Training Progress:  98%|█████████▊| 98/100 [22:38:40<27:29, 824.85s/epoch]26-11-02 22:36:53.724 - INFO: Learning rate: 8.028347812878127e-06
+26-11-02 22:50:07.417 - INFO: Train epoch 98: bpp_loss: 0.180614 | recon_loss: 0.000312153 | loss: 0.180926
+26-11-02 22:50:33.518 - INFO: Validation epoch 98: Average losses: Loss: 28.3193 | Deriv loss: 0.052772 | F1 Score: 0.003206 | PSNR: 37.222406 | RMSE: 4.638852 | ECS: 0.375682 | bpp_loss: 0.0000 | recon_loss: 28.3193 | loss: 28.3193 
+26-11-02 22:50:39.864 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress:  99%|█████████▉| 99/100 [22:52:26<13:45, 825.24s/epoch]26-11-02 22:50:39.865 - INFO: Learning rate: 7.997099148425515e-06
+26-11-02 23:03:51.440 - INFO: Train epoch 99: bpp_loss: 0.180608 | recon_loss: 0.000314567 | loss: 0.180922
+26-11-02 23:04:17.605 - INFO: Validation epoch 99: Average losses: Loss: 27.5580 | Deriv loss: 0.049490 | F1 Score: 0.003155 | PSNR: 37.181209 | RMSE: 4.601343 | ECS: 0.364165 | bpp_loss: 0.0000 | recon_loss: 27.5580 | loss: 27.5580 
+26-11-02 23:04:24.246 - INFO: best checkpoint (bpp_loss) saved.
+Training Progress: 100%|██████████| 100/100 [23:06:11<00:00, 824.98s/epoch]Training Progress: 100%|██████████| 100/100 [23:06:11<00:00, 831.71s/epoch]
+26-11-02 23:04:24.248 - INFO: Evaluating on test set after training...
+26-11-02 23:07:58.275 - INFO: Test epoch 100: Average losses: Loss: 32.0519 | Deriv loss: 0.059402 | F1 Score: 0.002718 | PSNR: 36.249542 | RMSE: 4.991549 | ECS: 0.407725 | bpp_loss: 0.0000 | recon_loss: 32.0519 | loss: 32.0519 
+26-11-02 23:07:58.370 - INFO: Test set metrics after training: {'loss': 32.051906745179586, 'bpp_loss': 0.0, 'deriv_loss': tensor(0.0594, device='cuda:0'), 'f1_score': np.float64(0.0027175058670135784), 'psnr': np.float64(36.24954211063161), 'rmse_loss': tensor(4.9915, device='cuda:0'), 'ecs_loss': np.float32(0.4077253), 'rgb_psnr': 0, 'rgb_rmse_loss': 0}
