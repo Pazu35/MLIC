@@ -63,6 +63,14 @@ def test_one_epoch(epoch, test_dataloader, model, criterion, save_dir, logger_va
                 std = norm_stats["params"]["std_along_depth"]
                 mean = torch.from_numpy(mean).to(device=d.device, dtype=d.dtype)
                 std = torch.from_numpy(std).to(device=d.device, dtype=d.dtype)
+                if mean.shape[1] != d.size(1):
+                    # RGB triplets packed after a per-depth normalisation (12 Nov 2026): sample k of the
+                    # unshuffled loader is triplet k % n_trip of its day, i.e. levels 3g..3g+2.
+                    n_trip = mean.shape[1] // d.size(1)
+                    k = i * test_dataloader.batch_size + torch.arange(d.size(0), device=d.device)
+                    lev = (k % n_trip)[:, None] * d.size(1) + torch.arange(d.size(1), device=d.device)
+                    mean = mean.reshape(-1)[lev][:, :, None, None]
+                    std = std.reshape(-1)[lev][:, :, None, None]
                 out_net['x_hat'] = out_net['x_hat'] * std  + mean
                 d = d * std + mean 
 

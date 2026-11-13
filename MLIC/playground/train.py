@@ -362,7 +362,11 @@ def main(dm,config, loss_params,checkpoint_dir_name):
         #         else:  # classical initialization
         #             checkpoint['state_dict'][key] = model_dict[key] 
 
-        net.load_state_dict(checkpoint['state_dict'], strict=False)
+        load_res = net.load_state_dict(checkpoint['state_dict'], strict=False)
+        # strict=False hides mismatches: report them (C3 fine-tune debug, 9 Nov 2026)
+        print(f"[ckpt] {args.checkpoint}: {len(load_res.missing_keys)} missing, "
+              f"{len(load_res.unexpected_keys)} unexpected keys; "
+              f"missing e.g. {load_res.missing_keys[:5]}; unexpected e.g. {load_res.unexpected_keys[:5]}", flush=True)
         resume_checkpoint = checkpoint if args.resume else None
 
         # optimizer.load_state_dict(checkpoint['optimizer'])
@@ -489,6 +493,11 @@ def main(dm,config, loss_params,checkpoint_dir_name):
 
     # Continue with training loop
     optimizer.param_groups[0]['lr'] = args.learning_rate
+    if os.environ.get("VAL0") == "1":  # validate the loaded weights before any training step (C3 debug)
+        loss_dict0 = test_one_epoch(-1, val_dataloader, net, criterion,
+                                    os.path.join('/Odyssey/private/o23gauvr/code/MLIC/experiments', checkpoint_dir_name, 'val_images', 'epoch0'),
+                                    logger_val, tb_logger)
+        print(f"[VAL0] before training: {loss_dict0}", flush=True)
     for epoch in tqdm(range(start_epoch, args.epochs), desc="Training Progress", unit="epoch"):
         logger_train.info(f"Learning rate: {optimizer.param_groups[0]['lr']}")
 
@@ -785,7 +794,7 @@ if __name__ == '__main__':
         "--exp", env("EXP", f"back_to_the_future/H/off/norm_{NORM}"),
         "--gpu_id", env("GPU", "0"),
         "--epochs", env("EPOCHS", "2000"),
-        "--lambda", "1.0",
+        "--lambda", env("LMBDA", "1.0"),  # C3 fine-tune: 0.025*255**2 = 1626 matches the pretrained q5 balance
         "-lr", env("LR", "1e-5"),
         "--num-workers", "10",
         "--clip_max_norm", "1.0",
@@ -911,7 +920,8 @@ if __name__ == '__main__':
     cfg['output_low_band_filter_use'] = os.environ.get("SMOOTHER", "0") == "1"
     cfg['output_low_band_filter_mode'] = "learnable_gauss"  # "iir", "learnable_fir" , #learnable_dogs , learnable_gauss #zero_phase_lfilt
 
-    rgb = {"use": env("RGB", "0") == "1", "method": "depth_layers"}  # RGB=1: 52 depth triplets, global min-max (C3)
+    rgb = {"use": env("RGB", "0") == "1", "method": "depth_layers",  # RGB=1: 52 depth triplets, global min-max (C3)
+           "norm": env("RGB_NORM", "min_max")}  # RGB_NORM=mean_std_along_depth: per-depth stats, packed after (12 Nov)
     chn = "3" if rgb["use"] else "157"  # Number of channels
     dtype_str = "float32"
     # if rgb["use"] and rgb["method"] == "CAE":
