@@ -709,3 +709,138 @@ Parameter Group 0
 26-11-13 01:59:55.663 - INFO: Train epoch 55: bpp_loss: 0.0613401 | recon_loss: 0.00811082 | loss: 0.0694509
 26-11-13 02:00:13.746 - INFO: Validation epoch 55: Average losses: Loss: 1.2116 | Deriv loss: 0.032927 | F1 Score: 0.003527 | PSNR: 50.484544 | RMSE: 0.965513 | ECS: 0.268626 | bpp_loss: 0.0256 | recon_loss: 1.1860 | loss: 1.2116 
 Training Progress:  56%|█████▌    | 56/100 [5:24:42<4:15:39, 348.63s/epoch]26-11-13 02:00:14.159 - INFO: Learning rate: 9.178891340833464e-06
+26-11-13 02:05:43.409 - INFO: Train epoch 56: bpp_loss: 0.0611338 | recon_loss: 0.00804599 | loss: 0.0691798
+26-11-13 02:06:01.455 - INFO: Validation epoch 56: Average losses: Loss: 1.2135 | Deriv loss: 0.033442 | F1 Score: 0.003336 | PSNR: 50.471012 | RMSE: 0.965881 | ECS: 0.274891 | bpp_loss: 0.0278 | recon_loss: 1.1857 | loss: 1.2135 
+Training Progress:  57%|█████▋    | 57/100 [5:30:30<4:09:41, 348.42s/epoch]26-11-13 02:06:02.089 - INFO: Learning rate: 9.155766181121831e-06
+26-11-13 02:11:29.749 - INFO: Train epoch 57: bpp_loss: 0.0609719 | recon_loss: 0.00798435 | loss: 0.0689563
+26-11-13 02:11:47.546 - INFO: Validation epoch 57: Average losses: Loss: 1.2381 | Deriv loss: 0.034030 | F1 Score: 0.003699 | PSNR: 50.383533 | RMSE: 0.976226 | ECS: 0.268221 | bpp_loss: 0.0274 | recon_loss: 1.2107 | loss: 1.2381 
+Training Progress:  58%|█████▊    | 58/100 [5:36:16<4:03:21, 347.66s/epoch]26-11-13 02:11:47.969 - INFO: Learning rate: 9.132406678210523e-06
+26-11-13 02:17:20.586 - INFO: Train epoch 58: bpp_loss: 0.0607812 | recon_loss: 0.00791683 | loss: 0.068698
+26-11-13 02:17:38.189 - INFO: Validation epoch 58: Average losses: Loss: 1.2478 | Deriv loss: 0.033865 | F1 Score: 0.003718 | PSNR: 50.362918 | RMSE: 0.979075 | ECS: 0.258925 | bpp_loss: 0.0284 | recon_loss: 1.2194 | loss: 1.2478 
+Training Progress:  59%|█████▉    | 59/100 [5:42:07<3:58:10, 348.56s/epoch]26-11-13 02:17:38.632 - INFO: Learning rate: 9.108814674130416e-06
+26-11-13 02:23:10.797 - INFO: Train epoch 59: bpp_loss: 0.0606102 | recon_loss: 0.00785251 | loss: 0.0684628
+26-11-13 02:23:28.786 - INFO: Validation epoch 59: Average losses: Loss: 1.2690 | Deriv loss: 0.035530 | F1 Score: 0.003789 | PSNR: 50.309085 | RMSE: 0.986673 | ECS: 0.262833 | bpp_loss: 0.0292 | recon_loss: 1.2398 | loss: 1.2690 
+Training Progress:  60%|██████    | 60/100 [5:47:57<3:52:46, 349.17s/epoch]26-11-13 02:23:29.219 - INFO: Learning rate: 9.084992024095253e-06
+26-11-13 02:28:58.524 - INFO: Train epoch 60: bpp_loss: 0.0604385 | recon_loss: 0.0077966 | loss: 0.0682351
+26-11-13 02:29:16.985 - INFO: Validation epoch 60: Average losses: Loss: 1.2785 | Deriv loss: 0.034039 | F1 Score: 0.003691 | PSNR: 50.278438 | RMSE: 0.989969 | ECS: 0.261250 | bpp_loss: 0.0309 | recon_loss: 1.2476 | loss: 1.2785 
+Training Progress:  61%|██████    | 61/100 [5:53:46<3:46:46, 348.89s/epoch]26-11-13 02:29:17.467 - INFO: Learning rate: 9.060940596341159e-06
+26-11-13 02:34:52.557 - INFO: Train epoch 61: bpp_loss: 0.0602748 | recon_loss: 0.0077338 | loss: 0.0680086
+26-11-13 02:35:10.499 - INFO: Validation epoch 61: Average losses: Loss: 1.3136 | Deriv loss: 0.033664 | F1 Score: 0.003655 | PSNR: 50.178722 | RMSE: 1.003222 | ECS: 0.263245 | bpp_loss: 0.0307 | recon_loss: 1.2829 | loss: 1.3136 
+Training Progress:  62%|██████▏   | 62/100 [5:59:39<3:41:50, 350.26s/epoch]26-11-13 02:35:10.936 - INFO: Learning rate: 9.036662271965515e-06
+26-11-13 02:40:47.789 - INFO: Train epoch 62: bpp_loss: 0.0601002 | recon_loss: 0.00766646 | loss: 0.0677667
+26-11-13 02:41:06.092 - INFO: Validation epoch 62: Average losses: Loss: 1.3096 | Deriv loss: 0.033423 | F1 Score: 0.003528 | PSNR: 50.189410 | RMSE: 1.001374 | ECS: 0.276202 | bpp_loss: 0.0321 | recon_loss: 1.2774 | loss: 1.3096 
+Training Progress:  63%|██████▎   | 63/100 [6:05:35<3:36:58, 351.86s/epoch]26-11-13 02:41:06.529 - INFO: Learning rate: 9.01215894476526e-06
+26-11-13 02:46:40.146 - INFO: Train epoch 63: bpp_loss: 0.0599688 | recon_loss: 0.0076231 | loss: 0.0675919
+26-11-13 02:46:58.483 - INFO: Validation epoch 63: Average losses: Loss: 1.3650 | Deriv loss: 0.034202 | F1 Score: 0.003502 | PSNR: 50.014994 | RMSE: 1.023410 | ECS: 0.265302 | bpp_loss: 0.0310 | recon_loss: 1.3340 | loss: 1.3650 
+Training Progress:  64%|██████▍   | 64/100 [6:11:27<3:31:13, 352.03s/epoch]26-11-13 02:46:58.953 - INFO: Learning rate: 8.987432521074578e-06
+26-11-13 02:52:34.210 - INFO: Train epoch 64: bpp_loss: 0.0598028 | recon_loss: 0.00755206 | loss: 0.0673549
+26-11-13 02:52:52.581 - INFO: Validation epoch 64: Average losses: Loss: 1.3484 | Deriv loss: 0.033764 | F1 Score: 0.003414 | PSNR: 50.055028 | RMSE: 1.016730 | ECS: 0.276044 | bpp_loss: 0.0325 | recon_loss: 1.3159 | loss: 1.3484 
+Training Progress:  65%|██████▌   | 65/100 [6:17:21<3:25:43, 352.67s/epoch]26-11-13 02:52:53.116 - INFO: Learning rate: 8.962484919602033e-06
+26-11-13 02:58:30.144 - INFO: Train epoch 65: bpp_loss: 0.0596442 | recon_loss: 0.00748117 | loss: 0.0671254
+26-11-13 02:58:48.367 - INFO: Validation epoch 65: Average losses: Loss: 1.3456 | Deriv loss: 0.035695 | F1 Score: 0.003434 | PSNR: 50.091577 | RMSE: 1.014106 | ECS: 0.278505 | bpp_loss: 0.0338 | recon_loss: 1.3118 | loss: 1.3456 
+Training Progress:  66%|██████▌   | 66/100 [6:23:17<3:20:21, 353.58s/epoch]26-11-13 02:58:48.806 - INFO: Learning rate: 8.937318071267134e-06
+26-11-13 03:04:20.343 - INFO: Train epoch 66: bpp_loss: 0.0595115 | recon_loss: 0.00744159 | loss: 0.0669531
+26-11-13 03:04:38.207 - INFO: Validation epoch 66: Average losses: Loss: 1.3756 | Deriv loss: 0.033997 | F1 Score: 0.003451 | PSNR: 50.006660 | RMSE: 1.024958 | ECS: 0.269740 | bpp_loss: 0.0360 | recon_loss: 1.3396 | loss: 1.3756 
+Training Progress:  67%|██████▋   | 67/100 [6:29:07<3:13:51, 352.46s/epoch]26-11-13 03:04:38.653 - INFO: Learning rate: 8.91193391903635e-06
+26-11-13 03:10:09.219 - INFO: Train epoch 67: bpp_loss: 0.0593626 | recon_loss: 0.00738859 | loss: 0.0667512
+26-11-13 03:10:27.334 - INFO: Validation epoch 67: Average losses: Loss: 1.3735 | Deriv loss: 0.034040 | F1 Score: 0.003491 | PSNR: 50.015331 | RMSE: 1.024012 | ECS: 0.279206 | bpp_loss: 0.0354 | recon_loss: 1.3381 | loss: 1.3735 
+Training Progress:  68%|██████▊   | 68/100 [6:34:56<3:07:26, 351.45s/epoch]26-11-13 03:10:27.761 - INFO: Learning rate: 8.886334417758584e-06
+26-11-13 03:15:57.600 - INFO: Train epoch 68: bpp_loss: 0.0592192 | recon_loss: 0.0073235 | loss: 0.0665427
+26-11-13 03:16:16.086 - INFO: Validation epoch 68: Average losses: Loss: 1.4229 | Deriv loss: 0.035117 | F1 Score: 0.003453 | PSNR: 49.870654 | RMSE: 1.042695 | ECS: 0.278500 | bpp_loss: 0.0357 | recon_loss: 1.3873 | loss: 1.4229 
+Training Progress:  69%|██████▉   | 69/100 [6:40:45<3:01:10, 350.66s/epoch]26-11-13 03:16:16.586 - INFO: Learning rate: 8.860521534000138e-06
+26-11-13 03:21:43.564 - INFO: Train epoch 69: bpp_loss: 0.0590885 | recon_loss: 0.00728346 | loss: 0.066372
+26-11-13 03:22:01.694 - INFO: Validation epoch 69: Average losses: Loss: 1.4395 | Deriv loss: 0.036278 | F1 Score: 0.003410 | PSNR: 49.828658 | RMSE: 1.048681 | ECS: 0.284537 | bpp_loss: 0.0365 | recon_loss: 1.4030 | loss: 1.4395 
+Training Progress:  70%|███████   | 70/100 [6:46:30<2:54:33, 349.12s/epoch]26-11-13 03:22:02.118 - INFO: Learning rate: 8.834497245879163e-06
+26-11-13 03:27:29.911 - INFO: Train epoch 70: bpp_loss: 0.0589528 | recon_loss: 0.0072214 | loss: 0.0661742
+26-11-13 03:27:48.012 - INFO: Validation epoch 70: Average losses: Loss: 1.4254 | Deriv loss: 0.034465 | F1 Score: 0.003460 | PSNR: 49.865046 | RMSE: 1.042712 | ECS: 0.275976 | bpp_loss: 0.0382 | recon_loss: 1.3873 | loss: 1.4254 
+Training Progress:  71%|███████   | 71/100 [6:52:17<2:48:20, 348.28s/epoch]26-11-13 03:27:48.440 - INFO: Learning rate: 8.808263542899602e-06
+26-11-13 03:33:18.980 - INFO: Train epoch 71: bpp_loss: 0.0588203 | recon_loss: 0.00717711 | loss: 0.0659974
+26-11-13 03:33:37.028 - INFO: Validation epoch 71: Average losses: Loss: 1.4362 | Deriv loss: 0.034213 | F1 Score: 0.003317 | PSNR: 49.824668 | RMSE: 1.047590 | ECS: 0.273302 | bpp_loss: 0.0371 | recon_loss: 1.3990 | loss: 1.4362 
+Training Progress:  72%|███████▏  | 72/100 [6:58:06<2:42:38, 348.50s/epoch]26-11-13 03:33:37.455 - INFO: Learning rate: 8.781822425784655e-06
+26-11-13 03:39:05.716 - INFO: Train epoch 72: bpp_loss: 0.0586912 | recon_loss: 0.00712857 | loss: 0.0658198
+26-11-13 03:39:24.017 - INFO: Validation epoch 72: Average losses: Loss: 1.4497 | Deriv loss: 0.035074 | F1 Score: 0.003202 | PSNR: 49.803259 | RMSE: 1.051775 | ECS: 0.285611 | bpp_loss: 0.0381 | recon_loss: 1.4116 | loss: 1.4497 
+Training Progress:  73%|███████▎  | 73/100 [7:03:53<2:36:37, 348.06s/epoch]26-11-13 03:39:24.469 - INFO: Learning rate: 8.755175906309799e-06
+26-11-13 03:44:49.926 - INFO: Train epoch 73: bpp_loss: 0.0585738 | recon_loss: 0.00708357 | loss: 0.0656574
+26-11-13 03:45:07.725 - INFO: Validation epoch 73: Average losses: Loss: 1.4516 | Deriv loss: 0.034807 | F1 Score: 0.003390 | PSNR: 49.797397 | RMSE: 1.052286 | ECS: 0.271021 | bpp_loss: 0.0388 | recon_loss: 1.4128 | loss: 1.4516 
+Training Progress:  74%|███████▍  | 74/100 [7:09:36<2:30:15, 346.75s/epoch]26-11-13 03:45:08.158 - INFO: Learning rate: 8.728326007135289e-06
+26-11-13 03:50:31.739 - INFO: Train epoch 74: bpp_loss: 0.0584416 | recon_loss: 0.00703326 | loss: 0.0654749
+26-11-13 03:50:49.708 - INFO: Validation epoch 74: Average losses: Loss: 1.4856 | Deriv loss: 0.035122 | F1 Score: 0.003354 | PSNR: 49.706129 | RMSE: 1.064367 | ECS: 0.270130 | bpp_loss: 0.0407 | recon_loss: 1.4449 | loss: 1.4856 
+Training Progress:  75%|███████▌  | 75/100 [7:15:18<2:23:53, 345.33s/epoch]26-11-13 03:50:50.169 - INFO: Learning rate: 8.701274761638287e-06
+26-11-13 03:56:09.046 - INFO: Train epoch 75: bpp_loss: 0.0583311 | recon_loss: 0.00698101 | loss: 0.0653121
+26-11-13 03:56:27.105 - INFO: Validation epoch 75: Average losses: Loss: 1.5015 | Deriv loss: 0.034848 | F1 Score: 0.003321 | PSNR: 49.675821 | RMSE: 1.069523 | ECS: 0.274013 | bpp_loss: 0.0400 | recon_loss: 1.4615 | loss: 1.5015 
+Training Progress:  76%|███████▌  | 76/100 [7:20:56<2:17:10, 342.94s/epoch]26-11-13 03:56:27.536 - INFO: Learning rate: 8.674024213744498e-06
+26-11-13 04:01:54.281 - INFO: Train epoch 76: bpp_loss: 0.0582199 | recon_loss: 0.00694397 | loss: 0.0651639
+26-11-13 04:02:12.188 - INFO: Validation epoch 76: Average losses: Loss: 1.5193 | Deriv loss: 0.035776 | F1 Score: 0.003368 | PSNR: 49.623369 | RMSE: 1.075485 | ECS: 0.271306 | bpp_loss: 0.0423 | recon_loss: 1.4770 | loss: 1.5193 
+Training Progress:  77%|███████▋  | 77/100 [7:26:41<2:11:42, 343.58s/epoch]26-11-13 04:02:12.629 - INFO: Learning rate: 8.646576417759432e-06
+26-11-13 04:07:39.188 - INFO: Train epoch 77: bpp_loss: 0.0581058 | recon_loss: 0.00690103 | loss: 0.0650069
+26-11-13 04:07:56.793 - INFO: Validation epoch 77: Average losses: Loss: 1.5403 | Deriv loss: 0.035615 | F1 Score: 0.003282 | PSNR: 49.573446 | RMSE: 1.083152 | ECS: 0.270051 | bpp_loss: 0.0425 | recon_loss: 1.4979 | loss: 1.5403 
+Training Progress:  78%|███████▊  | 78/100 [7:32:25<2:06:05, 343.89s/epoch]26-11-13 04:07:57.228 - INFO: Learning rate: 8.618933438199227e-06
+26-11-13 04:13:23.094 - INFO: Train epoch 78: bpp_loss: 0.0579913 | recon_loss: 0.00685725 | loss: 0.0648485
+26-11-13 04:13:41.291 - INFO: Validation epoch 78: Average losses: Loss: 1.5718 | Deriv loss: 0.035561 | F1 Score: 0.003249 | PSNR: 49.483851 | RMSE: 1.094836 | ECS: 0.277778 | bpp_loss: 0.0415 | recon_loss: 1.5303 | loss: 1.5718 
+Training Progress:  79%|███████▉  | 79/100 [7:38:10<2:00:25, 344.08s/epoch]26-11-13 04:13:41.740 - INFO: Learning rate: 8.59109734962111e-06
+26-11-13 04:19:16.782 - INFO: Train epoch 79: bpp_loss: 0.0578982 | recon_loss: 0.00683249 | loss: 0.0647307
+26-11-13 04:19:35.096 - INFO: Validation epoch 79: Average losses: Loss: 1.5944 | Deriv loss: 0.034835 | F1 Score: 0.003182 | PSNR: 49.432635 | RMSE: 1.102142 | ECS: 0.278509 | bpp_loss: 0.0429 | recon_loss: 1.5515 | loss: 1.5944 
+Training Progress:  80%|████████  | 80/100 [7:44:04<1:55:39, 346.99s/epoch]26-11-13 04:19:35.534 - INFO: Learning rate: 8.563070236453442e-06
+26-11-13 04:25:11.957 - INFO: Train epoch 80: bpp_loss: 0.0577788 | recon_loss: 0.00677652 | loss: 0.0645553
+26-11-13 04:25:30.413 - INFO: Validation epoch 80: Average losses: Loss: 1.5554 | Deriv loss: 0.035290 | F1 Score: 0.003251 | PSNR: 49.546431 | RMSE: 1.087382 | ECS: 0.278306 | bpp_loss: 0.0429 | recon_loss: 1.5124 | loss: 1.5554 
+Training Progress:  81%|████████  | 81/100 [7:49:59<1:50:40, 349.49s/epoch]26-11-13 04:25:30.838 - INFO: Learning rate: 8.534854192825432e-06
+26-11-13 04:31:04.733 - INFO: Train epoch 81: bpp_loss: 0.0576934 | recon_loss: 0.00675174 | loss: 0.0644451
+26-11-13 04:31:22.999 - INFO: Validation epoch 81: Average losses: Loss: 1.5550 | Deriv loss: 0.035472 | F1 Score: 0.003232 | PSNR: 49.526845 | RMSE: 1.088166 | ECS: 0.281461 | bpp_loss: 0.0440 | recon_loss: 1.5110 | loss: 1.5550 
+Training Progress:  82%|████████▏ | 82/100 [7:55:52<1:45:07, 350.42s/epoch]26-11-13 04:31:23.435 - INFO: Learning rate: 8.506451322396478e-06
+26-11-13 04:36:59.758 - INFO: Train epoch 82: bpp_loss: 0.057598 | recon_loss: 0.00671709 | loss: 0.0643151
+26-11-13 04:37:17.784 - INFO: Validation epoch 82: Average losses: Loss: 1.5768 | Deriv loss: 0.035987 | F1 Score: 0.003336 | PSNR: 49.476847 | RMSE: 1.095134 | ECS: 0.283479 | bpp_loss: 0.0468 | recon_loss: 1.5300 | loss: 1.5768 
+Training Progress:  83%|████████▎ | 83/100 [8:01:46<1:39:39, 351.73s/epoch]26-11-13 04:37:18.228 - INFO: Learning rate: 8.477863738185164e-06
+26-11-13 04:42:50.139 - INFO: Train epoch 83: bpp_loss: 0.0574965 | recon_loss: 0.00668784 | loss: 0.0641843
+26-11-13 04:43:08.196 - INFO: Validation epoch 83: Average losses: Loss: 1.6134 | Deriv loss: 0.037037 | F1 Score: 0.003231 | PSNR: 49.379138 | RMSE: 1.108396 | ECS: 0.268689 | bpp_loss: 0.0452 | recon_loss: 1.5681 | loss: 1.6134 
+Training Progress:  84%|████████▍ | 84/100 [8:07:37<1:33:41, 351.33s/epoch]26-11-13 04:43:08.629 - INFO: Learning rate: 8.449093562397955e-06
+26-11-13 04:48:41.420 - INFO: Train epoch 84: bpp_loss: 0.0574174 | recon_loss: 0.00668313 | loss: 0.0641005
+26-11-13 04:48:59.428 - INFO: Validation epoch 84: Average losses: Loss: 1.5920 | Deriv loss: 0.035936 | F1 Score: 0.003112 | PSNR: 49.457531 | RMSE: 1.099542 | ECS: 0.286788 | bpp_loss: 0.0466 | recon_loss: 1.5455 | loss: 1.5920 
+Training Progress:  85%|████████▌ | 85/100 [8:13:28<1:27:49, 351.31s/epoch]26-11-13 04:48:59.872 - INFO: Learning rate: 8.420142926257535e-06
+26-11-13 04:54:22.153 - INFO: Train epoch 85: bpp_loss: 0.0573083 | recon_loss: 0.00661011 | loss: 0.0639184
+26-11-13 04:54:39.630 - INFO: Validation epoch 85: Average losses: Loss: 1.6102 | Deriv loss: 0.034488 | F1 Score: 0.003232 | PSNR: 49.396338 | RMSE: 1.106560 | ECS: 0.275179 | bpp_loss: 0.0464 | recon_loss: 1.5637 | loss: 1.6102 
+Training Progress:  86%|████████▌ | 86/100 [8:19:08<1:21:11, 347.97s/epoch]26-11-13 04:54:40.050 - INFO: Learning rate: 8.391013969830885e-06
+26-11-13 04:59:59.690 - INFO: Train epoch 86: bpp_loss: 0.0572144 | recon_loss: 0.00655269 | loss: 0.0637671
+26-11-13 05:00:17.676 - INFO: Validation epoch 86: Average losses: Loss: 1.6120 | Deriv loss: 0.034430 | F1 Score: 0.003225 | PSNR: 49.399051 | RMSE: 1.106649 | ECS: 0.274885 | bpp_loss: 0.0478 | recon_loss: 1.5642 | loss: 1.6120 
+Training Progress:  87%|████████▋ | 87/100 [8:24:46<1:14:44, 344.99s/epoch]26-11-13 05:00:18.102 - INFO: Learning rate: 8.361708841857054e-06
+26-11-13 05:05:40.323 - INFO: Train epoch 87: bpp_loss: 0.0571271 | recon_loss: 0.0065416 | loss: 0.0636687
+26-11-13 05:05:58.126 - INFO: Validation epoch 87: Average losses: Loss: 1.6353 | Deriv loss: 0.037299 | F1 Score: 0.003295 | PSNR: 49.345188 | RMSE: 1.114496 | ECS: 0.281767 | bpp_loss: 0.0484 | recon_loss: 1.5869 | loss: 1.6353 
+Training Progress:  88%|████████▊ | 88/100 [8:30:27<1:08:43, 343.63s/epoch]26-11-13 05:05:58.549 - INFO: Learning rate: 8.332229699574644e-06
+26-11-13 05:11:18.872 - INFO: Train epoch 88: bpp_loss: 0.0570475 | recon_loss: 0.0065118 | loss: 0.0635593
+26-11-13 05:11:36.401 - INFO: Validation epoch 88: Average losses: Loss: 1.6414 | Deriv loss: 0.035297 | F1 Score: 0.003090 | PSNR: 49.343089 | RMSE: 1.116035 | ECS: 0.286287 | bpp_loss: 0.0474 | recon_loss: 1.5940 | loss: 1.6414 
+Training Progress:  89%|████████▉ | 89/100 [8:36:05<1:02:42, 342.02s/epoch]26-11-13 05:11:36.828 - INFO: Learning rate: 8.302578708549065e-06
+26-11-13 05:16:59.823 - INFO: Train epoch 89: bpp_loss: 0.0569664 | recon_loss: 0.00644455 | loss: 0.0634109
+26-11-13 05:17:17.350 - INFO: Validation epoch 89: Average losses: Loss: 1.7594 | Deriv loss: 0.038267 | F1 Score: 0.003142 | PSNR: 49.037936 | RMSE: 1.158372 | ECS: 0.289545 | bpp_loss: 0.0446 | recon_loss: 1.7148 | loss: 1.7594 
+Training Progress:  90%|█████████ | 90/100 [8:41:46<56:57, 341.70s/epoch]  26-11-13 05:17:17.775 - INFO: Learning rate: 8.272758042499497e-06
+26-11-13 05:22:39.597 - INFO: Train epoch 90: bpp_loss: 0.0568849 | recon_loss: 0.00644071 | loss: 0.0633256
+26-11-13 05:22:57.572 - INFO: Validation epoch 90: Average losses: Loss: 1.7298 | Deriv loss: 0.037504 | F1 Score: 0.003169 | PSNR: 49.128245 | RMSE: 1.146654 | ECS: 0.280107 | bpp_loss: 0.0475 | recon_loss: 1.6823 | loss: 1.7298 
+Training Progress:  91%|█████████ | 91/100 [8:47:26<51:11, 341.27s/epoch]26-11-13 05:22:58.025 - INFO: Learning rate: 8.242769883125653e-06
+26-11-13 05:28:58.800 - INFO: Train epoch 91: bpp_loss: 0.0568038 | recon_loss: 0.00639909 | loss: 0.0632029
+26-11-13 05:29:16.663 - INFO: Validation epoch 91: Average losses: Loss: 1.7206 | Deriv loss: 0.036199 | F1 Score: 0.003191 | PSNR: 49.149703 | RMSE: 1.142926 | ECS: 0.282389 | bpp_loss: 0.0504 | recon_loss: 1.6701 | loss: 1.7206 
+Training Progress:  92%|█████████▏| 92/100 [8:53:45<47:00, 352.61s/epoch]26-11-13 05:29:17.093 - INFO: Learning rate: 8.212616419934309e-06
+26-11-13 05:35:20.111 - INFO: Train epoch 92: bpp_loss: 0.0567207 | recon_loss: 0.00636734 | loss: 0.063088
+26-11-13 05:35:37.843 - INFO: Validation epoch 92: Average losses: Loss: 1.7054 | Deriv loss: 0.035317 | F1 Score: 0.003133 | PSNR: 49.187166 | RMSE: 1.137506 | ECS: 0.280250 | bpp_loss: 0.0505 | recon_loss: 1.6549 | loss: 1.7054 
+Training Progress:  93%|█████████▎| 93/100 [9:00:06<42:08, 361.19s/epoch]26-11-13 05:35:38.305 - INFO: Learning rate: 8.182299850065598e-06
+26-11-13 05:41:37.608 - INFO: Train epoch 93: bpp_loss: 0.0566268 | recon_loss: 0.00632103 | loss: 0.0629478
+26-11-13 05:41:55.313 - INFO: Validation epoch 93: Average losses: Loss: 1.7148 | Deriv loss: 0.037795 | F1 Score: 0.003138 | PSNR: 49.162307 | RMSE: 1.141027 | ECS: 0.291331 | bpp_loss: 0.0503 | recon_loss: 1.6645 | loss: 1.7148 
+Training Progress:  94%|█████████▍| 94/100 [9:06:24<36:36, 366.06s/epoch]26-11-13 05:41:55.738 - INFO: Learning rate: 8.151822378119149e-06
+26-11-13 05:48:01.420 - INFO: Train epoch 94: bpp_loss: 0.0565716 | recon_loss: 0.00630029 | loss: 0.0628719
+26-11-13 05:48:19.112 - INFO: Validation epoch 94: Average losses: Loss: 1.6966 | Deriv loss: 0.036748 | F1 Score: 0.003100 | PSNR: 49.196197 | RMSE: 1.134537 | ECS: 0.292982 | bpp_loss: 0.0518 | recon_loss: 1.6448 | loss: 1.6966 
+Training Progress:  95%|█████████▌| 95/100 [9:12:48<30:56, 371.38s/epoch]26-11-13 05:48:19.536 - INFO: Learning rate: 8.121186215980013e-06
+26-11-13 05:54:20.899 - INFO: Train epoch 95: bpp_loss: 0.0564719 | recon_loss: 0.00623232 | loss: 0.0627042
+26-11-13 05:54:38.468 - INFO: Validation epoch 95: Average losses: Loss: 1.7752 | Deriv loss: 0.036187 | F1 Score: 0.003052 | PSNR: 49.028223 | RMSE: 1.160535 | ECS: 0.288541 | bpp_loss: 0.0522 | recon_loss: 1.7231 | loss: 1.7752 
+Training Progress:  96%|█████████▌| 96/100 [9:19:07<24:55, 373.78s/epoch]26-11-13 05:54:38.898 - INFO: Learning rate: 8.090393582644414e-06
+26-11-13 06:00:41.305 - INFO: Train epoch 96: bpp_loss: 0.0564044 | recon_loss: 0.00621533 | loss: 0.0626198
+26-11-13 06:00:59.021 - INFO: Validation epoch 96: Average losses: Loss: 1.7036 | Deriv loss: 0.037906 | F1 Score: 0.003161 | PSNR: 49.190903 | RMSE: 1.136431 | ECS: 0.287726 | bpp_loss: 0.0521 | recon_loss: 1.6515 | loss: 1.7036 
+Training Progress:  97%|█████████▋| 97/100 [9:25:28<18:47, 375.81s/epoch]26-11-13 06:00:59.444 - INFO: Learning rate: 8.059446704045367e-06
+26-11-13 06:06:57.390 - INFO: Train epoch 97: bpp_loss: 0.0563382 | recon_loss: 0.00619012 | loss: 0.0625283
+26-11-13 06:07:14.989 - INFO: Validation epoch 97: Average losses: Loss: 1.7861 | Deriv loss: 0.036952 | F1 Score: 0.003091 | PSNR: 48.991012 | RMSE: 1.164799 | ECS: 0.297767 | bpp_loss: 0.0530 | recon_loss: 1.7331 | loss: 1.7861 
+Training Progress:  98%|█████████▊| 98/100 [9:31:44<12:31, 375.86s/epoch]26-11-13 06:07:15.420 - INFO: Learning rate: 8.028347812878127e-06
+26-11-13 06:13:18.714 - INFO: Train epoch 98: bpp_loss: 0.0562512 | recon_loss: 0.00615002 | loss: 0.0624012
+26-11-13 06:13:36.339 - INFO: Validation epoch 98: Average losses: Loss: 1.8025 | Deriv loss: 0.037394 | F1 Score: 0.003198 | PSNR: 48.979448 | RMSE: 1.168916 | ECS: 0.280265 | bpp_loss: 0.0531 | recon_loss: 1.7493 | loss: 1.8025 
+Training Progress:  99%|█████████▉| 99/100 [9:38:05<06:17, 377.50s/epoch]26-11-13 06:13:36.766 - INFO: Learning rate: 7.997099148425515e-06
+26-11-13 06:19:38.854 - INFO: Train epoch 99: bpp_loss: 0.0562109 | recon_loss: 0.00613635 | loss: 0.0623472
+26-11-13 06:19:56.671 - INFO: Validation epoch 99: Average losses: Loss: 1.7763 | Deriv loss: 0.036023 | F1 Score: 0.003015 | PSNR: 49.025405 | RMSE: 1.160241 | ECS: 0.286939 | bpp_loss: 0.0540 | recon_loss: 1.7223 | loss: 1.7763 
+Training Progress: 100%|██████████| 100/100 [9:44:25<00:00, 378.35s/epoch]Training Progress: 100%|██████████| 100/100 [9:44:25<00:00, 350.66s/epoch]
+26-11-13 06:19:57.099 - INFO: Evaluating on test set after training...
+26-11-13 06:22:18.745 - INFO: Test epoch 100: Average losses: Loss: 1.7704 | Deriv loss: 0.031264 | F1 Score: 0.003243 | PSNR: 49.113549 | RMSE: 1.155847 | ECS: 0.308738 | bpp_loss: 0.0532 | recon_loss: 1.7172 | loss: 1.7704 
+26-11-13 06:22:19.015 - INFO: Test set metrics after training: {'loss': 1.770392157386472, 'bpp_loss': 0.05319981771941136, 'deriv_loss': tensor(0.0313, device='cuda:0'), 'f1_score': np.float64(0.0032425446774966547), 'psnr': np.float64(49.11354903902439), 'rmse_loss': tensor(1.1558, device='cuda:0'), 'ecs_loss': np.float32(0.308738), 'rgb_psnr': 0, 'rgb_rmse_loss': 0}
