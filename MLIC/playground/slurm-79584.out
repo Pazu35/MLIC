@@ -1,0 +1,666 @@
+/var/spool/slurm/slurmd/job79584/slurm_script: 4: source: Key has expired
+/var/spool/slurm/slurmd/job79584/slurm_script: 4: source: Key has expired
+mkdir -p failed for path /homes/o23gauvr/.config/matplotlib: [Errno 127] Key has expired: '/homes/o23gauvr/.config/matplotlib'
+Matplotlib created a temporary cache directory at /tmp/matplotlib-4tt70v4a because there was an issue with the default path (/homes/o23gauvr/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+Matplotlib is building the font cache; this may take a moment.
+Managing NaNs for train/test DAs...
+Applying factor_64 padding/interpolation for train/test DAs...
+Selecting days for train/test DAs...
+Computing and applying normalization (normalize_per_split=True)...
+  Computing normalization stats from train split...
+  Computing normalization stats from val split...
+  Computing normalization stats from test split...
+Reconstructing normalized train/test DAs...
+Attaching season_idx and depth attributes to train/test DAs...
+Attaching SST data to train/test DAs...
+Storing final processed train/test DAs...
+Creating torch datasets for train/val/test DAs...
+Experiment configuration saved to: /Odyssey/private/o23gauvr/code/MLIC/experiments/back_to_the_future/ch3/smoke_R1/fixed_weight_loss_64_96_1.0_CR_10000.0_enatl_natl__mean_std_along_depth/20261121_224341/experiment_config.log
+[INFO] loss_params: {'method': 'fixed_weight', 'loss_dict': {'recon': 1.0, 'weighted_recon': 0.0, 'deriv': 0.0, 'weighted_deriv': 0.0, 'curvature_recon': 0.0, 'soft_peak': 0.0, 'lsd': 0.0, 'wasserstein_peak': 0.0, 'soft_max_pos': 0.0, 'matched_extrema_pos': 0.0, 'local_extrema_pos': 0.0, 'prominence_recall': 1.0}, 'structure_params': {'search_m': 10.0, 'capture_m': 40.0, 'local_beta': 4.0, 'pos_scale_m': 50.0, 'prominence_scales_m': [10.0, 25.0, 50.0, 100.0], 'min_prominence_frac': 0.05}, 'extrema_method': 'minmax', 'cr_treshold': 10000.0, 'rate_reference_bits_per_level': None, 'recon_treshold': None, 'lmbda': 1.0, 'use_smoothl1': False, 'use_factor_weights': True, 'factor_warmup_epochs': 1}
+/Odyssey/private/o23gauvr/miniforge3/envs/fsc/lib/python3.11/site-packages/torch/functional.py:513: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1720538435607/work/aten/src/ATen/native/TensorShape.cpp:3609.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+[loss] terms with non-zero weight: {'recon': 1.0, 'prominence_recall': 1.0}
+26-11-21 22:43:43.923 - INFO: Namespace(experiment='back_to_the_future/ch3/smoke_R1', dataset='/home/npr/dataset/', epochs=2, learning_rate=1e-05, num_workers=10, lmbda=1.0, metrics='mse', batch_size=4, test_batch_size=4, aux_learning_rate=0.001, loss_learning_rate=0.01, patch_size=[196, 256], gpu_id=0, cuda=True, save=True, seed=42.0, clip_max_norm=1.0, checkpoint=None, resume=False, world_size=1, dist_url='env://', gradient_accumulation_steps=1, grad_projection=False, grad_weighting=True, grad_weight_ratio=0.3, grad_weight_every=1, grad_weight_batches=4, verbose=False)
+26-11-21 22:43:43.923 - INFO: {'N': 64, 'M': 96, 'slice_num': 6, 'context_window': 5, 'act': <class 'torch.nn.modules.activation.GELU'>, 'transform_only': False, 'enable_channel_context': True, 'enable_local_context': True, 'enable_global_inter_context': True, 'enable_global_intra_context': True, 'add_seasons': {'use': False, 'mode': 'embed'}, 'add_sst': False, 'output_low_band_filter_use': False, 'output_low_band_filter_mode': 'learnable_gauss', 'in_channels': 157}
+26-11-21 22:43:43.923 - INFO: MLICPlusPlus(
+  (entropy_bottleneck): EntropyBottleneck(
+    (likelihood_lower_bound): LowerBound()
+    (matrices): ParameterList(
+        (0): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (1): Parameter containing: [torch.float32 of size 64x3x3 (cuda:0)]
+        (2): Parameter containing: [torch.float32 of size 64x3x3 (cuda:0)]
+        (3): Parameter containing: [torch.float32 of size 64x3x3 (cuda:0)]
+        (4): Parameter containing: [torch.float32 of size 64x1x3 (cuda:0)]
+    )
+    (biases): ParameterList(
+        (0): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (1): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (2): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (3): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (4): Parameter containing: [torch.float32 of size 64x1x1 (cuda:0)]
+    )
+    (factors): ParameterList(
+        (0): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (1): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (2): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+        (3): Parameter containing: [torch.float32 of size 64x3x1 (cuda:0)]
+    )
+  )
+  (learnable_output_lpf): LearnableFIRLowpass()
+  (learnable_output_dogs): LearnableDoGSmoother()
+  (learnable_output_gauss): LearnableGaussianSmoother()
+  (g_a): AnalysisTransform(
+    (analysis_transform): Sequential(
+      (0): ResidualBlockWithStride(
+        (conv1): Conv2d(157, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (gdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (skip): Conv2d(157, 64, kernel_size=(1, 1), stride=(2, 2))
+      )
+      (1): ResidualBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (2): ResidualBlockWithStride(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (gdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (skip): Conv2d(64, 64, kernel_size=(1, 1), stride=(2, 2))
+      )
+      (3): ResidualBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (4): ResidualBlockWithStride(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (gdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (skip): Conv2d(64, 64, kernel_size=(1, 1), stride=(2, 2))
+      )
+      (5): ResidualBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (6): Conv2d(64, 96, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+    )
+  )
+  (g_s): SynthesisTransform(
+    (synthesis_transform): Sequential(
+      (0): ResidualBlock(
+        (conv1): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (1): ResidualBlockUpsample(
+        (subpel_conv): Sequential(
+          (0): Conv2d(96, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+        (act): GELU(approximate='none')
+        (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (igdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (upsample): Sequential(
+          (0): Conv2d(96, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+      )
+      (2): ResidualBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (3): ResidualBlockUpsample(
+        (subpel_conv): Sequential(
+          (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+        (act): GELU(approximate='none')
+        (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (igdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (upsample): Sequential(
+          (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+      )
+      (4): ResidualBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (5): ResidualBlockUpsample(
+        (subpel_conv): Sequential(
+          (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+        (act): GELU(approximate='none')
+        (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (igdn): GDN(
+          (beta_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+          (gamma_reparam): NonNegativeParametrizer(
+            (lower_bound): LowerBound()
+          )
+        )
+        (upsample): Sequential(
+          (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): PixelShuffle(upscale_factor=2)
+        )
+      )
+      (6): ResidualBlock(
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): GELU(approximate='none')
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (7): Sequential(
+        (0): Conv2d(64, 628, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): PixelShuffle(upscale_factor=2)
+      )
+    )
+  )
+  (h_a): HyperAnalysis(
+    (reduction): Sequential(
+      (0): Conv2d(96, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): GELU(approximate='none')
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (3): GELU(approximate='none')
+      (4): Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (5): GELU(approximate='none')
+      (6): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (7): GELU(approximate='none')
+      (8): Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+    )
+  )
+  (h_s): HyperSynthesis(
+    (increase): Sequential(
+      (0): Conv2d(64, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): GELU(approximate='none')
+      (2): Sequential(
+        (0): Conv2d(96, 384, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): PixelShuffle(upscale_factor=2)
+      )
+      (3): GELU(approximate='none')
+      (4): Conv2d(96, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (5): GELU(approximate='none')
+      (6): Sequential(
+        (0): Conv2d(144, 576, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): PixelShuffle(upscale_factor=2)
+      )
+      (7): GELU(approximate='none')
+      (8): Conv2d(144, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (gaussian_conditional): GaussianConditional(
+    (likelihood_lower_bound): LowerBound()
+    (lower_bound_scale): LowerBound()
+  )
+  (local_context): ModuleList(
+    (0-5): 6 x LocalContext(
+      (qkv_proj): Linear(in_features=16, out_features=48, bias=True)
+      (unfold): Unfold(kernel_size=5, dilation=1, padding=2, stride=1)
+      (softmax): Softmax(dim=-1)
+      (proj): Linear(in_features=32, out_features=32, bias=True)
+      (mlp): MLP(
+        (fc1): Linear(in_features=32, out_features=64, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=64, out_features=32, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+      (norm1): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+      (fusion): Conv2d(16, 32, kernel_size=(5, 5), stride=(1, 1))
+    )
+  )
+  (channel_context): ModuleList(
+    (0): None
+    (1): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(16, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (2): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(32, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (3): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(48, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (4): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(64, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (5): ChannelContext(
+      (fushion): Sequential(
+        (0): Conv2d(80, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(192, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+  )
+  (global_inter_context): ModuleList(
+    (0): None
+    (1): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+      )
+      (queries): Sequential(
+        (0): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+      )
+      (values): Sequential(
+        (0): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+      )
+      (reprojection): Conv2d(16, 48, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(48, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+        (3): GELU(approximate='none')
+        (4): Conv2d(64, 32, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(48, 32, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (2): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+      )
+      (queries): Sequential(
+        (0): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+      )
+      (values): Sequential(
+        (0): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+      )
+      (reprojection): Conv2d(32, 48, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(48, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+        (3): GELU(approximate='none')
+        (4): Conv2d(64, 32, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(48, 32, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (3): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48)
+      )
+      (queries): Sequential(
+        (0): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48)
+      )
+      (values): Sequential(
+        (0): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48)
+      )
+      (reprojection): Conv2d(48, 48, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(48, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+        (3): GELU(approximate='none')
+        (4): Conv2d(64, 32, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(48, 32, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (4): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+      )
+      (queries): Sequential(
+        (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+      )
+      (values): Sequential(
+        (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+      )
+      (reprojection): Conv2d(64, 48, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(48, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+        (3): GELU(approximate='none')
+        (4): Conv2d(64, 32, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(48, 32, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (5): LinearGlobalInterContext(
+      (keys): Sequential(
+        (0): Conv2d(80, 80, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(80, 80, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=80)
+      )
+      (queries): Sequential(
+        (0): Conv2d(80, 80, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(80, 80, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=80)
+      )
+      (values): Sequential(
+        (0): Conv2d(80, 80, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(80, 80, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=80)
+      )
+      (reprojection): Conv2d(80, 48, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(48, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+        (3): GELU(approximate='none')
+        (4): Conv2d(64, 32, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (skip): Conv2d(48, 32, kernel_size=(1, 1), stride=(1, 1))
+    )
+  )
+  (global_intra_context): ModuleList(
+    (0): None
+    (1-5): 5 x LinearGlobalIntraContext(
+      (keys): Sequential(
+        (0): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+      )
+      (queries): Sequential(
+        (0): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+      )
+      (values): Sequential(
+        (0): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+        (1): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+      )
+      (reprojection): Conv2d(16, 32, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+      (mlp): Sequential(
+        (0): Conv2d(32, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+        (3): GELU(approximate='none')
+        (4): Conv2d(64, 32, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+  )
+  (entropy_parameters_anchor): ModuleList(
+    (0): EntropyParameters(
+      (fusion): Sequential(
+        (0): Conv2d(192, 320, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(320, 256, kernel_size=(1, 1), stride=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+        (5): GELU(approximate='none')
+        (6): Conv2d(128, 32, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (1-5): 5 x EntropyParameters(
+      (fusion): Sequential(
+        (0): Conv2d(288, 320, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(320, 256, kernel_size=(1, 1), stride=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+        (5): GELU(approximate='none')
+        (6): Conv2d(128, 32, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+  )
+  (entropy_parameters_nonanchor): ModuleList(
+    (0): EntropyParameters(
+      (fusion): Sequential(
+        (0): Conv2d(224, 320, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(320, 256, kernel_size=(1, 1), stride=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+        (5): GELU(approximate='none')
+        (6): Conv2d(128, 32, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (1-5): 5 x EntropyParameters(
+      (fusion): Sequential(
+        (0): Conv2d(352, 320, kernel_size=(1, 1), stride=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(320, 256, kernel_size=(1, 1), stride=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+        (5): GELU(approximate='none')
+        (6): Conv2d(128, 32, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+  )
+  (lrp_anchor): ModuleList(
+    (0): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(112, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (1): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(128, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (2): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(144, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (3): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(160, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (4): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(176, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (5): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(192, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+  )
+  (lrp_nonanchor): ModuleList(
+    (0): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(112, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (1): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(128, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (2): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(144, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (3): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(160, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (4): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(176, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+    (5): LatentResidualPrediction(
+      (lrp_transform): Sequential(
+        (0): Conv2d(192, 224, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): GELU(approximate='none')
+        (2): Conv2d(224, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): GELU(approximate='none')
+        (4): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+    )
+  )
+)
+26-11-21 22:43:43.927 - INFO: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    initial_lr: 1e-05
+    lr: 1e-05
+    maximize: False
+    weight_decay: 0
+)
+26-11-21 22:43:43.928 - INFO: Computing initial compression rate...
+/Odyssey/private/o23gauvr/code/compressai/compressai/entropy_models/entropy_models.py:630: UserWarning: Specified kernel cache directory could not be created! This disables kernel caching. Specified directory is /homes/o23gauvr/.cache/torch/kernels. This warning will appear only once per process. (Triggered internally at /opt/conda/conda-bld/pytorch_1720538435607/work/aten/src/ATen/native/cuda/jit_utils.cpp:1442.)
+  cumulative = torch.erfc(const * inputs)
+26-11-21 22:43:51.129 - INFO: ==================================================
+26-11-21 22:43:51.130 - INFO: INITIAL COMPRESSION METRICS
+26-11-21 22:43:51.130 - INFO: ==================================================
+26-11-21 22:43:51.130 - INFO: Average Bits Per Element: 0.001177
+26-11-21 22:43:51.130 - INFO: Average Compression Rate: 6799.20x
+26-11-21 22:43:51.130 - INFO: Total compressed bits: 181594.52
+26-11-21 22:43:51.130 - INFO: Total original bits: 1234698240.00
+26-11-21 22:43:51.130 - INFO: ==================================================
+26-11-21 22:43:51.237 - INFO: Gradient remedies: projection=False, weighting=True (ratio=0.3, every=1, batches=4)
+Training Progress:   0%|          | 0/2 [00:00<?, ?epoch/s]26-11-21 22:43:51.239 - INFO: Learning rate: 1e-05
+26-11-21 22:44:25.879 - INFO: Train epoch 0: bpp_loss: 0.00372427 | recon_loss: 0.947881 | prominence_recall_loss: 0.402512 | loss: 0.951605
+/Odyssey/private/o23gauvr/code/MLIC/MLIC/utils/metrics.py:94: RuntimeWarning: invalid value encountered in divide
+  f1_score = np.where(sum_scores == 0, 0, 2 * (precision_score * recall_score) / sum_scores)
+/Odyssey/private/o23gauvr/code/MLIC/MLIC/utils/metrics.py:90: RuntimeWarning: invalid value encountered in divide
+  recall_score = np.where(recall_den == 0, 0, num_true_positives / recall_den)
+26-11-21 22:44:39.217 - INFO: Validation epoch 0: Average losses: Loss: 43.0729 | Deriv loss: 15.465319 | F1 Score: 0.329861 | PSNR: 31.827089 | RMSE: 6.545093 | ECS: 98.472328 | bpp_loss: 0.0919 | recon_loss: 42.9809 | weighted_recon_loss: 38.4768 | deriv_loss: 15.4653 | lsd_loss: 49072622445.7143 | weighted_deriv_loss: 14.7004 | curvature_recon_loss: 50.2132 | soft_peak_loss: 116.9623 | wasserstein_peak_loss: 0.1328 | soft_max_pos_loss: 8.2659 | matched_extrema_pos_loss: 11.2289 | local_extrema_pos_loss: 0.0849 | prominence_recall_loss: 0.1957 | loss: 43.0729 
+/Odyssey/private/o23gauvr/miniforge3/envs/fsc/lib/python3.11/site-packages/torch/optim/lr_scheduler.py:232: UserWarning: The epoch parameter in `scheduler.step()` was not necessary and is being deprecated where possible. Please use `scheduler.step()` to step the scheduler. During the deprecation, if epoch is different from None, the closed form is used instead of the new chainable form, where available. Please open an issue if you are unable to replicate your use case: https://github.com/pytorch/pytorch/issues/new/choose.
+  warnings.warn(EPOCH_DEPRECATION_WARNING, UserWarning)
+26-11-21 22:44:42.752 - INFO: best checkpoint (loss) saved.
+26-11-21 22:44:43.986 - INFO: best checkpoint (ecs) saved.
+26-11-21 22:44:45.402 - INFO: best checkpoint (f1) saved.
+26-11-21 22:44:46.789 - INFO: best checkpoint (bpp_loss) saved.
+26-11-21 22:44:48.065 - INFO: best checkpoint (rmse) saved.
+Training Progress:  50%|█████     | 1/2 [00:56<00:56, 56.83s/epoch]26-11-21 22:44:48.066 - INFO: Learning rate: 1e-05
+26-11-21 22:44:48.066 - INFO: Applying factor-based weights at epoch 1...
+26-11-21 22:44:48.069 - INFO: Computing factor-based weights on validation batch...
+26-11-21 22:44:50.866 - INFO: Factor-based weights applied:
+26-11-21 22:44:50.867 - INFO:   Mean magnitudes: {'recon': 0.7462351143360137, 'prominence_recall': 0.27184348553419113}
+26-11-21 22:44:50.867 - INFO:   Normalization factors: {'recon': 1.0, 'prominence_recall': 2.745091032325496}
+26-11-21 22:44:50.867 - INFO:   Active weights: {'recon': 1.0, 'prominence_recall': 2.745091032325496}
+26-11-21 22:44:53.525 - INFO: Gradient-norm weights (target |grad| = 0.3 x recon's, 4 batches): {'prominence_recall': 0.20402159481808566}
+26-11-21 22:45:10.687 - INFO: Train epoch 1: bpp_loss: 0.00930684 | recon_loss: 0.595618 | prominence_recall_loss: 0.235039 | loss: 0.652878
+26-11-21 22:45:20.076 - INFO: Validation epoch 1: Average losses: Loss: 25.9165 | Deriv loss: 5.624589 | F1 Score: 0.344165 | PSNR: 34.108201 | RMSE: 5.054578 | ECS: 92.269424 | bpp_loss: 0.0411 | recon_loss: 25.8438 | weighted_recon_loss: 23.6599 | deriv_loss: 5.6246 | lsd_loss: 25163581440.0000 | weighted_deriv_loss: 5.4277 | curvature_recon_loss: 29.1421 | soft_peak_loss: 77.4814 | wasserstein_peak_loss: 0.1191 | soft_max_pos_loss: 7.3844 | matched_extrema_pos_loss: 11.2866 | local_extrema_pos_loss: 0.0936 | prominence_recall_loss: 0.1544 | loss: 25.9165 
+26-11-21 22:45:22.938 - INFO: best checkpoint (loss) saved.
+26-11-21 22:45:24.253 - INFO: best checkpoint (ecs) saved.
+26-11-21 22:45:25.505 - INFO: best checkpoint (f1) saved.
+26-11-21 22:45:26.931 - INFO: best checkpoint (bpp_loss) saved.
+26-11-21 22:45:28.322 - INFO: best checkpoint (rmse) saved.
+26-11-21 22:45:29.607 - INFO: best checkpoint (rmse within the rate budget) saved.
+Training Progress: 100%|██████████| 2/2 [01:38<00:00, 47.84s/epoch]Training Progress: 100%|██████████| 2/2 [01:38<00:00, 49.18s/epoch]
+26-11-21 22:45:29.609 - INFO: Evaluating on test set after training...
+26-11-21 22:46:45.417 - INFO: Test epoch 2: Average losses: Loss: 26.6812 | Deriv loss: 5.662446 | F1 Score: 0.365115 | PSNR: 33.944412 | RMSE: 5.138929 | ECS: 105.408173 | bpp_loss: 0.0536 | recon_loss: 26.5947 | weighted_recon_loss: 24.4087 | deriv_loss: 5.6624 | lsd_loss: 25555625745.0667 | weighted_deriv_loss: 5.4642 | curvature_recon_loss: 30.8266 | soft_peak_loss: 78.3547 | wasserstein_peak_loss: 0.1338 | soft_max_pos_loss: 9.2072 | matched_extrema_pos_loss: 13.4137 | local_extrema_pos_loss: 0.0920 | prominence_recall_loss: 0.1613 | loss: 26.6812 
+26-11-21 22:46:45.654 - INFO: Test set metrics after training: {'loss': 26.681221421559652, 'bpp_loss': 0.0536296288172404, 'deriv_loss': tensor(5.6624, device='cuda:0'), 'f1_score': np.float64(0.365115168612958), 'psnr': np.float64(33.94441238224737), 'rmse_loss': tensor(5.1389, device='cuda:0'), 'ecs_loss': np.float32(105.40817), 'rgb_psnr': 0, 'rgb_rmse_loss': 0, 'recon_loss': 26.594685236612957, 'weighted_recon_loss': 24.40874538421631, 'lsd_loss': 25555625745.066666, 'weighted_deriv_loss': 5.464231093724568, 'curvature_recon_loss': 30.826592000325522, 'soft_peak_loss': 78.35467913945516, 'wasserstein_peak_loss': 0.13376861854145924, 'soft_max_pos_loss': 9.207168407241504, 'matched_extrema_pos_loss': 13.413689096768698, 'local_extrema_pos_loss': 0.09200864179680744, 'prominence_recall_loss': 0.16129008295635383}

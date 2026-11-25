@@ -191,6 +191,8 @@ def test_one_epoch(epoch, test_dataloader, model, criterion, save_dir, logger_va
 
 
     loss_dict = {"loss": loss.avg, "bpp_loss": bpp_loss.avg, "deriv_loss": deriv_loss.avg, "f1_score": f1_score.avg, "psnr": psnr.avg, "rmse_loss": rmse_loss.avg, "ecs_loss": ecs_loss.avg, "rgb_psnr": rgb_psnr.avg, "rgb_rmse_loss": rgb_rmse_loss.avg}
+    # criterion terms (e.g. recon_loss, read by the target-RMSE checkpoint rule, 19 Nov 2026)
+    loss_dict.update({k: m.avg for k, m in criterion_losses.items() if k not in loss_dict})
 
 
     # for key, value in out_criterion.items():

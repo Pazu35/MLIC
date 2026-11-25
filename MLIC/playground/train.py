@@ -394,6 +394,7 @@ def main(dm,config, loss_params,checkpoint_dir_name):
     best_bpp_loss = 1e10
     best_rmse = 1e10
     best_rmse_in_budget = 1e10
+    best_rate_in_error = 1e10  # target-RMSE mode
     budget_tol = float(os.environ.get("BUDGET_TOL", "0.10"))
     cr_floor = getattr(criterion, "cr_treshold", None)
     rate_budget = (native_levels or len(depth_array)) * 32 / cr_floor if cr_floor else None  # bits/profile, float32 reference
@@ -563,6 +564,11 @@ def main(dm,config, loss_params,checkpoint_dir_name):
         is_best_rmse_in_budget = (cr_floor is not None
                                   and loss_dict['bpp_loss'] <= budget_tol * rate_budget
                                   and loss_dict['rmse_loss'] <= best_rmse_in_budget)
+        # Target-RMSE mode: lowest validation rate among the epochs whose error hinge is (nearly) zero, i.e. RMSE_z
+        # within the target; the hinge is averaged over batches, so a 5 % tolerance on eps^2 is allowed.
+        eps2 = getattr(criterion, "recon_treshold", None)
+        is_best_rate_in_error = (eps2 is not None and float(loss_dict['recon_loss']) <= 0.05 * eps2
+                                 and loss_dict['bpp_loss'] <= best_rate_in_error)
 
 
         if is_best_loss:
@@ -577,6 +583,8 @@ def main(dm,config, loss_params,checkpoint_dir_name):
             best_f1 = loss_dict['f1_score']
         if is_best_rmse_in_budget:
             best_rmse_in_budget = loss_dict['rmse_loss']
+        if is_best_rate_in_error:
+            best_rate_in_error = loss_dict['bpp_loss']
 
         net.update(force=True)
 
@@ -596,7 +604,8 @@ def main(dm,config, loss_params,checkpoint_dir_name):
             "model": "MLIC",
             "criterion_state": criterion_state(criterion),
             "best": {"loss": best_loss, "ecs": best_ecs, "f1": best_f1,
-                     "bpp_loss": best_bpp_loss, "rmse": best_rmse, "rmse_in_budget": best_rmse_in_budget},
+                     "bpp_loss": best_bpp_loss, "rmse": best_rmse, "rmse_in_budget": best_rmse_in_budget,
+                     "rate_in_error": best_rate_in_error},
         }
 
         if args.save:
@@ -605,6 +614,10 @@ def main(dm,config, loss_params,checkpoint_dir_name):
                 dir_path=dir_path,
                 filename="last_checkpoint.pth.tar"
             )           
+
+        if args.save and is_best_rate_in_error:
+            save_checkpoint(state=state, dir_path=dir_path, filename="best_checkpoint_rate_in_error.pth.tar")
+            logger_val.info('best checkpoint (rate within the target RMSE) saved.')
 
         # Save checkpoints for each best metric
         if args.save and is_best_loss:
@@ -812,6 +825,8 @@ if __name__ == '__main__':
         #"--grad_projection",
         #"--grad_weighting", "--grad_weight_ratio", "0.2", "--grad_weight_every", "100",
     ]
+    if env("GRAD_RATIO"):  # chapter 3 (21 Nov 2026): structure terms at a gradient-norm ratio to recon, refreshed every 100 epochs
+        sys.argv += ["--grad_weighting", "--grad_weight_ratio", env("GRAD_RATIO"), "--grad_weight_every", env("GRAD_EVERY", "100")]
     if env("CKPT"):  # fine-tune from these weights (C3: MLIC/checkpoints/mlicpp_mse_q5_2960000.pth.tar)
         sys.argv += ["--checkpoint", env("CKPT")]
 
@@ -843,6 +858,7 @@ if __name__ == '__main__':
                     "matched_extrema_pos": 0.0,   # degenerate (report 14.4b); kept to reproduce E1
                     "local_extrema_pos": 0.0,     # E1b. Keep ONE entry: in a dict literal the last duplicate wins silently
                     "prominence_recall": 0.0,
+                    "acoustic_recon": 0.0,        # ch. 3: physical MSE weighted by k-kernel S(z); needs ACOUSTIC_W
         },
         "structure_params": {
                              # matched_extrema_pos only (E1 as run); inert otherwise
@@ -879,7 +895,7 @@ if __name__ == '__main__':
         # cr_native against a float32 reference, so on a float64 run set this to 32
         # or the loss will target twice the budget the metric reports.
         "rate_reference_bits_per_level": None,
-        "recon_treshold": None,   #In RMSE will be convert to MSE 
+        "recon_treshold": float(env("TARGET_RMSE")) if env("TARGET_RMSE", "") else None,  # m/s, RMSE_z target (rate then minimised)
         "lmbda": float(sys.argv[8]),
         "use_smoothl1": False,
         #"auto_normalize": False,
@@ -893,6 +909,14 @@ if __name__ == '__main__':
         # T8a: MSE + SMSE + EMSE of Liang et al. (2024). recon only for the warm-up, then each term is
         # rescaled to the recon magnitude on 10 training batches (apply_factor_weights), factors 1 / 1 / 1.
         loss_params["loss_dict"].update(smse=1.0, emse=1.0)
+    if env("LOSS_TERMS"):  # chapter 3: LOSS_TERMS="prominence_recall=1.0,local_extrema_pos=1.0" (keys must exist)
+        extra = {k: float(v) for k, v in (kv.split("=") for kv in env("LOSS_TERMS").split(","))}
+        unknown = set(extra) - set(loss_params["loss_dict"])
+        assert not unknown, f"LOSS_TERMS: unknown loss_dict keys {unknown}"
+        loss_params["loss_dict"].update(extra)
+    if env("ACOUSTIC_W"):  # ch. 3: npz with w (157,) and z from FASCINATION/pickle/k_kernel/acoustic_w.npz
+        import numpy as np
+        loss_params["acoustic_weights"] = np.load(env("ACOUSTIC_W"))["w"]
 
 
 #        "lambda_deriv": 0.1,
@@ -981,7 +1005,8 @@ if __name__ == '__main__':
                 shuffle=True,
                 rgb=rgb,
                 dtype_str=dtype_str,
-                normalize_per_split=True
+                normalize_per_split=True,
+                train_days=os.environ.get("TRAIN_DAYS") or None,  # summer / winter / random<N> (19 Nov 2026)
             )
             #days_split={"method":"ratio", "value": (0.03,0.97), "n_gap": 10}
             #days_split={"method": "alternate_days", "value": (7,60) , "n_gap": 10}, 
@@ -1018,20 +1043,10 @@ if __name__ == '__main__':
 
     if loss_params['recon_treshold'] is not None:
         tresh = loss_params['recon_treshold']
-        train_norm = datamodule.train_ds.input.attrs.get("norm_stats", None)
-        train_norm_method = train_norm["method"]
-        
-        if train_norm_method == "min_max":
-            x_min = train_norm["params"]["x_min"]
-            x_max = train_norm["params"]["x_max"]  
-            tresh = tresh / (x_max - x_min)
-        elif train_norm_method == "mean_std" or train_norm_method == "mean_std_along_depth":
-            mean = train_norm['params']["mean"]
-            std = train_norm['params']["std"]
-            tresh = tresh / std
-
-
-        loss_params['recon_treshold'] = tresh
+        # 19 Nov 2026: the hinge now acts on the physical depth-weighted squared error (rd_loss), so the target
+        # RMSE in m/s is only squared. The old conversion divided an RMSE by the global std and compared it, unsquared,
+        # with a normalised MSE: wrong scale under the depth-wise standardisation.
+        loss_params['recon_treshold'] = float(tresh) ** 2
 
 
 

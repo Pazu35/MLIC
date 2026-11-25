@@ -922,8 +922,26 @@ class FixedWeightSSPLoss(StructureLossMixin, nn.Module):
                              allow_inert_terms=allow_inert_terms,
                              native_depth_levels=native_depth_levels,
                              rate_reference_bits_per_level=rate_reference_bits_per_level)
+        # Target-RMSE mode (19 Nov 2026): recon_treshold is eps^2 in m^2 s^-2 (train.py squares TARGET_RMSE) and the
+        # hinge acts on the physical squared error weighted by the trapezoid rule in depth, i.e. on RMSE_z^2.
+        if self.recon_treshold is not None:
+            if self._norm_scale.numel() == 0:
+                raise ValueError("recon_treshold (target RMSE) needs norm_stats to work on the physical error")
+            z = self._depth_m.double()
+            if z.numel() > 1:
+                w = torch.empty_like(z)
+                w[1:-1] = (z[2:] - z[:-2]) / 2
+                w[0], w[-1] = (z[1] - z[0]) / 2, (z[-1] - z[-2]) / 2
+                w = w / (z[-1] - z[0])
+            else:
+                w = torch.zeros(0, dtype=torch.float64)
+            self.register_buffer("_depth_w", w.float())
         self.curvature_beta = curvature_beta
         self.peak_beta = peak_beta
+        # acoustic_recon (ch. 3, 22 Nov 2026): per-level weights (sum 1) from the RAMGEO k-kernel S(z)
+        aw = kwargs.get("acoustic_weights")
+        self.register_buffer("_acoustic_w", torch.as_tensor(
+            np.zeros(0) if aw is None else np.asarray(aw), dtype=torch.float32))
         self.auto_normalize = auto_normalize
         self.use_factor_weights = use_factor_weights
         self.factor_warmup_epochs = factor_warmup_epochs
@@ -972,6 +990,17 @@ class FixedWeightSSPLoss(StructureLossMixin, nn.Module):
         `weighted_recon` is not SMSE-200: it cuts at 762 m with a soft tail and divides by all levels.
         """
         terms = {}
+        if "acoustic_recon" in wanted:
+            w = getattr(self, "_acoustic_w", torch.zeros(0))
+            if w.numel() == 0:
+                if float(self.loss_dict.get("acoustic_recon", 0.0) or 0.0) > 0:
+                    raise ValueError("acoustic_recon needs acoustic_weights (ACOUSTIC_W in train.py)")
+            else:
+                if w.numel() != pred.shape[1]:
+                    raise ValueError(f"acoustic_weights has {w.numel()} levels, input has {pred.shape[1]}")
+                # physical squared error per level, (m/s)^2, weighted by TL sensitivity
+                err2 = (self._physical(pred) - self._physical(target)).square().mean(dim=(0, 2, 3))
+                terms["acoustic_recon"] = (err2 * w.to(err2)).sum()
         if "smse" in wanted:
             if self._depth_m.numel() == 0:
                 raise ValueError("smse needs depth_array in the loss constructor")
@@ -1200,7 +1229,7 @@ class FixedWeightSSPLoss(StructureLossMixin, nn.Module):
         Terms not in ``names`` keep their factor weights. Call after
         :meth:`apply_factor_weights`; can be called again later to re-calibrate.
         """
-        names = [n for n in (names or STRUCTURE_LOSS_TERMS)
+        names = [n for n in (names or STRUCTURE_LOSS_TERMS + ("acoustic_recon",))
                  if float(self.loss_dict.get(n, 0.0) or 0.0) > 0]
         if not names or "recon" not in self.loss_dict:
             return {}
@@ -1283,7 +1312,11 @@ class FixedWeightSSPLoss(StructureLossMixin, nn.Module):
 
             
             if self.recon_treshold is not None:
-                recon_loss = nn.ReLU()(recon_loss - self.recon_treshold)
+                err2 = (self._physical(pred) - self._physical(target)) ** 2
+                per_level = err2.mean(dim=(0, 2, 3))
+                w = (self._depth_w if self._depth_w.numel() == per_level.numel()
+                     else torch.full_like(per_level, 1.0 / per_level.numel()))
+                recon_loss = nn.ReLU()((per_level * w.to(per_level)).sum() - self.recon_treshold)
 
             losses_dict["recon"] = recon_loss
         
@@ -1954,3 +1987,21 @@ if __name__ == "__main__":
         out = crit({"x_hat": pred, "likelihoods": {"y": torch.ones(2, 4, 1, 1)}}, truth)
         assert torch.isclose(out["loss"], out["recon_loss"] + out["smse_loss"] + out["emse_loss"]), method
     print("smse / emse ok for the four normalisations; both enter out['loss']")
+
+    # acoustic_recon check (ch. 3, 22 Nov 2026): one 3 m/s error at 100 m -> w[100 m] * 9 / (2*3*4) (m/s)^2.
+    w = np.linspace(1, 2, 8); w = w / w.sum()
+    crit = FixedWeightSSPLoss(loss_dict={"recon": 1.0, "acoustic_recon": 1.0}, use_smoothl1=False, lmbda=1.0,
+                              depth_array=z, acoustic_weights=w,
+                              norm_stats={"method": "mean_std_along_depth", "params": params})
+    truth = torch.randn(2, 8, 3, 4); pred = truth.clone()
+    pred[0, k100, 1, 1] += 3.0 / torch.as_tensor(std[k100], dtype=torch.float32)
+    t = crit._liang_terms(pred, truth, {"acoustic_recon"})
+    assert torch.isclose(t["acoustic_recon"], torch.tensor(w[k100] * 9.0 / 24, dtype=torch.float32), rtol=1e-4)
+    out = crit({"x_hat": pred, "likelihoods": {"y": torch.ones(2, 4, 1, 1)}}, truth)
+    assert torch.isclose(out["loss"], out["recon_loss"] + out["acoustic_recon_loss"])
+    try:
+        FixedWeightSSPLoss(loss_dict={"recon": 1.0, "acoustic_recon": 1.0}, depth_array=z, lmbda=1.0)._liang_terms(
+            pred, truth, {"acoustic_recon"}); raise AssertionError("missing weights accepted")
+    except ValueError:
+        pass
+    print("acoustic_recon ok")
