@@ -942,6 +942,10 @@ class FixedWeightSSPLoss(StructureLossMixin, nn.Module):
         aw = kwargs.get("acoustic_weights")
         self.register_buffer("_acoustic_w", torch.as_tensor(
             np.zeros(0) if aw is None else np.asarray(aw), dtype=torch.float32))
+        # acoustic_quad (ch. 3, 26 Nov 2026): full 157x157 Gauss-Newton metric from the k-kernel (SPEC-kernel-loss.md)
+        am = kwargs.get("acoustic_matrix")
+        self.register_buffer("_acoustic_M", torch.as_tensor(
+            np.zeros((0, 0)) if am is None else np.asarray(am), dtype=torch.float32))
         self.auto_normalize = auto_normalize
         self.use_factor_weights = use_factor_weights
         self.factor_warmup_epochs = factor_warmup_epochs
@@ -1001,6 +1005,17 @@ class FixedWeightSSPLoss(StructureLossMixin, nn.Module):
                 # physical squared error per level, (m/s)^2, weighted by TL sensitivity
                 err2 = (self._physical(pred) - self._physical(target)).square().mean(dim=(0, 2, 3))
                 terms["acoustic_recon"] = (err2 * w.to(err2)).sum()
+        if "acoustic_quad" in wanted:
+            m = getattr(self, "_acoustic_M", torch.zeros(0, 0))
+            if m.numel() == 0:
+                if float(self.loss_dict.get("acoustic_quad", 0.0) or 0.0) > 0:
+                    raise ValueError("acoustic_quad needs acoustic_matrix (ACOUSTIC_M in train.py)")
+            else:
+                if m.shape[0] != pred.shape[1]:
+                    raise ValueError(f"acoustic_matrix is {tuple(m.shape)}, input has {pred.shape[1]} levels")
+                e = self._physical(pred) - self._physical(target)  # m/s
+                n = e.shape[0] * e.shape[2] * e.shape[3]
+                terms["acoustic_quad"] = torch.einsum("nchw,cd,ndhw->", e, m.to(e), e) / n
         if "smse" in wanted:
             if self._depth_m.numel() == 0:
                 raise ValueError("smse needs depth_array in the loss constructor")
@@ -1229,7 +1244,7 @@ class FixedWeightSSPLoss(StructureLossMixin, nn.Module):
         Terms not in ``names`` keep their factor weights. Call after
         :meth:`apply_factor_weights`; can be called again later to re-calibrate.
         """
-        names = [n for n in (names or STRUCTURE_LOSS_TERMS + ("acoustic_recon",))
+        names = [n for n in (names or STRUCTURE_LOSS_TERMS + ("acoustic_recon", "acoustic_quad"))
                  if float(self.loss_dict.get(n, 0.0) or 0.0) > 0]
         if not names or "recon" not in self.loss_dict:
             return {}
@@ -2004,4 +2019,16 @@ if __name__ == "__main__":
             pred, truth, {"acoustic_recon"}); raise AssertionError("missing weights accepted")
     except ValueError:
         pass
-    print("acoustic_recon ok")
+    # acoustic_quad with M = diag(w) equals acoustic_recon (22 Nov weights path)
+    crit = FixedWeightSSPLoss(loss_dict={"recon": 1.0, "acoustic_recon": 1.0, "acoustic_quad": 1.0}, use_smoothl1=False,
+                              lmbda=1.0, depth_array=z, acoustic_weights=w, acoustic_matrix=np.diag(w),
+                              norm_stats={"method": "mean_std_along_depth", "params": params})
+    pred = truth + torch.randn_like(truth) * 0.3
+    t = crit._liang_terms(pred, truth, {"acoustic_recon", "acoustic_quad"})
+    assert torch.isclose(t["acoustic_quad"], t["acoustic_recon"], rtol=1e-4), t
+    try:
+        FixedWeightSSPLoss(loss_dict={"recon": 1.0, "acoustic_quad": 1.0}, depth_array=z, lmbda=1.0)._liang_terms(
+            pred, truth, {"acoustic_quad"}); raise AssertionError("missing matrix accepted")
+    except ValueError:
+        pass
+    print("acoustic_recon ok, acoustic_quad ok")

@@ -859,6 +859,7 @@ if __name__ == '__main__':
                     "local_extrema_pos": 0.0,     # E1b. Keep ONE entry: in a dict literal the last duplicate wins silently
                     "prominence_recall": 0.0,
                     "acoustic_recon": 0.0,        # ch. 3: physical MSE weighted by k-kernel S(z); needs ACOUSTIC_W
+                    "acoustic_quad": 0.0,         # ch. 3: e^T M e, k-kernel Gauss-Newton metric; needs ACOUSTIC_M
         },
         "structure_params": {
                              # matched_extrema_pos only (E1 as run); inert otherwise
@@ -917,6 +918,9 @@ if __name__ == '__main__':
     if env("ACOUSTIC_W"):  # ch. 3: npz with w (157,) and z from FASCINATION/pickle/k_kernel/acoustic_w.npz
         import numpy as np
         loss_params["acoustic_weights"] = np.load(env("ACOUSTIC_W"))["w"]
+    if env("ACOUSTIC_M"):  # ch. 3: npz with M (157, 157) from FASCINATION/pickle/k_kernel/acoustic_M.npz
+        import numpy as np
+        loss_params["acoustic_matrix"] = np.load(env("ACOUSTIC_M"))["M"]
 
 
 #        "lambda_deriv": 0.1,
